@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── Surfaces (lighter, more contrast) ──────────────────── */
+    --color-bg-primary:   #0d1526;   /* page bg — rich dark navy */
+    --color-bg-secondary: #16213a;   /* sidebar / topbar */
+    --color-bg-card:      #1e293b;   /* card surface */
+    --color-bg-elevated:  #263347;   /* elevated panels / dropdowns */
+    --color-bg-hover:     #2d3d54;   /* hover state */
+
+    /* ── Borders ─────────────────────────────────────────────── */
+    --color-border:       #2d3d54;
+    --color-border-hover: #3f536e;
+
+    /* ── Text ────────────────────────────────────────────────── */
+    --color-text-primary:   #f1f5f9;  /* near-white */
+    --color-text-secondary: #cbd5e1;  /* lighter secondary */
+    --color-text-muted:     #64748b;
+
+    /* ── Accent (bright vivid blue) ──────────────────────────── */
+    --color-accent:       #3b82f6;
+    --color-accent-hover: #60a5fa;
+    --color-accent-dim:   rgba(59, 130, 246, 0.15);
+  }
+
+  html, body, #root {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #2d3d54 transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #2d3d54;
+    border-radius: 3px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: #3f536e;
+  }
+}
+
+@layer components {
+  /* ── Cards ─────────────────────────────────────────────────── */
+  .card {
+    @apply rounded-xl border border-[#2d3d54] bg-[#1e293b] backdrop-blur-sm;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-200 hover:border-[#3f536e] hover:bg-[#263347];
+  }
+
+  /* ── Buttons ────────────────────────────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-mq-600 px-4 py-2.5
+           text-sm font-semibold text-white transition-all duration-200
+           hover:bg-mq-500 active:scale-[0.98]
+           shadow-sm shadow-mq-600/30
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg
+           border border-[#2d3d54] bg-[#1e293b] px-4 py-2.5
+           text-sm font-medium text-slate-200
+           transition-all duration-200
+           hover:border-[#3f536e] hover:bg-[#263347] hover:text-white
+           active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5
+           text-sm font-medium text-slate-400 transition-all duration-200
+           hover:bg-[#1e293b] hover:text-slate-200;
+  }
+
+  /* ── Form elements ──────────────────────────────────────────── */
+  .input {
+    @apply w-full rounded-lg border border-[#2d3d54] bg-[#1e293b] px-3.5 py-2.5
+           text-sm text-white placeholder-slate-500 outline-none transition-all duration-200
+           focus:border-mq-500 focus:ring-2 focus:ring-mq-500/25;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-slate-300 mb-1.5;
+  }
+
+  /* ── Badges ─────────────────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+
+  .badge-ahead {
+    @apply badge bg-emerald-500/15 text-emerald-400 border border-emerald-500/25;
+  }
+
+  .badge-ontrack {
+    @apply badge bg-blue-500/15 text-blue-400 border border-blue-500/25;
+  }
+
+  .badge-behind {
+    @apply badge bg-red-500/15 text-red-400 border border-red-500/25;
+  }
+
+  .badge-warning {
+    @apply badge bg-amber-500/15 text-amber-400 border border-amber-500/25;
+  }
+
+  /* ── Typography ─────────────────────────────────────────────── */
+  .section-title {
+    @apply text-lg font-semibold text-white font-display;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold text-white font-display tracking-tight;
+  }
+
+  /* ── Stat card ──────────────────────────────────────────────── */
+  .stat-card {
+    @apply card p-5 flex flex-col gap-1;
+  }
+
+  /* ── Table ──────────────────────────────────────────────────── */
+  .table-row-hover {
+    @apply transition-colors duration-100 hover:bg-[#1e293b];
+  }
+}
+
+/* Three.js canvas container */
+.ifc-viewer-container canvas {
+  outline: none;
+  border-radius: 0.75rem;
+}

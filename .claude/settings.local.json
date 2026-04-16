@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(./node_modules/.bin/tsc --noEmit --pretty)",
+      "Bash(npm install:*)",
+      "Bash(psql -h localhost -U miqyas -d miqyas -c ':*)",
+      "Bash(curl -s -X POST http://localhost:8000/api/v1/projects/ -H 'Content-Type: application/json' -d '{\"name\":\"Test Project\",\"code\":\"TEST\"}')",
+      "Bash(python3 -m json.tool)",
+      "Bash(.venv/bin/python3.12 -c ':*)",
+      "Bash(.venv/bin/pip install:*)",
+      "Bash(python3.12 -m venv .venv --clear)",
+      "Bash(.venv/bin/python3.12 -m alembic upgrade head)",
+      "Bash(.venv/bin/uvicorn app.main:app --reload --port 8000)",
+      "Bash(curl -s http://localhost:8000/api/v1/health)",
+      "Bash(kill -9 79423)",
+      "Bash(curl -s -X POST http://localhost:8000/api/v1/projects/ -H 'Content-Type: application/json' -d '{\"name\":\"Test Project\",\"code\":\"TST\",\"description\":\"test\"}')",
+      "Bash(sed -i '' 's/stroke=\"#1e293b\"/stroke=\"#263347\"/g' /Users/asylkhan/Projects/miqyas/frontend/src/pages/TradesPage.tsx)",
+      "Bash(sed -i '' 's|const NO_PROGRESS_COLOR = \"#334155\";|const NO_PROGRESS_COLOR = \"#3a506b\";|g' /Users/asylkhan/Projects/miqyas/frontend/src/pages/BIMViewerPage.tsx)",
+      "Bash(sed -i '' 's|fill: \"rgba\\(51,65,85,0.15\\)\",    stroke: \"#334155\"|fill: \"rgba\\(58,80,107,0.15\\)\",    stroke: \"#3a506b\"|g' /Users/asylkhan/Projects/miqyas/frontend/src/pages/ReprojectionViewPage.tsx)",
+      "Bash(npm run:*)",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}

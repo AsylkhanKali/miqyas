@@ -1,0 +1,41 @@
+# MIQYAS — Caddy Reverse Proxy Configuration
+#
+# Replace {$DOMAIN} with your actual domain (e.g., miqyas.example.com)
+# or set DOMAIN env var. Caddy auto-provisions Let's Encrypt TLS.
+#
+# For local dev without a domain, use: localhost:443
+
+{$DOMAIN:localhost} {
+	# API — proxy to FastAPI backend
+	handle /api/* {
+		reverse_proxy backend:8000
+	}
+
+	# Health check (direct backend access)
+	handle /api/v1/health {
+		reverse_proxy backend:8000
+	}
+
+	# Frontend — proxy to nginx SPA
+	handle {
+		reverse_proxy frontend:3000
+	}
+
+	# Security headers
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	# Compression
+	encode gzip zstd
+
+	# Logging
+	log {
+		output stdout
+		format json
+	}
+}

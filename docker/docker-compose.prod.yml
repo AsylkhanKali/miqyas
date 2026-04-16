@@ -1,0 +1,237 @@
+version: "3.9"
+
+# Production Docker Compose for MIQYAS
+# Usage: docker compose -f docker/docker-compose.prod.yml up -d
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: miqyas-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-miqyas}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-miqyas}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-miqyas}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: miqyas-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: miqyas-backend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file:
+      - ../.env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-miqyas}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-miqyas}
+      DATABASE_URL_SYNC: postgresql://${POSTGRES_USER:-miqyas}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-miqyas}
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      DEBUG: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/uploads
+    command: >
+      sh -c "alembic upgrade head &&
+             gunicorn app.main:app -c gunicorn.conf.py"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  celery-default:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: miqyas-celery-default
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-miqyas}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-miqyas}
+      DATABASE_URL_SYNC: postgresql://${POSTGRES_USER:-miqyas}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-miqyas}
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/uploads
+    command: >
+      celery -A app.tasks.worker worker
+      --loglevel=warning
+      --concurrency=4
+      --hostname=default@%h
+      -Q parsing,video,celery,default
+
+  celery-gpu:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: miqyas-celery-gpu
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-miqyas}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-miqyas}
+      DATABASE_URL_SYNC: postgresql://${POSTGRES_USER:-miqyas}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-miqyas}
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/uploads
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: >
+      celery -A app.tasks.worker worker
+      --loglevel=warning
+      --concurrency=1
+      --hostname=gpu@%h
+      -Q gpu
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    container_name: miqyas-frontend
+    restart: unless-stopped
+    expose:
+      - "3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ── Caddy Reverse Proxy (auto-TLS) ─────────────────────────────────
+  caddy:
+    image: caddy:2-alpine
+    container_name: miqyas-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+  # ── Automated Database Backups ──────────────────────────────────────
+  backup:
+    image: prodrigestivill/postgres-backup-local:15
+    container_name: miqyas-backup
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-miqyas}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-miqyas}
+      SCHEDULE: "@daily"
+      BACKUP_KEEP_DAYS: 7
+      BACKUP_KEEP_WEEKS: 4
+      BACKUP_KEEP_MONTHS: 6
+      HEALTHCHECK_PORT: 8080
+    volumes:
+      - backups:/backups
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+
+  # ── Monitoring: Prometheus + Grafana ─────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: miqyas-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=30d"
+    expose:
+      - "9090"
+
+  grafana:
+    image: grafana/grafana:11.0.0
+    container_name: miqyas-grafana
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-miqyas}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+
+volumes:
+  pgdata:
+  redisdata:
+  uploads:
+  backups:
+  caddy_data:
+  caddy_config:
+  prometheus_data:
+  grafana_data:

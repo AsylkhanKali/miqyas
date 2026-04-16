@@ -1,17 +1,39 @@
-# Python / Backend
+# ── Python / Backend ─────────────────────────────────────────────
 backend/.venv/
+backend/venv/
 backend/__pycache__/
 backend/**/__pycache__/
-backend/*.pyc
+backend/**/*.pyc
 backend/.env
 backend/uploads/
 backend/logs/
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/*.egg-info/
 
-# Frontend
+# ── Frontend ──────────────────────────────────────────────────────
 frontend/node_modules/
 frontend/dist/
 frontend/.env
+frontend/.env.local
+frontend/.env.production
 
-# General
+# ── General ───────────────────────────────────────────────────────
 .DS_Store
+Thumbs.db
 *.log
+*.tmp
+.idea/
+.vscode/
+*.swp
+
+# ── Large binary assets (не хранить в git) ───────────────────────
+assets/
+backend/uploads/
+*.ifc
+*.mp4
+*.avi
+*.mov
+*.xer
+*.p6xml

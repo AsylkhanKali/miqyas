@@ -1,0 +1,54 @@
+# ── Лёгкий requirements для Railway (только API, без ML/torch) ────
+
+# Web Framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.18
+
+# Database
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+psycopg2-binary==2.9.10
+alembic==1.14.1
+
+# Celery (только broker, без ML воркеров)
+celery[redis]==5.4.0
+redis==5.2.1
+
+# Validation / Config
+pydantic==2.10.4
+pydantic-settings==2.7.1
+python-dotenv==1.0.1
+
+# Auth
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# File handling
+aiofiles==24.1.0
+python-magic==0.4.27
+
+# IFC / Schedule parsing
+ifcopenshell==0.8.1
+lxml==5.3.0
+
+# Basic image/math (лёгкие версии)
+numpy==2.2.1
+Pillow==11.1.0
+scipy==1.17.1
+trimesh==4.11.5
+shapely==2.1.2
+
+# Cloud Storage
+boto3>=1.34.0
+
+# Report Generation
+reportlab==4.2.5
+
+# Production Server
+gunicorn==23.0.0
+
+# Monitoring
+sentry-sdk[fastapi]==2.19.2
+structlog>=24.1.0
+prometheus-fastapi-instrumentator>=7.0.0

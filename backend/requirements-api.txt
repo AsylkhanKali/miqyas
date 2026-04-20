@@ -28,6 +28,9 @@ passlib[bcrypt]==1.7.4
 aiofiles==24.1.0
 python-magic==0.4.27
 
+# HTTP client (Procore integration)
+httpx==0.28.1
+
 # Schedule parsing (IFC parsing runs in worker, not API server)
 lxml==5.3.0
 

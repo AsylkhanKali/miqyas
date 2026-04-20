@@ -9,16 +9,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 COPY requirements-api.txt .
-
-# Install the heaviest packages first in a separate layer so Docker
-# caches them independently — avoids re-downloading on every code change.
-RUN pip install --no-cache-dir --timeout 120 --retries 5 \
-    ifcopenshell==0.8.1 \
-    "scipy>=1.12.0" \
-    "boto3>=1.34.0"
-
-# Install remaining dependencies
-RUN pip install --no-cache-dir --timeout 120 --retries 5 -r requirements-api.txt
+RUN pip install --no-cache-dir --timeout 120 -r requirements-api.txt
 
 COPY . .
 

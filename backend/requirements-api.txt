@@ -1,4 +1,6 @@
-# ── Лёгкий requirements для Railway (только API, без ML/torch) ────
+# Minimal requirements for the Railway web server.
+# Heavy ML / IFC packages (ifcopenshell, torch, scipy, trimesh) belong
+# in the Celery worker image — the API only dispatches tasks, never runs them.
 
 # Web Framework
 fastapi==0.115.6
@@ -11,7 +13,7 @@ asyncpg==0.30.0
 psycopg2-binary==2.9.10
 alembic==1.14.1
 
-# Celery (только broker, без ML воркеров)
+# Celery (task dispatch only — workers run separately)
 celery[redis]==5.4.0
 redis==5.2.1
 
@@ -28,22 +30,16 @@ passlib[bcrypt]==1.7.4
 aiofiles==24.1.0
 python-magic==0.4.27
 
-# IFC / Schedule parsing
-ifcopenshell==0.8.1
+# Schedule parsing (XER) — lxml is small (~5 MB)
 lxml==5.3.0
 
-# Basic image/math (лёгкие версии)
+# Report generation — needed for PDF endpoints
 numpy==2.2.1
 Pillow==11.1.0
-scipy>=1.12.0
-trimesh>=4.0.0
-shapely==2.1.2
+reportlab==4.2.5
 
 # Cloud Storage
 boto3>=1.34.0
-
-# Report Generation
-reportlab==4.2.5
 
 # Production Server
 gunicorn==23.0.0

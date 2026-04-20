@@ -15,4 +15,4 @@ COPY . .
 
 RUN mkdir -p uploads/ifc uploads/video uploads/frames uploads/reports
 
-CMD celery -A app.tasks.worker worker --loglevel=info --queues=default,parsing
+CMD ["celery", "-A", "app.tasks.worker", "worker", "--loglevel=info", "--queues=default,parsing", "--concurrency=2"]

@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "DOCKERFILE",
-    "dockerfilePath": "Dockerfile.worker"
+    "dockerfilePath": "backend/Dockerfile.worker"
   },
   "deploy": {
     "startCommand": "sh -c 'celery -A app.tasks.worker worker --loglevel=info --queues=default,parsing'",

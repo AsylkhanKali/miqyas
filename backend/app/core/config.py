@@ -3,6 +3,7 @@
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -22,6 +23,23 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "postgresql+asyncpg://miqyas:miqyas_dev@localhost:5432/miqyas"
     database_url_sync: str = "postgresql://miqyas:miqyas_dev@localhost:5432/miqyas"
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def fix_async_database_url(cls, v: str) -> str:
+        # Railway and other providers supply postgres:// or postgresql:// without async driver
+        if v.startswith("postgres://"):
+            return v.replace("postgres://", "postgresql+asyncpg://", 1)
+        if v.startswith("postgresql://") and "+asyncpg" not in v:
+            return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return v
+
+    @field_validator("database_url_sync", mode="before")
+    @classmethod
+    def fix_sync_database_url(cls, v: str) -> str:
+        if v.startswith("postgres://"):
+            return v.replace("postgres://", "postgresql://", 1)
+        return v
 
     # Redis / Celery
     redis_url: str = "redis://localhost:6379/0"

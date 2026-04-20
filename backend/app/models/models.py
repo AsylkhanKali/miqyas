@@ -16,7 +16,6 @@ Tables cover the entire MVP:
 
 import enum
 import uuid
-from datetime import date, datetime
 
 from sqlalchemy import (
     Boolean,
@@ -28,7 +27,6 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
-    JSON,
     String,
     Text,
     UniqueConstraint,
@@ -38,7 +36,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.core.database import Base
-
 
 # ── Helper ──────────────────────────────────────────────────────────────
 
@@ -51,14 +48,14 @@ def pk() -> Column:
 
 # ── Enums ───────────────────────────────────────────────────────────────
 
-class ProjectStatus(str, enum.Enum):
+class ProjectStatus(enum.StrEnum):
     ACTIVE = "active"
     PAUSED = "paused"
     COMPLETED = "completed"
     ARCHIVED = "archived"
 
 
-class ElementCategory(str, enum.Enum):
+class ElementCategory(enum.StrEnum):
     """High-level BIM element categories for segmentation mapping."""
     WALL = "wall"
     SLAB = "slab"
@@ -75,14 +72,14 @@ class ElementCategory(str, enum.Enum):
     OTHER = "other"
 
 
-class ActivityStatus(str, enum.Enum):
+class ActivityStatus(enum.StrEnum):
     NOT_STARTED = "not_started"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
     DELAYED = "delayed"
 
 
-class VideoStatus(str, enum.Enum):
+class VideoStatus(enum.StrEnum):
     UPLOADING = "uploading"
     UPLOADED = "uploaded"
     PROCESSING = "processing"
@@ -93,12 +90,12 @@ class VideoStatus(str, enum.Enum):
     FAILED = "failed"
 
 
-class AlignmentMethod(str, enum.Enum):
+class AlignmentMethod(enum.StrEnum):
     COLMAP = "colmap"
     MANUAL = "manual"
 
 
-class DeviationType(str, enum.Enum):
+class DeviationType(enum.StrEnum):
     AHEAD = "ahead"
     ON_TRACK = "on_track"
     BEHIND = "behind"
@@ -106,14 +103,14 @@ class DeviationType(str, enum.Enum):
     EXTRA_WORK = "extra_work"
 
 
-class ReportStatus(str, enum.Enum):
+class ReportStatus(enum.StrEnum):
     PENDING = "pending"
     GENERATING = "generating"
     READY = "ready"
     FAILED = "failed"
 
 
-class ProcoreEntityType(str, enum.Enum):
+class ProcoreEntityType(enum.StrEnum):
     RFI = "rfi"
     ISSUE = "issue"
     OBSERVATION = "observation"

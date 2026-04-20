@@ -71,7 +71,7 @@ app.add_middleware(
 app.include_router(api_router, prefix=settings.api_v1_prefix)
 
 # ── Prometheus Metrics ────────────────────────────────────────────────
-from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_fastapi_instrumentator import Instrumentator  # noqa: E402
 
 Instrumentator(
     should_group_status_codes=True,

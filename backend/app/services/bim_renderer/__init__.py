@@ -16,7 +16,6 @@ Falls back to bbox convex-hull projection when mesh data is unavailable.
 
 import logging
 from pathlib import Path
-from typing import Any
 from uuid import UUID
 
 import numpy as np
@@ -24,15 +23,15 @@ from PIL import Image, ImageDraw
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import BIMElement, CameraAlignment, CameraPose, Frame
+from app.models import BIMElement, CameraAlignment, CameraPose
 
 logger = logging.getLogger(__name__)
 
 # Try to import mesh rendering dependencies; mark available if found
 _HAS_MESH_RENDERER = False
 try:
-    import trimesh
     import pyrender
+    import trimesh
 
     _HAS_MESH_RENDERER = True
 except ImportError:

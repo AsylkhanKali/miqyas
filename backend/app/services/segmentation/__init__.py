@@ -20,7 +20,6 @@ For production with fine-tuned models, swap to MMSeg/MMDet.
 import logging
 import time
 from pathlib import Path
-from typing import Any
 from uuid import UUID
 
 import numpy as np
@@ -63,8 +62,6 @@ ADE20K_TO_CONSTRUCTION: dict[int, str] = {
     28: "slab",      # rug (floor-level)
     # Columns
     42: "column",    # column
-    # Ceilings
-    5: "ceiling",    # ceiling
     # Stairs
     53: "stair",     # stairs / stairway
     # Railings
@@ -167,7 +164,7 @@ class SegmentationService:
         # Get frames to process
         query = select(Frame).where(Frame.capture_id == capture_id)
         if keyframes_only:
-            query = query.where(Frame.is_keyframe == True)
+            query = query.where(Frame.is_keyframe)
         query = query.order_by(Frame.frame_number)
         frames = (await self.db.execute(query)).scalars().all()
 
@@ -211,8 +208,8 @@ class SegmentationService:
             return
 
         try:
+            import torch  # noqa: F401
             from transformers import Mask2FormerForUniversalSegmentation, Mask2FormerImageProcessor
-            import torch
 
             logger.info(f"Loading model: {config.model_name} on {config.device}")
             self._processor = Mask2FormerImageProcessor.from_pretrained(config.model_name)

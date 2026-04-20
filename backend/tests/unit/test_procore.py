@@ -14,13 +14,11 @@ Tests cover:
 import hashlib
 import hmac
 import uuid
-from datetime import datetime, timedelta, timezone
-from typing import Any
+from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
-import pytest_asyncio
 from httpx import AsyncClient
 
 from app.services.procore import (
@@ -29,7 +27,6 @@ from app.services.procore import (
     _fmt,
     _template_context,
 )
-
 
 # ── Helpers ────────────────────────────────────────────────────────────
 
@@ -238,7 +235,7 @@ class TestTokenManagement:
         config.id = uuid.uuid4()
         config.access_token = "old-access-token"
         config.refresh_token = "old-refresh-token" if has_refresh else None
-        config.token_expires_at = datetime.now(timezone.utc) + timedelta(seconds=expires_in_seconds)
+        config.token_expires_at = datetime.now(UTC) + timedelta(seconds=expires_in_seconds)
         return config
 
     @pytest.mark.asyncio
@@ -302,7 +299,7 @@ class TestTokenManagement:
             MockClient.return_value.__aenter__ = AsyncMock(return_value=instance)
             MockClient.return_value.__aexit__ = AsyncMock(return_value=False)
 
-            result = await client._refresh_token(config)
+            await client._refresh_token(config)
             assert config.access_token == "brand-new-token"
             assert config.refresh_token == "brand-new-refresh"
 
@@ -316,7 +313,7 @@ class TestPushFlow:
         config.id = uuid.uuid4()
         config.access_token = "valid-token"
         config.refresh_token = "refresh"
-        config.token_expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+        config.token_expires_at = datetime.now(UTC) + timedelta(hours=1)
         config.procore_project_id = "12345"
         config.procore_company_id = "67890"
         config.field_mapping = DEFAULT_FIELD_MAPPING

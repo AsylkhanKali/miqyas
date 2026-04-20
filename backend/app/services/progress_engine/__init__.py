@@ -16,8 +16,6 @@ IoU thresholds:
 
 import logging
 from datetime import date
-from pathlib import Path
-from typing import Any
 from uuid import UUID
 
 import numpy as np
@@ -27,7 +25,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import (
     Activity,
-    BIMElement,
     DeviationType,
     ElementActivityLink,
     Frame,
@@ -36,7 +33,6 @@ from app.models import (
     SegmentationResult,
     VideoCapture,
 )
-from app.services.segmentation import ADE20K_TO_CONSTRUCTION
 
 logger = logging.getLogger(__name__)
 
@@ -186,7 +182,6 @@ class ProgressComparisonEngine:
 
         for element_id, comps in element_comparisons.items():
             # Aggregate: average IoU across all frames where this element appears
-            avg_iou = np.mean([c.iou_score for c in comps])
             max_iou = max(c.iou_score for c in comps)
             is_present = any(c.is_present for c in comps)
             avg_confidence = np.mean([c.confidence for c in comps])

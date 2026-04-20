@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.models import Activity, Project, Schedule
-from app.schemas import ActivityListResponse, ActivityResponse, ScheduleResponse
+from app.schemas import ActivityListResponse, ScheduleResponse
 
 router = APIRouter(prefix="/projects/{project_id}/schedules", tags=["schedules"])
 settings = get_settings()

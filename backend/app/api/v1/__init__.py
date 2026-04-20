@@ -1,7 +1,7 @@
 """API v1 — aggregate all sub-routers."""
 
 import time
-from typing import Optional
+from datetime import UTC
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
@@ -11,13 +11,13 @@ from app.api.v1.bim import router as bim_router
 from app.api.v1.captures import router as captures_router
 from app.api.v1.cv_pipeline import router as cv_router
 from app.api.v1.pipeline import router as pipeline_router
+from app.api.v1.procore import router as procore_router
 from app.api.v1.projects import router as projects_router
 from app.api.v1.reports import router as reports_router
-from app.api.v1.procore import router as procore_router
 from app.api.v1.schedules import router as schedules_router
 from app.core.config import get_settings
 from app.core.database import get_db
-from app.schemas import DashboardStats, HealthResponse, ServiceStatus, InvestorDashboard
+from app.schemas import DashboardStats, HealthResponse, InvestorDashboard, ServiceStatus
 
 _START_TIME = time.time()
 
@@ -84,7 +84,7 @@ async def system_capabilities():
     # ── pyrender / trimesh (BIM mesh rendering) ───────────────────────
     try:
         import pyrender  # noqa: F401
-        import trimesh   # noqa: F401
+        import trimesh  # noqa: F401
         caps["bim_mesh_renderer"] = {"available": True}
     except ImportError:
         caps["bim_mesh_renderer"] = {
@@ -170,17 +170,25 @@ async def investor_dashboard(db: AsyncSession = Depends(get_db)):
     Returns: KPI bar, deviation donut, per-project health scores,
     top 5 most critical behind-schedule elements.
     """
-    from datetime import datetime, timezone
-    from sqlalchemy import select, func, case
+    from datetime import datetime
+
+    from sqlalchemy import func, select
+
     from app.models import (
-        Project, ProgressItem, DeviationType,
-        BIMElement, Activity, ElementActivityLink, VideoCapture,
+        Activity,
+        BIMElement,
+        DeviationType,
+        ProgressItem,
+        Project,
+        VideoCapture,
     )
     from app.schemas import (
-        DeviationBreakdown, ProjectHealthCard, CriticalElement,
+        CriticalElement,
+        DeviationBreakdown,
+        ProjectHealthCard,
     )
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     # ── Global deviation counts ────────────────────────────────────────
     dev_rows = (await db.execute(
@@ -209,21 +217,7 @@ async def investor_dashboard(db: AsyncSession = Depends(get_db)):
 
     health_cards: list[ProjectHealthCard] = []
     for proj in projects_result:
-        # Count progress items per deviation type for this project
-        proj_items = (await db.execute(
-            select(ProgressItem.deviation_type, func.count().label("cnt"))
-            .join(BIMElement, ProgressItem.element_id == BIMElement.id)
-            .where(BIMElement.bim_model_id.in_(
-                select(func.unnest(func.array(
-                    select(BIMElement.bim_model_id)
-                    .where(BIMElement.id == ProgressItem.element_id)
-                    .scalar_subquery()
-                )))
-            ))
-            .group_by(ProgressItem.deviation_type)
-        )).all()
-
-        # Simpler: direct join through capture → project
+        # Direct join through capture → project
         proj_counts_result = (await db.execute(
             select(ProgressItem.deviation_type, func.count().label("cnt"))
             .join(VideoCapture, ProgressItem.capture_id == VideoCapture.id)
@@ -335,7 +329,7 @@ async def investor_dashboard(db: AsyncSession = Depends(get_db)):
 
 @api_router.get("/stats/progress-timeline", tags=["system"])
 async def progress_timeline(
-    project_id: Optional[str] = None,
+    project_id: str | None = None,
     db: AsyncSession = Depends(get_db),
 ):
     """Time-series progress data for S-curve chart.
@@ -343,9 +337,9 @@ async def progress_timeline(
     Returns per-capture averages of observed vs scheduled percent,
     used to render the Actual vs Planned S-curve on the dashboard.
     """
-    from typing import Optional as _Opt
-    from sqlalchemy import select, func
-    from app.models import VideoCapture, ProgressItem
+    from sqlalchemy import func, select
+
+    from app.models import ProgressItem, VideoCapture
 
     query = (
         select(

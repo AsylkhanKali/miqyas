@@ -13,11 +13,9 @@ Usage:
 """
 
 import logging
-from pathlib import Path
 from uuid import UUID
 
 import numpy as np
-from PIL import Image
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -48,7 +46,8 @@ class QualityReport:
         self.warnings: list[str] = []
 
     def to_dict(self) -> dict:
-        pct = lambda k: round(self.iou_distribution[k] / max(self.total_comparisons, 1) * 100, 1)
+        def pct(k: str) -> float:
+            return round(self.iou_distribution[k] / max(self.total_comparisons, 1) * 100, 1)
         return {
             "total_comparisons": self.total_comparisons,
             "mesh_rendered": self.mesh_rendered,

@@ -2,17 +2,16 @@
 
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.models import (
-    ProgressComparison,
+    Frame,
     ProgressItem,
     SegmentationResult,
-    Frame,
     VideoCapture,
     VideoStatus,
 )

@@ -10,7 +10,7 @@ import hashlib
 import hmac
 import logging
 import uuid as _uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -113,7 +113,7 @@ class ProcoreClient:
             resp.raise_for_status()
             token_data = resp.json()
 
-        expires_at = datetime.now(timezone.utc) + timedelta(seconds=token_data["expires_in"])
+        expires_at = datetime.now(UTC) + timedelta(seconds=token_data["expires_in"])
 
         # Upsert config for the project
         result = await self.db.execute(
@@ -160,7 +160,7 @@ class ProcoreClient:
 
         config.access_token = token_data["access_token"]
         config.refresh_token = token_data["refresh_token"]
-        config.token_expires_at = datetime.now(timezone.utc) + timedelta(
+        config.token_expires_at = datetime.now(UTC) + timedelta(
             seconds=token_data["expires_in"]
         )
         await self.db.flush()
@@ -169,7 +169,7 @@ class ProcoreClient:
 
     async def _ensure_token(self, config: ProcoreConfig) -> str:
         """Return a valid access token, refreshing if within the expiry buffer."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if config.token_expires_at is None or config.token_expires_at - TOKEN_EXPIRY_BUFFER <= now:
             config = await self._refresh_token(config)
         return config.access_token

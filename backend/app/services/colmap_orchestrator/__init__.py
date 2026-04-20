@@ -15,13 +15,10 @@ Dependencies:
 """
 
 import asyncio
-import json
 import logging
-import struct
 from collections import namedtuple
 from pathlib import Path
-from typing import Any
-from uuid import UUID, uuid4
+from uuid import UUID
 
 import numpy as np
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -259,7 +256,7 @@ class COLMAPOrchestrator:
         from sqlalchemy import select
         result = await self.db.execute(
             select(Frame)
-            .where(Frame.capture_id == capture_id, Frame.is_keyframe == True)
+            .where(Frame.capture_id == capture_id, Frame.is_keyframe)
             .order_by(Frame.frame_number)
         )
         return list(result.scalars().all())
@@ -281,7 +278,7 @@ class COLMAPOrchestrator:
 
         try:
             stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=timeout)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             proc.kill()
             raise RuntimeError(f"COLMAP {label} timed out after {timeout}s")
 

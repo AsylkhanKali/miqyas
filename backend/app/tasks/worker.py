@@ -30,9 +30,9 @@ celery_app.conf.update(
     },
 )
 
-import app.tasks.ifc_tasks       # noqa: F401
-import app.tasks.p6_tasks        # noqa: F401
-import app.tasks.video_tasks     # noqa: F401
-import app.tasks.cv_tasks        # noqa: F401
-import app.tasks.pipeline        # noqa: F401
-import app.tasks.procore_tasks   # noqa: F401
+import app.tasks.cv_tasks  # noqa: E402, F401
+import app.tasks.ifc_tasks  # noqa: E402, F401
+import app.tasks.p6_tasks  # noqa: E402, F401
+import app.tasks.pipeline  # noqa: E402, F401
+import app.tasks.procore_tasks  # noqa: E402, F401
+import app.tasks.video_tasks  # noqa: E402, F401

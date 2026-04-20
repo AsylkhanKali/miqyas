@@ -1,7 +1,5 @@
 """Procore integration API — OAuth2 flow, config, RFI/Issue push, audit logs."""
 
-import base64
-import json
 import logging
 from uuid import UUID
 
@@ -12,15 +10,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.database import get_db
-from app.core.exceptions import ProcoreNotConfiguredError
-from app.models import ProcoreConfig, ProcorePushLog, ProcoreEntityType
+from app.models import ProcoreConfig, ProcorePushLog
 from app.schemas import (
     ProcoreAuthUrlResponse,
+    ProcoreBulkPushRequest,
+    ProcoreBulkPushResponse,
     ProcoreConfigResponse,
     ProcoreConfigUpdate,
     ProcoreProjectListItem,
-    ProcoreBulkPushRequest,
-    ProcoreBulkPushResponse,
     ProcorePushLogResponse,
     ProcorePushRequest,
     ProcorePushResponse,
@@ -319,6 +316,7 @@ async def get_bulk_push_status(
 ):
     """Poll the status of a bulk push task."""
     from celery.result import AsyncResult
+
     from app.tasks.worker import celery_app
 
     result = AsyncResult(task_id, app=celery_app)

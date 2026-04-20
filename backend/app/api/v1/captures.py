@@ -182,7 +182,7 @@ async def list_frames(
 ):
     query = select(Frame).where(Frame.capture_id == capture_id)
     if keyframes_only:
-        query = query.where(Frame.is_keyframe == True)
+        query = query.where(Frame.is_keyframe)
     query = query.order_by(Frame.frame_number).offset(skip).limit(limit)
     result = await db.execute(query)
     return result.scalars().all()
@@ -294,7 +294,8 @@ async def get_reprojection(
     """
     import numpy as np
     from sqlalchemy import select
-    from app.models import BIMElement, BIMModel, ProgressItem
+
+    from app.models import BIMElement, ProgressItem
 
     # ── Load alignment ────────────────────────────────────────────────────
     result = await db.execute(

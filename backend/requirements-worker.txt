@@ -1,0 +1,43 @@
+# ── Worker requirements (IFC/P6 parsing + Celery) ────
+
+# Celery
+celery[redis]==5.4.0
+redis==5.2.1
+
+# Database
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+psycopg2-binary==2.9.10
+
+# Validation / Config
+pydantic==2.10.4
+pydantic-settings==2.7.1
+python-dotenv==1.0.1
+
+# File handling
+aiofiles==24.1.0
+python-magic==0.4.27
+
+# IFC parsing
+ifcopenshell==0.8.1
+lxml==5.3.0
+
+# Schedule parsing
+numpy==2.2.1
+scipy==1.17.1
+shapely==2.1.2
+
+# Report generation
+reportlab==4.2.5
+Pillow==11.1.0
+trimesh==4.11.5
+
+# Cloud Storage
+boto3>=1.34.0
+
+# HTTP client
+httpx==0.28.1
+
+# Monitoring
+sentry-sdk==2.19.2
+structlog>=24.1.0

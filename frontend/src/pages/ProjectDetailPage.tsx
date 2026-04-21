@@ -174,18 +174,21 @@ function OverviewTab({ project, bimCount, scheduleCount }: { project: any; bimCo
 
 function BIMTab({ projectId, models, onRefresh }: { projectId: string; models: BIMModel[]; onRefresh: () => void }) {
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleUpload = async (file: File | null) => {
     if (!file) return;
     setUploading(true);
+    setUploadProgress(0);
     try {
-      await bimApi.uploadIFC(projectId, file);
+      await bimApi.uploadIFC(projectId, file, (pct) => setUploadProgress(pct));
       toast.success("IFC file uploaded — parsing started");
       onRefresh();
     } catch {
       toast.error("Upload failed");
     } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -193,12 +196,26 @@ function BIMTab({ projectId, models, onRefresh }: { projectId: string; models: B
     <div className="space-y-4">
       <FileDropzone
         accept={{ "application/x-ifc": [".ifc"] }}
-        label="Upload another IFC model"
+        label={uploading ? `Uploading… ${uploadProgress}%` : "Upload another IFC model"}
         sublabel="IFC2x3 or IFC4"
         file={null}
-        onFileChange={handleUpload}
-        icon={<Upload size={24} className="text-mq-400" />}
+        onFileChange={uploading ? () => {} : handleUpload}
+        icon={<Upload size={24} className={uploading ? "text-slate-500 animate-pulse" : "text-mq-400"} />}
       />
+      {uploading && (
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs text-slate-400">
+            <span>Uploading IFC file…</span>
+            <span>{uploadProgress}%</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-slate-700">
+            <div
+              className="h-1.5 rounded-full bg-mq-400 transition-all duration-300"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
       {models.length > 0 && (
         <div className="space-y-2">
           {models.map((m) => (

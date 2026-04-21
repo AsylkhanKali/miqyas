@@ -73,6 +73,7 @@ class BIMElementResponse(TimestampMixin):
     zone: str
     material: str
     geometry_bbox: dict | None = None
+    geometry_mesh: dict | None = None
     properties: dict = {}
     quantity_data: dict = {}
 

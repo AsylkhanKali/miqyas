@@ -9,9 +9,9 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Install API-only dependencies (без torch/transformers — ~200MB вместо 6GB)
-COPY requirements-api.txt .
-RUN pip install --no-cache-dir -r requirements-api.txt
+# Install all dependencies (API + Worker)
+COPY requirements-api.txt requirements-worker.txt ./
+RUN pip install --no-cache-dir --timeout=300 -r requirements-api.txt -r requirements-worker.txt
 
 # Copy app code
 COPY . .
@@ -19,6 +19,8 @@ COPY . .
 # Create uploads directory
 RUN mkdir -p uploads/ifc uploads/video uploads/frames uploads/reports
 
+RUN chmod +x start.sh
+
 EXPOSE 8000
 
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+CMD ["./start.sh"]

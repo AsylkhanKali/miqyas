@@ -477,7 +477,7 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-2">
               {(data?.projects ?? []).map((proj) => (
-                <ProjectHealthRow key={proj.id} proj={proj} />
+                <ProjectHealthRow key={proj.id} proj={proj} isLight={isLight} />
               ))}
             </div>
           )}
@@ -528,7 +528,7 @@ export default function DashboardPage() {
 
 // ── Sub-components ────────────────────────────────────────────────────────
 
-function ProjectHealthRow({ proj }: { proj: ProjectHealthCard }) {
+function ProjectHealthRow({ proj, isLight }: { proj: ProjectHealthCard; isLight?: boolean }) {
   return (
     <Link
       to={`/projects/${proj.id}`}

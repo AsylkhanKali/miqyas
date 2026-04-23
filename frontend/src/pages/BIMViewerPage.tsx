@@ -84,6 +84,11 @@ export default function BIMViewerPage() {
   const [ifcFileUrl, setIfcFileUrl] = useState<string | null>(null);
   const [reparsing, setReparsing] = useState(false);
 
+  // Stable ref so the Three.js animation loop can read the latest
+  // selectedElement without re-running the entire scene-init effect.
+  const selectedElementRef = useRef<BIMElement | null>(null);
+  useEffect(() => { selectedElementRef.current = selectedElement; }, [selectedElement]);
+
   // Load model + elements
   useEffect(() => {
     if (!projectId || !modelId) return;
@@ -445,7 +450,7 @@ export default function BIMViewerPage() {
           {/* 3D Canvas — extended with progress data + color mode + mesh rendering */}
           <IFCViewerCanvas
             elements={filteredElements}
-            selectedElement={selectedElement}
+            selectedElementRef={selectedElementRef}
             colorMode={colorMode}
             progressByElementId={progressByElementId}
             showTrajectory={showTrajectory}
@@ -757,7 +762,7 @@ type RenderMode = "mesh" | "bbox";
 
 function IFCViewerCanvas({
   elements,
-  selectedElement,
+  selectedElementRef,
   colorMode = "category",
   progressByElementId = new Map(),
   showTrajectory = false,
@@ -765,7 +770,7 @@ function IFCViewerCanvas({
   ifcFileUrl,
 }: {
   elements: BIMElement[];
-  selectedElement: BIMElement | null;
+  selectedElementRef: React.RefObject<BIMElement | null>;
   colorMode?: ColorMode;
   progressByElementId?: Map<string, ProgressItem>;
   showTrajectory?: boolean;
@@ -787,16 +792,27 @@ function IFCViewerCanvas({
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x080e1a);
 
-      // Grid
-      const grid = new THREE.GridHelper(200, 40, 0x1a2332, 0x111827);
-      scene.add(grid);
+      // IFC content root — rotated -90° around X so IFC Z-up becomes
+      // Three.js Y-up. This is a *proper rotation* (preserves winding order
+      // and normals), unlike the per-vertex swap the viewer used to do
+      // (which was a reflection — broke lighting + didn't compose correctly
+      // with the IFC placement matrix).
+      const ifcRoot = new THREE.Group();
+      ifcRoot.rotation.x = -Math.PI / 2;
+      scene.add(ifcRoot);
 
       // Ambient + directional lights
-      scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
       dirLight.position.set(50, 100, 50);
       dirLight.castShadow = true;
       scene.add(dirLight);
+      const fillLight = new THREE.DirectionalLight(0xb0c4ff, 0.25);
+      fillLight.position.set(-60, 30, -40);
+      scene.add(fillLight);
+
+      // Grid — added *after* we know model extent (see bottom of init)
+      let grid: THREE.GridHelper | null = null;
 
       // Camera
       const camera = new THREE.PerspectiveCamera(
@@ -840,11 +856,10 @@ function IFCViewerCanvas({
         return { hex: CATEGORY_COLORS[el.category]?.hex || "#94a3b8", opacity: 0.7 };
       };
 
-      // Build an IFC GUID → element lookup for mapping web-ifc meshes to our elements
-      const guidToElement = new Map<string, BIMElement>();
-      elements.forEach((el) => guidToElement.set(el.ifc_guid, el));
-
       // ── Mesh rendering mode (web-ifc) ─────────────────────
+      // All IFC vertices / bboxes live in IFC space (Z-up). We attach them
+      // to `ifcRoot` which is rotated -90° around X, so we DON'T swap axes
+      // manually — rotation is applied once by the parent group.
       let ifcMeshLoaded = false;
       if (renderMode === "mesh" && ifcFileUrl) {
         try {
@@ -853,79 +868,88 @@ function IFCViewerCanvas({
           await loader.init();
           const ifcMeshes = await loader.loadFromUrl(ifcFileUrl);
 
-          // We need a mapping from expressID → IFC GUID to link meshes to our elements.
-          // web-ifc GetLine can retrieve the GlobalId for an expressID.
-          // For efficiency, build the mesh using expressID and match by position to elements.
-          // Strategy: for each IFC mesh, create geometry and try to match to an element
-          // by finding the element whose bbox center is closest to the mesh centroid.
-
-          // Build centroid map from elements for matching
+          // Build centroid map from our DB elements — in raw IFC space
+          // (no axis swap). Used for mesh↔element association.
           const elementCentroids = new Map<string, THREE.Vector3>();
           elements.forEach((el) => {
             if (!el.geometry_bbox) return;
             const { min, max } = el.geometry_bbox;
-            elementCentroids.set(el.id, new THREE.Vector3(
-              (min[0] + max[0]) / 2,
-              (min[2] + max[2]) / 2,  // swap Y/Z for BIM coords
-              (min[1] + max[1]) / 2,
-            ));
+            elementCentroids.set(
+              el.id,
+              new THREE.Vector3(
+                (min[0] + max[0]) / 2,
+                (min[1] + max[1]) / 2,
+                (min[2] + max[2]) / 2,
+              ),
+            );
           });
+
+          // Estimate scene scale to derive a unit-agnostic match threshold.
+          // IFC files can be in meters, cm, or mm — a hardcoded 5.0 threshold
+          // fails on mm-scale models (every element gets dropped to default grey).
+          const overallBox = new THREE.Box3();
+          if (elementCentroids.size > 0) {
+            elementCentroids.forEach((c) => overallBox.expandByPoint(c));
+          }
+          const sceneDiag = overallBox.isEmpty()
+            ? 0
+            : overallBox.getSize(new THREE.Vector3()).length();
+          // 1.5% of scene diagonal, with a floor of 0.1 and ceiling of 500
+          // (500mm ≈ half a metre in mm-files, reasonable for element center
+          // slop after IFC placement vs backend centroid).
+          const matchThreshold = Math.max(0.1, Math.min(sceneDiag * 0.015, 500));
 
           const matchedElements = new Set<string>();
 
           ifcMeshes.forEach((meshData) => {
             const verts = meshData.vertices;
             const indices = meshData.indices;
+            if (verts.length === 0 || indices.length === 0) return;
 
-            // Build Three.js BufferGeometry
+            // Pass vertices straight through — no swap. The ifcRoot group
+            // rotates them into Y-up display space once at the parent level.
             const geometry = new THREE.BufferGeometry();
-            // web-ifc vertices are in IFC coordinate system (Y-up in some, Z-up in others)
-            // We swap Y/Z to match our Three.js convention (Y-up display)
-            const positions = new Float32Array(verts.length);
-            for (let i = 0; i < verts.length; i += 3) {
-              positions[i] = verts[i];          // X
-              positions[i + 1] = verts[i + 2];  // Z → Y (up)
-              positions[i + 2] = verts[i + 1];  // Y → Z (depth)
-            }
-            geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute("position", new THREE.BufferAttribute(verts, 3));
             geometry.setIndex(new THREE.BufferAttribute(indices, 1));
             geometry.computeVertexNormals();
-
-            // Compute centroid of this mesh
             geometry.computeBoundingBox();
-            const bb = geometry.boundingBox!;
-            const centroid = new THREE.Vector3();
-            bb.getCenter(centroid);
 
-            // Find closest element by centroid distance
-            let bestEl: BIMElement | null = null;
+            // Mesh centroid in IFC space
+            const centroid = new THREE.Vector3();
+            geometry.boundingBox!.getCenter(centroid);
+
+            // Closest unmatched element
+            let bestElId: string | null = null;
             let bestDist = Infinity;
             elementCentroids.forEach((elCenter, elId) => {
               if (matchedElements.has(elId)) return;
               const dist = centroid.distanceTo(elCenter);
               if (dist < bestDist) {
                 bestDist = dist;
-                bestEl = elements.find((e) => e.id === elId) || null;
+                bestElId = elId;
               }
             });
 
-            // Match threshold: within 5 units (generous for coordinate discrepancies)
-            const matchEl: BIMElement | null = bestEl && bestDist < 5.0 ? (bestEl as BIMElement) : null;
+            const matchEl: BIMElement | null =
+              bestElId != null && bestDist <= matchThreshold
+                ? (elements.find((e) => e.id === bestElId) ?? null)
+                : null;
             if (matchEl) matchedElements.add(matchEl.id);
 
             const elColor = matchEl
               ? getElementColor(matchEl)
-              : { hex: "#94a3b8", opacity: 0.5 };
+              : { hex: "#94a3b8", opacity: 0.6 };
 
             const material = new THREE.MeshPhongMaterial({
               color: new THREE.Color(elColor.hex),
-              transparent: true,
+              transparent: elColor.opacity < 1,
               opacity: elColor.opacity,
               side: THREE.DoubleSide,
+              flatShading: false,
             });
 
             const mesh = new THREE.Mesh(geometry, material);
-            scene.add(mesh);
+            ifcRoot.add(mesh);
             meshes.push(mesh);
             if (matchEl) elementMeshMap.set(matchEl.id, mesh);
           });
@@ -938,6 +962,8 @@ function IFCViewerCanvas({
       }
 
       // ── Bbox fallback ─────────────────────────────────────
+      // Bboxes stored in DB are in raw IFC space too; attach to ifcRoot
+      // without any axis swap.
       if (!ifcMeshLoaded) {
         elements.forEach((el) => {
           if (!el.geometry_bbox) return;
@@ -945,41 +971,60 @@ function IFCViewerCanvas({
           const sx = max[0] - min[0];
           const sy = max[1] - min[1];
           const sz = max[2] - min[2];
-
           if (sx <= 0 || sy <= 0 || sz <= 0) return;
 
           const { hex: color, opacity } = getElementColor(el);
-          const geometry = new THREE.BoxGeometry(sx, sz, sy); // swap Y/Z for BIM coords
+          const geometry = new THREE.BoxGeometry(sx, sy, sz);
           const material = new THREE.MeshPhongMaterial({
             color: new THREE.Color(color),
-            transparent: true,
+            transparent: opacity < 1,
             opacity,
             side: THREE.DoubleSide,
           });
-
           const mesh = new THREE.Mesh(geometry, material);
           mesh.position.set(
             (min[0] + max[0]) / 2,
+            (min[1] + max[1]) / 2,
             (min[2] + max[2]) / 2,
-            (min[1] + max[1]) / 2
           );
-
-          scene.add(mesh);
+          ifcRoot.add(mesh);
           meshes.push(mesh);
           elementMeshMap.set(el.id, mesh);
         });
       }
 
-      // Fit camera to content
+      // Fit camera to content (measured in WORLD space after group rotation).
       if (meshes.length > 0) {
-        const box = new THREE.Box3();
-        meshes.forEach((m) => box.expandByObject(m));
+        // Force world matrices to update so Box3.expandByObject sees the
+        // rotation we applied on ifcRoot.
+        ifcRoot.updateMatrixWorld(true);
+        const box = new THREE.Box3().setFromObject(ifcRoot);
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        camera.position.copy(center).add(new THREE.Vector3(maxDim, maxDim * 0.8, maxDim));
+        const maxDim = Math.max(size.x, size.y, size.z) || 10;
+
+        camera.position.copy(center).add(
+          new THREE.Vector3(maxDim * 0.9, maxDim * 0.8, maxDim * 0.9),
+        );
+        camera.near = Math.max(maxDim / 1000, 0.01);
+        camera.far = maxDim * 20;
+        camera.updateProjectionMatrix();
         controls.target.copy(center);
+        controls.minDistance = maxDim / 50;
+        controls.maxDistance = maxDim * 10;
         controls.update();
+
+        // Size grid to model footprint (round up to nice multiple).
+        const footprint = Math.max(size.x, size.z);
+        const gridSize = Math.pow(2, Math.ceil(Math.log2(footprint * 1.5)));
+        const gridDivs = 40;
+        grid = new THREE.GridHelper(gridSize, gridDivs, 0x1a2332, 0x111827);
+        grid.position.set(center.x, box.min.y, center.z);
+        scene.add(grid);
+      } else {
+        // Default grid for empty scenes
+        grid = new THREE.GridHelper(200, 40, 0x1a2332, 0x111827);
+        scene.add(grid);
       }
 
       // Camera trajectory overlay
@@ -1010,27 +1055,41 @@ function IFCViewerCanvas({
         }, 200);
       }
 
-      // Highlight selected
+      // Highlight selected element — reads from ref so no effect re-run needed
       let highlightedMesh: THREE.Mesh | null = null;
+      let prevSelectedId: string | null = null;
 
       const updateSelection = () => {
-        // Reset previous
+        const selectedElement = selectedElementRef.current;
+        const newId = selectedElement?.id ?? null;
+        if (newId === prevSelectedId) return;
+        prevSelectedId = newId;
+
+        // Restore previous
         if (highlightedMesh) {
+          const mat = highlightedMesh.material as THREE.MeshPhongMaterial;
           const el = elements.find((e) => elementMeshMap.get(e.id) === highlightedMesh);
           if (el) {
             const { hex, opacity } = getElementColor(el);
-            (highlightedMesh.material as THREE.MeshPhongMaterial).color.set(hex);
-            (highlightedMesh.material as THREE.MeshPhongMaterial).opacity = opacity;
-            (highlightedMesh.material as THREE.MeshPhongMaterial).emissiveIntensity = 0;
+            mat.color.set(hex);
+            mat.emissive.set(0x000000);
+            mat.emissiveIntensity = 0;
+            mat.opacity = opacity;
+            mat.transparent = opacity < 1;
           }
+          highlightedMesh = null;
         }
-        // Highlight new
+
+        // Apply new highlight
         if (selectedElement) {
           const mesh = elementMeshMap.get(selectedElement.id);
           if (mesh) {
-            (mesh.material as THREE.MeshPhongMaterial).color.set(0x0a7cff);
-            (mesh.material as THREE.MeshPhongMaterial).opacity = 0.95;
-            (mesh.material as THREE.MeshPhongMaterial).emissiveIntensity = 0.3;
+            const mat = mesh.material as THREE.MeshPhongMaterial;
+            mat.color.set(0x3b82f6);
+            mat.emissive.set(0x1a3a7a);
+            mat.emissiveIntensity = 0.4;
+            mat.opacity = 1.0;
+            mat.transparent = false;
             highlightedMesh = mesh;
           }
         }
@@ -1064,6 +1123,10 @@ function IFCViewerCanvas({
           trajectoryLine.geometry.dispose();
           (trajectoryLine.material as THREE.Material).dispose();
         }
+        if (grid) {
+          grid.geometry.dispose();
+          (grid.material as THREE.Material).dispose();
+        }
         renderer.dispose();
         controls.dispose();
         meshes.forEach((m) => {
@@ -1077,7 +1140,12 @@ function IFCViewerCanvas({
     return () => {
       cleanup.then((fn) => fn?.());
     };
-  }, [elements, selectedElement, colorMode, progressByElementId, showTrajectory, renderMode, ifcFileUrl]);
+  // Note: selectedElement is intentionally excluded — selection highlight is
+  // handled inside the animation loop via updateSelection(), which reads
+  // `selectedElement` via closure ref. Re-running the whole effect on every
+  // click would rebuild the scene unnecessarily.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [elements, colorMode, progressByElementId, showTrajectory, renderMode, ifcFileUrl]);
 
   return (
     <canvas

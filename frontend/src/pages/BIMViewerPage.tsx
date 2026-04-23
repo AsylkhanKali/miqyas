@@ -453,8 +453,8 @@ export default function BIMViewerPage() {
             ifcFileUrl={ifcFileUrl}
           />
 
-          {/* No-geometry banner — backend bbox is empty and bbox mode can't render */}
-          {noGeometry && renderMode === "bbox" && (
+          {/* No-geometry banner — backend bbox is empty for all elements */}
+          {noGeometry && (
             <div className="absolute left-1/2 top-16 z-20 -translate-x-1/2 rounded-lg border border-red-500/40 bg-red-950/90 px-4 py-3 text-xs text-red-200 backdrop-blur-sm flex items-center gap-3 shadow-xl">
               <AlertCircle size={14} className="shrink-0" />
               <div>

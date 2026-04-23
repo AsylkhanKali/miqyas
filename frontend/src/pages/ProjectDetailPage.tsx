@@ -175,6 +175,21 @@ function OverviewTab({ project, bimCount, scheduleCount }: { project: any; bimCo
 function BIMTab({ projectId, models, onRefresh }: { projectId: string; models: BIMModel[]; onRefresh: () => void }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [reparsing, setReparsing] = useState<string | null>(null);
+
+  const handleReparse = async (modelId: string) => {
+    setReparsing(modelId);
+    try {
+      await bimApi.reparse(projectId, modelId);
+      toast.success("Re-parse scheduled — refresh in a minute");
+      setTimeout(() => onRefresh(), 3000);
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      toast.error(detail ?? "Re-parse failed");
+    } finally {
+      setReparsing(null);
+    }
+  };
 
   const handleUpload = async (file: File | null) => {
     if (!file) return;
@@ -219,39 +234,40 @@ function BIMTab({ projectId, models, onRefresh }: { projectId: string; models: B
       {models.length > 0 && (
         <div className="space-y-2">
           {models.map((m) => (
-            m.parse_status === "parsed" ? (
-              <Link
-                key={m.id}
-                to={`/viewer/${projectId}/${m.id}`}
-                className="card-hover flex items-center justify-between p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <Box size={18} className="text-mq-400" />
-                  <div>
-                    <p className="text-sm font-medium text-white">{m.filename}</p>
-                    <p className="text-xs text-slate-500">
-                      {m.ifc_schema_version} · {m.element_count} elements
-                    </p>
-                  </div>
+            <div key={m.id} className="card flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <Box size={18} className="text-mq-400" />
+                <div>
+                  <p className="text-sm font-medium text-white">{m.filename}</p>
+                  <p className="text-xs text-slate-500">
+                    {m.ifc_schema_version} · {m.element_count} elements
+                  </p>
                 </div>
-                <span className="badge badge-ahead">{m.parse_status}</span>
-              </Link>
-            ) : (
-              <div key={m.id} className="card flex items-center justify-between p-4">
-                <div className="flex items-center gap-3">
-                  <Box size={18} className="text-mq-400" />
-                  <div>
-                    <p className="text-sm font-medium text-white">{m.filename}</p>
-                    <p className="text-xs text-slate-500">
-                      {m.ifc_schema_version} · {m.element_count} elements
-                    </p>
-                  </div>
-                </div>
-                <span className={`badge ${m.parse_status === "failed" ? "badge-behind" : "badge-warning"}`}>
-                  {m.parse_status}
-                </span>
               </div>
-            )
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleReparse(m.id)}
+                  disabled={reparsing === m.id}
+                  title="Re-parse IFC geometry"
+                  className="flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs text-slate-300 hover:border-slate-600 hover:text-white disabled:opacity-50 transition-colors"
+                >
+                  <RefreshCw size={12} className={reparsing === m.id ? "animate-spin" : ""} />
+                  {reparsing === m.id ? "Re-parsing…" : "Re-parse"}
+                </button>
+                {m.parse_status === "parsed" ? (
+                  <Link
+                    to={`/viewer/${projectId}/${m.id}`}
+                    className="flex items-center gap-1.5 rounded-md border border-mq-600 bg-mq-600/10 px-2.5 py-1 text-xs text-mq-400 hover:bg-mq-600/20 transition-colors"
+                  >
+                    Open Viewer
+                  </Link>
+                ) : (
+                  <span className={`badge ${m.parse_status === "failed" ? "badge-behind" : "badge-warning"}`}>
+                    {m.parse_status}
+                  </span>
+                )}
+              </div>
+            </div>
           ))}
         </div>
       )}

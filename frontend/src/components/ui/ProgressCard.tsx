@@ -42,6 +42,12 @@ interface ProgressCardProps {
 
   /** Colour accent: "green" | "red" | "blue" | "amber" */
   accent?: "green" | "red" | "blue" | "amber" | "neutral";
+
+  /**
+   * When true, leftValue is displayed as a raw number (no % sign).
+   * Use for count-based metrics like "Elements at Risk".
+   */
+  noPercent?: boolean;
 }
 
 const ACCENT_COLORS: Record<string, { ring: string; value: string; icon: string }> = {
@@ -65,6 +71,7 @@ export default function ProgressCard({
   className,
   subLabel,
   accent = "neutral",
+  noPercent = false,
 }: ProgressCardProps) {
   const colors = ACCENT_COLORS[accent];
 
@@ -96,7 +103,11 @@ export default function ProgressCard({
       <div>
         <div className="flex items-baseline gap-2 flex-wrap">
           <span className={clsx("text-4xl font-bold font-display leading-none", colors.value)}>
-            {leftValue != null ? `${leftValue.toFixed(0)}%` : "—"}
+            {leftValue != null
+              ? noPercent
+                ? leftValue.toLocaleString()
+                : `${leftValue.toFixed(0)}%`
+              : "—"}
           </span>
           {rightValue != null && rightLabel && (
             <>

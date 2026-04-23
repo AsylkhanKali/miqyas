@@ -27,6 +27,29 @@ import toast from "react-hot-toast";
 import { bimApi, progressApi, capturesApi } from "@/services/api";
 import type { BIMElement, BIMModel, BIMModelInfo, ElementCategory, ProgressItem, VideoCapture, DeviationType } from "@/types";
 
+// IFC type constant → category hex color (constants verified from web-ifc package)
+// This lets the viewer render distinct colors even when DB element matching fails.
+const IFC_TYPE_COLORS: Record<number, string> = {
+  2391406946: "#64748b",  // IFCWALL
+  3512223829: "#64748b",  // IFCWALLSTANDARDCASE
+  1529196076: "#8b5cf6",  // IFCSLAB
+  843113511:  "#f59e0b",  // IFCCOLUMN
+  753842376:  "#ef4444",  // IFCBEAM
+  395920057:  "#10b981",  // IFCDOOR
+  3304561284: "#06b6d4",  // IFCWINDOW
+  331165859:  "#ec4899",  // IFCSTAIR
+  4252922144: "#ec4899",  // IFCSTAIRFLIGHT
+  2262370178: "#78716c",  // IFCRAILING
+  1973544240: "#a78bfa",  // IFCCOVERING
+  3495092785: "#38bdf8",  // IFCCURTAINWALL
+  3171933400: "#94a3b8",  // IFCPLATE
+  1073191201: "#94a3b8",  // IFCMEMBER
+  900683007:  "#d97706",  // IFCFOOTING
+  2016517767: "#6366f1",  // IFCROOF
+  3024970846: "#14b8a6",  // IFCRAMP
+  3283111854: "#14b8a6",  // IFCRAMPFLIGHT
+};
+
 // Category color map for the 3D viewer and UI
 const CATEGORY_COLORS: Record<ElementCategory, { hex: string; label: string }> = {
   wall: { hex: "#64748b", label: "Walls" },
@@ -936,9 +959,15 @@ function IFCViewerCanvas({
                 : null;
             if (matchEl) matchedElements.add(matchEl.id);
 
+            // Color priority:
+            // 1. If progress mode and element matched → deviation color
+            // 2. If element matched → category color from DB element
+            // 3. IFC type → category color directly from IFC (always has color)
+            // 4. Default grey (fallback only if type unknown)
+            const typeHex = IFC_TYPE_COLORS[meshData.ifcType] ?? "#94a3b8";
             const elColor = matchEl
               ? getElementColor(matchEl)
-              : { hex: "#94a3b8", opacity: 0.6 };
+              : { hex: typeHex, opacity: 0.75 };
 
             const material = new THREE.MeshPhongMaterial({
               color: new THREE.Color(elColor.hex),

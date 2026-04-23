@@ -432,6 +432,20 @@
 [data-theme="light"] a.text-blue-400:hover,
 [data-theme="light"] a.text-blue-500:hover { color: var(--color-accent) !important; text-decoration: underline; text-underline-offset: 3px; }
 
+/* ── Skeleton pulse ──────────────────────────────────────────────────────
+   Single semantic class so dark/light both animate nicely. */
+.skeleton-pulse {
+  background-color: #263347cc; /* dark default */
+}
+[data-theme="light"] .skeleton-pulse {
+  background-color: #E8E4D7;   /* warm stone for light mode */
+}
+
+/* Missing arbitrary-hex overrides */
+[data-theme="light"] .bg-\[\#1a2842\]        { background-color: var(--color-bg-elevated) !important; }
+[data-theme="light"] .bg-\[\#1a2842\]\/40    { background-color: rgba(248,246,239,0.50)   !important; }
+[data-theme="light"] .border-\[\#1a2842\]    { border-color: var(--color-border)          !important; }
+
 /* Three.js canvas container */
 .ifc-viewer-container canvas {
   outline: none;

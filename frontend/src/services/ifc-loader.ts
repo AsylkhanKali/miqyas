@@ -26,6 +26,7 @@ const IFC_TYPES = [
 
 export interface IFCMeshData {
   expressID: number;
+  ifcType: number;         // e.g. IFCWALL, IFCSLAB — raw web-ifc constant
   vertices: Float32Array;  // xyz interleaved
   indices: Uint32Array;
   flatTransformation: number[];
@@ -80,6 +81,7 @@ export class IFCMeshLoader {
         if (result.has(expressID)) continue;
 
         try {
+          /* ↓ ifcType is captured from the loop variable */
           const flatMesh = this.api.GetFlatMesh(modelID, expressID);
           const geometries = flatMesh.geometries;
 
@@ -133,6 +135,7 @@ export class IFCMeshLoader {
           if (allVerts.length > 0 && allIndices.length > 0) {
             result.set(expressID, {
               expressID,
+              ifcType,
               vertices: new Float32Array(allVerts),
               indices: new Uint32Array(allIndices),
               flatTransformation: Array.from(geometries.get(0).flatTransformation),

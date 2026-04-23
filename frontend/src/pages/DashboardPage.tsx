@@ -11,6 +11,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTheme } from "@/store/themeContext";
 import { motion } from "framer-motion";
 import {
   Plus,
@@ -166,6 +167,9 @@ function deriveTrades(data: InvestorDashboard): TradeSummary[] {
 // ── Main component ────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
+
   const [data,     setData]     = useState<InvestorDashboard | null>(null);
   const [timeline, setTimeline] = useState<ProgressTimePoint[]>([]);
   const [loading,  setLoading]  = useState(true);
@@ -283,6 +287,7 @@ export default function DashboardPage() {
         <ProgressCard
           leftLabel="Elements at Risk"
           leftValue={data?.elements_at_risk ?? null}
+          noPercent
           subLabel="Behind + Not Started"
           trendText={
             (data?.elements_at_risk ?? 0) > 0
@@ -415,8 +420,11 @@ export default function DashboardPage() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      background: "#1a2842", border: "1px solid #263347",
-                      borderRadius: 8, fontSize: 12,
+                      background:   isLight ? "#FCFBF7" : "#1a2842",
+                      border:       `1px solid ${isLight ? "#E0DBCC" : "#263347"}`,
+                      borderRadius: 8,
+                      fontSize:     12,
+                      color:        isLight ? "#26241F" : "#cbd5e1",
                     }}
                     formatter={(v) => [v, ""]}
                   />

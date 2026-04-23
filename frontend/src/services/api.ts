@@ -81,6 +81,11 @@ export const bimApi = {
 
   getFileUrl: (projectId: string, modelId: string) =>
     `/api/v1/projects/${projectId}/bim/models/${modelId}/file`,
+
+  reparse: (projectId: string, modelId: string) =>
+    api.post<{ model_id: string; task_id: string; status: string; message: string }>(
+      `/projects/${projectId}/bim/models/${modelId}/reparse`,
+    ),
 };
 
 // ── Schedules ───────────────────────────────────────────────────────────

@@ -173,17 +173,35 @@ class IFCParserService:
         Returns (bbox_map, mesh_map) where:
           bbox_map[guid] = {"min": [x,y,z], "max": [x,y,z]}
           mesh_map[guid] = {"vertices": [[x,y,z],...], "faces": [[i,j,k],...]}
+
+        Resilient: a single failing element must not kill the whole iteration —
+        we advance the iterator in a per-step try/except. If the iterator itself
+        cannot be initialised at all, we fall back to ObjectPlacement-based
+        bbox estimation so the viewer still gets *something*.
         """
         bbox_map: dict[str, dict] = {}
         mesh_map: dict[str, dict] = {}
+        skipped = 0
+        total_seen = 0
 
         try:
             settings = ifcopenshell.geom.settings()
             settings.set(settings.USE_WORLD_COORDS, True)
-            iterator = ifcopenshell.geom.iterator(settings, ifc_file, multiprocessing=False)
+            iterator = ifcopenshell.geom.iterator(
+                settings, ifc_file, multiprocessing=False
+            )
 
-            if iterator.initialize():
-                while True:
+            if not iterator.initialize():
+                logger.warning(
+                    "ifcopenshell.geom.iterator.initialize() returned False — "
+                    "file may have no representable geometry. Falling back to "
+                    "placement-based bbox estimation."
+                )
+                return self._placement_bbox_fallback(ifc_file), mesh_map
+
+            while True:
+                total_seen += 1
+                try:
                     shape = iterator.get()
                     guid = shape.guid
                     geom = shape.geometry
@@ -200,7 +218,6 @@ class IFCParserService:
                             "max": [round(max(xs), 4), round(max(ys), 4), round(max(zs), 4)],
                         }
 
-                        # Store triangle mesh if size is reasonable
                         n_verts = len(xs)
                         if n_verts <= self._MAX_MESH_VERTICES and faces:
                             vertices = [
@@ -215,16 +232,80 @@ class IFCParserService:
                                 "vertices": vertices,
                                 "faces": tri_faces,
                             }
+                except Exception as elem_err:
+                    skipped += 1
+                    if skipped <= 5:
+                        logger.warning(
+                            f"Geometry extraction failed for one element: {elem_err}"
+                        )
 
+                try:
                     if not iterator.next():
                         break
+                except Exception as next_err:
+                    logger.error(
+                        f"iterator.next() raised, aborting geometry pass: {next_err}"
+                    )
+                    break
         except Exception as e:
-            logger.warning(f"Geometry iterator failed, geometry will be empty: {e}")
+            logger.exception(f"Geometry iterator aborted at top level: {e}")
 
         logger.info(
-            f"Geometry extraction: {len(bbox_map)} bboxes, {len(mesh_map)} meshes"
+            f"Geometry extraction: {len(bbox_map)} bboxes, {len(mesh_map)} meshes, "
+            f"{skipped} skipped of {total_seen} shapes"
         )
+
+        # Safety net: if geom iterator produced nothing, try placement-based bbox
+        if not bbox_map:
+            logger.warning(
+                "Geom iterator produced 0 bboxes — using placement-based fallback."
+            )
+            bbox_map = self._placement_bbox_fallback(ifc_file)
+
         return bbox_map, mesh_map
+
+    def _placement_bbox_fallback(
+        self, ifc_file: ifcopenshell.file
+    ) -> dict[str, dict]:
+        """
+        Fallback bbox computation using ObjectPlacement transformations.
+
+        When OCCT/shape iteration can't process an IFC file (corrupt
+        representations, unsupported NURBS, missing native libs), we can still
+        give the viewer a spatial approximation by reading each element's
+        placement origin and using a small synthetic box around it. This is
+        enough to scaffold the 3D view until proper meshes are re-parsed.
+        """
+        import numpy as np
+
+        bbox_map: dict[str, dict] = {}
+        half_size = 0.5  # meters — visible placeholder cube
+
+        for ifc_type in EXTRACT_TYPES:
+            try:
+                entities = ifc_file.by_type(ifc_type)
+            except Exception:
+                continue
+            for entity in entities:
+                try:
+                    placement = getattr(entity, "ObjectPlacement", None)
+                    if placement is None:
+                        continue
+                    matrix = ifcopenshell.util.placement.get_local_placement(placement)
+                    # Origin is the translation column of the 4x4 matrix
+                    origin = np.asarray(matrix)[:3, 3]
+                    x, y, z = float(origin[0]), float(origin[1]), float(origin[2])
+                    bbox_map[entity.GlobalId] = {
+                        "min": [round(x - half_size, 4), round(y - half_size, 4), round(z - half_size, 4)],
+                        "max": [round(x + half_size, 4), round(y + half_size, 4), round(z + half_size, 4)],
+                    }
+                except Exception:
+                    continue
+
+        logger.info(
+            f"Placement-based bbox fallback produced {len(bbox_map)} bboxes"
+        )
+        return bbox_map
 
     def _resolve_category(self, entity) -> ElementCategory:
         """Map an IFC entity to our simplified ElementCategory."""
@@ -272,29 +353,45 @@ class IFCParserService:
         return ""
 
     def _get_property_sets(self, entity) -> dict[str, Any]:
-        """Extract all property sets (Pset_*) for the element."""
+        """
+        Extract all property sets for the element.
+
+        Keeps standard `Pset_*` / `CPset_*` as well as vendor-prefixed sets
+        (MagiCAD, Revit, ArchiCAD, etc.) — anything that isn't a quantity set.
+        Quantity sets (`Qto_*`) are handled separately by `_get_quantities`.
+        """
         props = {}
         try:
             psets = ifcopenshell.util.element.get_psets(entity)
             for pset_name, pset_values in psets.items():
-                if pset_name.startswith("Pset_") or pset_name.startswith("CPset_"):
-                    cleaned = {}
-                    for k, v in pset_values.items():
-                        if k == "id":
-                            continue
-                        # Convert non-serializable values to strings
-                        if isinstance(v, (str, int, float, bool, type(None))):
-                            cleaned[k] = v
-                        else:
-                            cleaned[k] = str(v)
+                if pset_name.startswith("Qto_"):
+                    continue  # handled by _get_quantities
+                cleaned = {}
+                for k, v in pset_values.items():
+                    if k == "id":
+                        continue
+                    # Convert non-serializable values to strings
+                    if isinstance(v, (str, int, float, bool, type(None))):
+                        cleaned[k] = v
+                    else:
+                        cleaned[k] = str(v)
+                if cleaned:
                     props[pset_name] = cleaned
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug(f"get_psets failed for {getattr(entity, 'GlobalId', '?')}: {e}")
         return props
 
     def _get_quantities(self, entity) -> dict[str, Any]:
-        """Extract quantity sets (Qto_*) — area, volume, length, etc."""
-        quantities = {}
+        """
+        Extract numeric quantities — area, volume, length, etc.
+
+        Primary source: `Qto_*` quantity sets.
+        Secondary source: numeric keys from any pset whose name contains
+        common quantity tokens (Area, Volume, Length, Width, Height, Weight).
+        This catches vendor tools that don't follow the `Qto_` convention.
+        """
+        quantities: dict[str, Any] = {}
+        quantity_tokens = ("Area", "Volume", "Length", "Width", "Height", "Weight", "Depth", "Perimeter")
         try:
             psets = ifcopenshell.util.element.get_psets(entity)
             for pset_name, pset_values in psets.items():
@@ -302,10 +399,18 @@ class IFCParserService:
                     for k, v in pset_values.items():
                         if k == "id":
                             continue
-                        if isinstance(v, (int, float)):
+                        if isinstance(v, (int, float)) and not isinstance(v, bool):
                             quantities[k] = v
-        except Exception:
-            pass
+                else:
+                    # Harvest numeric quantity-looking fields from other psets
+                    for k, v in pset_values.items():
+                        if k == "id" or k in quantities:
+                            continue
+                        if isinstance(v, (int, float)) and not isinstance(v, bool):
+                            if any(tok in k for tok in quantity_tokens):
+                                quantities[k] = v
+        except Exception as e:
+            logger.debug(f"get_psets (qto) failed for {getattr(entity, 'GlobalId', '?')}: {e}")
         return quantities
 
     def _extract_header_metadata(self, ifc_file: ifcopenshell.file) -> dict:

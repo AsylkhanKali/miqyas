@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import clsx from "clsx";
 import type * as THREE from "three";
+import toast from "react-hot-toast";
 import { bimApi, progressApi, capturesApi } from "@/services/api";
 import type { BIMElement, BIMModel, BIMModelInfo, ElementCategory, ProgressItem, VideoCapture, DeviationType } from "@/types";
 
@@ -81,6 +82,7 @@ export default function BIMViewerPage() {
   const [renderMode, setRenderMode] = useState<RenderMode>("mesh");
   const [modelInfo, setModelInfo] = useState<BIMModelInfo | null>(null);
   const [ifcFileUrl, setIfcFileUrl] = useState<string | null>(null);
+  const [reparsing, setReparsing] = useState(false);
 
   // Load model + elements
   useEffect(() => {
@@ -110,14 +112,17 @@ export default function BIMViewerPage() {
     if (!projectId || !modelId) return;
     bimApi.getModelInfo(projectId, modelId).then(({ data }) => {
       setModelInfo(data);
-      // Auto-select bbox mode for large models (>50MB) to avoid slow IFC loading
-      if (data.file_size_mb > 50) {
+      // Mesh mode renders via web-ifc in the browser, so it works even when
+      // backend geometry_bbox is empty. Only fall back to bbox for very large
+      // files (>200MB) where parsing in-browser would freeze the tab.
+      if (data.file_size_mb > 200) {
         setRenderMode("bbox");
       }
       setIfcFileUrl(bimApi.getFileUrl(projectId, modelId));
     }).catch(() => {
-      // Fall back to bbox if model info fails
-      setRenderMode("bbox");
+      // If we can't even get model info, try mesh anyway via the file URL —
+      // the backend might be returning partial data.
+      setIfcFileUrl(bimApi.getFileUrl(projectId, modelId));
     });
   }, [projectId, modelId]);
 
@@ -190,6 +195,28 @@ export default function BIMViewerPage() {
     },
     {} as Record<string, number>
   );
+
+  // Detect "no geometry" state: elements loaded but none have bboxes.
+  // Bbox mode cannot render anything; mesh mode still works if ifcFileUrl loads.
+  const hasAnyBbox = useMemo(
+    () => elements.some((el) => el.geometry_bbox != null),
+    [elements],
+  );
+  const noGeometry = !loading && elements.length > 0 && !hasAnyBbox;
+
+  const handleReparse = useCallback(async () => {
+    if (!projectId || !modelId || reparsing) return;
+    setReparsing(true);
+    try {
+      await bimApi.reparse(projectId, modelId);
+      toast.success("Re-parse scheduled. Refresh in a minute to see results.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Re-parse failed";
+      toast.error(msg);
+    } finally {
+      setReparsing(false);
+    }
+  }, [projectId, modelId, reparsing]);
 
   return (
     <div className="flex h-screen w-screen fixed inset-0 z-50">
@@ -425,6 +452,32 @@ export default function BIMViewerPage() {
             renderMode={renderMode}
             ifcFileUrl={ifcFileUrl}
           />
+
+          {/* No-geometry banner — backend bbox is empty and bbox mode can't render */}
+          {noGeometry && renderMode === "bbox" && (
+            <div className="absolute left-1/2 top-16 z-20 -translate-x-1/2 rounded-lg border border-red-500/40 bg-red-950/90 px-4 py-3 text-xs text-red-200 backdrop-blur-sm flex items-center gap-3 shadow-xl">
+              <AlertCircle size={14} className="shrink-0" />
+              <div>
+                <div className="font-semibold">No geometry parsed for this model</div>
+                <div className="mt-0.5 text-red-300/80">
+                  Bbox mode has nothing to render. Try mesh mode, or re-parse the IFC file.
+                </div>
+              </div>
+              <button
+                onClick={() => setRenderMode("mesh")}
+                className="rounded px-2.5 py-1 text-xs bg-slate-700/60 hover:bg-slate-700 text-slate-100 border border-slate-600"
+              >
+                Try mesh mode
+              </button>
+              <button
+                onClick={handleReparse}
+                disabled={reparsing}
+                className="rounded px-2.5 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 text-red-100 border border-red-500/50 disabled:opacity-50"
+              >
+                {reparsing ? "Re-parsing…" : "Re-parse IFC"}
+              </button>
+            </div>
+          )}
 
           {/* Mock/simulated data warning banner */}
           {colorMode === "progress" && progressData.length > 0 &&

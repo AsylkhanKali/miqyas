@@ -6,7 +6,7 @@ from uuid import UUID
 import aiofiles
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
@@ -121,6 +121,56 @@ async def download_ifc_file(
         filename=model.filename,
         headers={"Cache-Control": "public, max-age=3600"},
     )
+
+
+@router.post("/models/{model_id}/reparse", status_code=status.HTTP_202_ACCEPTED)
+async def reparse_bim_model(
+    project_id: UUID,
+    model_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Re-run the IFC parser on an existing model.
+
+    Use this after:
+      - parser improvements (e.g. geometry/pset bug fixes) are deployed, to
+        back-fill previously-parsed models
+      - `parse_status` is stuck on `failed` or `parsing`
+
+    Existing `BIMElement` rows are deleted first so the new parse starts clean.
+    The IFC file must still exist on disk at `model.storage_path`.
+    """
+    model = await db.get(BIMModel, model_id)
+    if not model:
+        raise HTTPException(status_code=404, detail="BIM model not found")
+    if model.project_id != project_id:
+        raise HTTPException(status_code=404, detail="BIM model not found in this project")
+
+    if not Path(model.storage_path).exists():
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "IFC file no longer exists on disk — cannot re-parse. "
+                "Re-upload the file."
+            ),
+        )
+
+    # Wipe existing elements and reset status
+    await db.execute(delete(BIMElement).where(BIMElement.bim_model_id == model_id))
+    model.element_count = 0
+    model.parse_status = "pending"
+    model.parse_error = None
+    await db.commit()
+
+    from app.tasks.ifc_tasks import parse_ifc_task
+    task = parse_ifc_task.delay(str(model_id))
+
+    return {
+        "model_id": str(model_id),
+        "task_id": task.id,
+        "status": "queued",
+        "message": "Re-parse scheduled. Poll /models/{id}/info for parse_status.",
+    }
 
 
 @router.get("/models/{model_id}/info")

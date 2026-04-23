@@ -4,6 +4,7 @@ import { RouterProvider } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import * as Sentry from "@sentry/react";
 import { router } from "@/router";
+import { ThemeProvider } from "@/store/themeContext";
 import "@/styles/globals.css";
 
 // ── Sentry ────────────────────────────────────────────────────────────
@@ -21,25 +22,27 @@ if (sentryDsn) {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
-    <Toaster
-      position="bottom-right"
-      toastOptions={{
-        duration: 4000,
-        style: {
-          background: "#1e293b",
-          color: "#f1f5f9",
-          border: "1px solid #334155",
-          borderRadius: "0.75rem",
-          fontSize: "0.875rem",
-        },
-        success: {
-          iconTheme: { primary: "#10b981", secondary: "#f1f5f9" },
-        },
-        error: {
-          iconTheme: { primary: "#ef4444", secondary: "#f1f5f9" },
-        },
-      }}
-    />
+    <ThemeProvider>
+      <RouterProvider router={router} />
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "var(--color-bg-card)",
+            color: "var(--color-text-primary)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "0.75rem",
+            fontSize: "0.875rem",
+          },
+          success: {
+            iconTheme: { primary: "#10b981", secondary: "var(--color-text-primary)" },
+          },
+          error: {
+            iconTheme: { primary: "#ef4444", secondary: "var(--color-text-primary)" },
+          },
+        }}
+      />
+    </ThemeProvider>
   </React.StrictMode>
 );

@@ -2,28 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════════
+   THEME SYSTEM
+   Dark (default) — rich navy with blue accents.
+   Light — warm whitemustard cream with black-grey text (complement of blue).
+   Switch via `[data-theme="light"]` on <html>.
+   ═════════════════════════════════════════════════════════════════════ */
+
 @layer base {
   :root {
-    /* ── Surfaces (lighter, more contrast) ──────────────────── */
-    --color-bg-primary:   #0d1526;   /* page bg — rich dark navy */
-    --color-bg-secondary: #16213a;   /* sidebar / topbar */
-    --color-bg-card:      #1e293b;   /* card surface */
-    --color-bg-elevated:  #263347;   /* elevated panels / dropdowns */
-    --color-bg-hover:     #2d3d54;   /* hover state */
+    /* ── Surfaces ────────────────────────────────────────────── */
+    --color-bg-primary:   #0d1526;
+    --color-bg-secondary: #16213a;
+    --color-bg-card:      #1e293b;
+    --color-bg-elevated:  #263347;
+    --color-bg-hover:     #2d3d54;
 
     /* ── Borders ─────────────────────────────────────────────── */
     --color-border:       #2d3d54;
     --color-border-hover: #3f536e;
 
     /* ── Text ────────────────────────────────────────────────── */
-    --color-text-primary:   #f1f5f9;  /* near-white */
-    --color-text-secondary: #cbd5e1;  /* lighter secondary */
+    --color-text-primary:   #f1f5f9;
+    --color-text-secondary: #cbd5e1;
     --color-text-muted:     #64748b;
 
-    /* ── Accent (bright vivid blue) ──────────────────────────── */
+    /* ── Accent (blue — brand) ───────────────────────────────── */
     --color-accent:       #3b82f6;
     --color-accent-hover: #60a5fa;
     --color-accent-dim:   rgba(59, 130, 246, 0.15);
+
+    /* ── Scrollbar ───────────────────────────────────────────── */
+    --color-scrollbar:       #2d3d54;
+    --color-scrollbar-hover: #3f536e;
+
+    /* ── Shadows ─────────────────────────────────────────────── */
+    --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ── Light theme — warm whitemustard + black-grey ────────────
+     Palette rationale (color theory):
+       • Bg is a warm cream (Y/YO family ≈ hue 45°) — the "whitemustard".
+       • Accent stays brand-blue (≈ hue 220°) — ~180° complementary to
+         mustard, so cards/CTAs pop clean on cream.
+       • Text is a warm near-black-grey, slightly warm-biased so it
+         feels native to the cream surface (not cold-blue on warm bg). */
+  [data-theme="light"] {
+    --color-bg-primary:   #f5edd6;   /* page bg — warm cream */
+    --color-bg-secondary: #eee3c0;   /* sidebar / topbar — deeper cream */
+    --color-bg-card:      #ffffff;   /* pure white cards for contrast */
+    --color-bg-elevated:  #fcf7e6;   /* dropdowns / elevated panels */
+    --color-bg-hover:     #e7d8a9;   /* warm mustard-tinted hover */
+
+    --color-border:       #d4c38a;
+    --color-border-hover: #b8a468;
+
+    --color-text-primary:   #1c1b16;   /* warm near-black */
+    --color-text-secondary: #3e3d38;   /* dark charcoal */
+    --color-text-muted:     #6e6b5c;   /* warm muted grey */
+
+    --color-accent:       #2563eb;
+    --color-accent-hover: #1d4ed8;
+    --color-accent-dim:   rgba(37, 99, 235, 0.10);
+
+    --color-scrollbar:       #d4c38a;
+    --color-scrollbar-hover: #b8a468;
+
+    --shadow-card: 0 2px 8px -2px rgba(120, 100, 40, 0.14);
   }
 
   html, body, #root {
@@ -33,35 +78,102 @@
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: #2d3d54 transparent;
+    scrollbar-color: var(--color-scrollbar) transparent;
   }
 
-  *::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  *::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
+  *::-webkit-scrollbar { width: 6px; }
+  *::-webkit-scrollbar-track { background: transparent; }
   *::-webkit-scrollbar-thumb {
-    background-color: #2d3d54;
+    background-color: var(--color-scrollbar);
     border-radius: 3px;
   }
-
   *::-webkit-scrollbar-thumb:hover {
-    background-color: #3f536e;
+    background-color: var(--color-scrollbar-hover);
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   LIGHT-MODE OVERRIDES FOR HARDCODED TAILWIND CLASSES
+   The codebase uses many `bg-slate-*`, `text-slate-*`, and arbitrary-value
+   classes (`bg-[#0d1526]` etc.). Rather than touch every page, we map the
+   dark-surface/dark-text semantic tokens to cream/charcoal in light mode
+   via attribute-selector specificity (beats Tailwind's single-class rules).
+   ═════════════════════════════════════════════════════════════════════ */
+
+[data-theme="light"] {
+  /* ── Surface hexes used across layout/page components ──────────── */
+  .bg-\[\#0d1526\] { background-color: var(--color-bg-primary) !important; }
+  .bg-\[\#16213a\] { background-color: var(--color-bg-secondary) !important; }
+  .bg-\[\#1e293b\] { background-color: var(--color-bg-card) !important; }
+  .bg-\[\#263347\] { background-color: var(--color-bg-elevated) !important; }
+  .bg-\[\#2d3d54\] { background-color: var(--color-bg-hover) !important; }
+  .bg-\[\#3f536e\] { background-color: var(--color-border-hover) !important; }
+
+  .hover\:bg-\[\#1e293b\]:hover { background-color: var(--color-bg-elevated) !important; }
+  .hover\:bg-\[\#263347\]:hover { background-color: var(--color-bg-hover) !important; }
+
+  .border-\[\#2d3d54\] { border-color: var(--color-border) !important; }
+  .border-\[\#3f536e\] { border-color: var(--color-border-hover) !important; }
+  .hover\:border-\[\#2d3d54\]:hover { border-color: var(--color-border) !important; }
+  .hover\:border-\[\#3f536e\]:hover { border-color: var(--color-border-hover) !important; }
+
+  /* ── Slate surface classes (backgrounds) ──────────────────────── */
+  .bg-slate-950 { background-color: var(--color-bg-primary) !important; }
+  .bg-slate-925 { background-color: var(--color-bg-secondary) !important; }
+  .bg-slate-900 { background-color: var(--color-bg-secondary) !important; }
+  .bg-slate-850 { background-color: var(--color-bg-card) !important; }
+  .bg-slate-800 { background-color: var(--color-bg-card) !important; }
+  .bg-slate-700 { background-color: var(--color-bg-elevated) !important; }
+  .bg-slate-600 { background-color: var(--color-bg-hover) !important; }
+
+  .hover\:bg-slate-800\/50:hover { background-color: var(--color-bg-elevated) !important; }
+  .hover\:bg-slate-800:hover     { background-color: var(--color-bg-elevated) !important; }
+  .hover\:bg-slate-700:hover     { background-color: var(--color-bg-hover) !important; }
+
+  /* ── Slate borders ────────────────────────────────────────────── */
+  .border-slate-800 { border-color: var(--color-border) !important; }
+  .border-slate-700 { border-color: var(--color-border) !important; }
+  .border-slate-600 { border-color: var(--color-border-hover) !important; }
+  .hover\:border-slate-600:hover { border-color: var(--color-border-hover) !important; }
+
+  /* ── Text colors — invert the dark-mode slate scale ───────────── */
+  .text-white      { color: var(--color-text-primary) !important; }
+  .text-slate-100  { color: var(--color-text-primary) !important; }
+  .text-slate-200  { color: var(--color-text-primary) !important; }
+  .text-slate-300  { color: var(--color-text-secondary) !important; }
+  .text-slate-400  { color: var(--color-text-secondary) !important; }
+  .text-slate-500  { color: var(--color-text-muted) !important; }
+  .text-slate-600  { color: var(--color-text-muted) !important; }
+  .text-slate-700  { color: #a39e85 !important; }   /* very muted / disabled */
+
+  .hover\:text-white:hover      { color: var(--color-text-primary) !important; }
+  .hover\:text-slate-200:hover  { color: var(--color-text-primary) !important; }
+  .hover\:text-slate-300:hover  { color: var(--color-text-secondary) !important; }
+
+  .placeholder-slate-500::placeholder { color: var(--color-text-muted) !important; }
+
+  /* ── Brand-accent (mq-400 etc.) stays blue — complements mustard ─ */
+  /* (no overrides needed — blue on cream reads great) */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   COMPONENT CLASSES — use semantic CSS vars so they auto-adapt
+   ═════════════════════════════════════════════════════════════════════ */
+
 @layer components {
-  /* ── Cards ─────────────────────────────────────────────────── */
   .card {
-    @apply rounded-xl border border-[#2d3d54] bg-[#1e293b] backdrop-blur-sm;
+    @apply rounded-xl backdrop-blur-sm;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
   }
 
   .card-hover {
-    @apply card transition-all duration-200 hover:border-[#3f536e] hover:bg-[#263347];
+    @apply card transition-all duration-200;
+  }
+  .card-hover:hover {
+    background-color: var(--color-bg-elevated);
+    border-color: var(--color-border-hover);
   }
 
   /* ── Buttons ────────────────────────────────────────────────── */
@@ -75,58 +187,73 @@
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 rounded-lg
-           border border-[#2d3d54] bg-[#1e293b] px-4 py-2.5
-           text-sm font-medium text-slate-200
-           transition-all duration-200
-           hover:border-[#3f536e] hover:bg-[#263347] hover:text-white
-           active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+           px-4 py-2.5 text-sm font-medium
+           transition-all duration-200 active:scale-[0.98]
+           disabled:opacity-50 disabled:cursor-not-allowed;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+  }
+  .btn-secondary:hover {
+    background-color: var(--color-bg-elevated);
+    border-color: var(--color-border-hover);
+    color: var(--color-text-primary);
   }
 
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5
-           text-sm font-medium text-slate-400 transition-all duration-200
-           hover:bg-[#1e293b] hover:text-slate-200;
+           text-sm font-medium transition-all duration-200;
+    color: var(--color-text-secondary);
+  }
+  .btn-ghost:hover {
+    background-color: var(--color-bg-card);
+    color: var(--color-text-primary);
   }
 
   /* ── Form elements ──────────────────────────────────────────── */
   .input {
-    @apply w-full rounded-lg border border-[#2d3d54] bg-[#1e293b] px-3.5 py-2.5
-           text-sm text-white placeholder-slate-500 outline-none transition-all duration-200
-           focus:border-mq-500 focus:ring-2 focus:ring-mq-500/25;
+    @apply w-full rounded-lg px-3.5 py-2.5 text-sm outline-none transition-all duration-200;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+  }
+  .input::placeholder { color: var(--color-text-muted); }
+  .input:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px var(--color-accent-dim);
   }
 
   .label {
-    @apply block text-sm font-medium text-slate-300 mb-1.5;
+    @apply block text-sm font-medium mb-1.5;
+    color: var(--color-text-secondary);
   }
 
-  /* ── Badges ─────────────────────────────────────────────────── */
+  /* ── Badges (status chips — stay semantic across themes) ──────── */
   .badge {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
   }
+  .badge-ahead    { @apply badge bg-emerald-500/15 text-emerald-600 border border-emerald-500/25; }
+  .badge-ontrack  { @apply badge bg-blue-500/15    text-blue-600    border border-blue-500/25; }
+  .badge-behind   { @apply badge bg-red-500/15     text-red-600     border border-red-500/25; }
+  .badge-warning  { @apply badge bg-amber-500/15   text-amber-700   border border-amber-500/25; }
 
-  .badge-ahead {
-    @apply badge bg-emerald-500/15 text-emerald-400 border border-emerald-500/25;
-  }
-
-  .badge-ontrack {
-    @apply badge bg-blue-500/15 text-blue-400 border border-blue-500/25;
-  }
-
-  .badge-behind {
-    @apply badge bg-red-500/15 text-red-400 border border-red-500/25;
-  }
-
-  .badge-warning {
-    @apply badge bg-amber-500/15 text-amber-400 border border-amber-500/25;
+  /* In dark mode, badges look better with lighter text shades */
+  :root:not([data-theme="light"]) {
+    .badge-ahead   { @apply text-emerald-400; }
+    .badge-ontrack { @apply text-blue-400; }
+    .badge-behind  { @apply text-red-400; }
+    .badge-warning { @apply text-amber-400; }
   }
 
   /* ── Typography ─────────────────────────────────────────────── */
   .section-title {
-    @apply text-lg font-semibold text-white font-display;
+    @apply text-lg font-semibold font-display;
+    color: var(--color-text-primary);
   }
 
   .page-title {
-    @apply text-2xl font-bold text-white font-display tracking-tight;
+    @apply text-2xl font-bold font-display tracking-tight;
+    color: var(--color-text-primary);
   }
 
   /* ── Stat card ──────────────────────────────────────────────── */
@@ -136,7 +263,10 @@
 
   /* ── Table ──────────────────────────────────────────────────── */
   .table-row-hover {
-    @apply transition-colors duration-100 hover:bg-[#1e293b];
+    @apply transition-colors duration-100;
+  }
+  .table-row-hover:hover {
+    background-color: var(--color-bg-card);
   }
 }
 

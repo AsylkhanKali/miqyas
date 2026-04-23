@@ -26,9 +26,12 @@ import {
   Video,
   Plus,
   Check,
+  Sun,
+  Moon,
 } from "lucide-react";
 import clsx from "clsx";
 import { useProjectStore } from "@/store/projectStore";
+import { useTheme } from "@/store/themeContext";
 
 // ── Nav structure ─────────────────────────────────────────────────────────
 
@@ -89,6 +92,7 @@ export default function AppLayout() {
   const location   = useLocation();
   const navigate   = useNavigate();
   const { projects, fetchProjects } = useProjectStore();
+  const { theme, toggle: toggleTheme } = useTheme();
 
   useEffect(() => {
     if (projects.length === 0) fetchProjects();
@@ -318,6 +322,15 @@ export default function AppLayout() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+              className="relative flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-[#1e293b] hover:text-white transition-colors"
+            >
+              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+
             {/* Notifications */}
             <button className="relative flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-[#1e293b] hover:text-white transition-colors">
               <AlertTriangle size={16} />

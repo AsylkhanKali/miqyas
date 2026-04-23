@@ -4,6 +4,7 @@ import asyncio
 import logging
 from uuid import UUID
 
+from celery.exceptions import SoftTimeLimitExceeded
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
@@ -49,6 +50,29 @@ def parse_ifc_task(self, bim_model_id: str):
         count = loop.run_until_complete(_run())
         logger.info(f"IFC parse complete: {count} elements")
         return {"status": "success", "element_count": count}
+    except SoftTimeLimitExceeded:
+        # 10-minute soft limit hit — mark model as failed so the UI stops
+        # showing "pending" and the user can upload a smaller file or retry.
+        logger.error(f"IFC parse timed out for model {bim_model_id}")
+        try:
+            from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+            from app.models.bim import BIMModel
+
+            async def _mark_failed():
+                engine = create_async_engine(settings.database_url)
+                async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+                async with async_session() as session:
+                    model = await session.get(BIMModel, UUID(bim_model_id))
+                    if model:
+                        model.parse_status = "failed"
+                        model.parse_error = "Parse timed out (file may be too large)"
+                        await session.commit()
+
+            loop2 = asyncio.new_event_loop()
+            loop2.run_until_complete(_mark_failed())
+        except Exception as inner:
+            logger.error(f"Could not mark model as failed: {inner}")
+        return {"status": "failed", "error": "timeout"}
     except Exception as exc:
         logger.error(f"IFC parse failed: {exc}")
         raise self.retry(exc=exc, countdown=30)

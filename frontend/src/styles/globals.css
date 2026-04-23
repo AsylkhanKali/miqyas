@@ -40,35 +40,36 @@
     --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.35);
   }
 
-  /* ── Light theme — warm whitemustard + black-grey ────────────
-     Palette rationale (color theory):
-       • Bg is a warm cream (Y/YO family ≈ hue 45°) — the "whitemustard".
-       • Accent stays brand-blue (≈ hue 220°) — ~180° complementary to
-         mustard, so cards/CTAs pop clean on cream.
-       • Text is a warm near-black-grey, slightly warm-biased so it
-         feels native to the cream surface (not cold-blue on warm bg). */
+  /* ── Light theme ────────────────────────────────────────────────
+     Anchors:
+       #F4F3EF  Concrete White     — page bg (warm off-white, plaster feel)
+       #C2A23A  Industrial Mustard — accent / CTA
+       #2F2F2C  Structural Charcoal — text / headers
+     Surfaces step between the anchors; mustard used for CTAs + borders.
+     Color theory: mustard (≈50°) + blue-grey (≈210°) interactive states
+     sit ~160° apart — split-complementary harmony, energetic but stable. */
   [data-theme="light"] {
-    --color-bg-primary:   #f5edd6;   /* page bg — warm cream */
-    --color-bg-secondary: #eee3c0;   /* sidebar / topbar — deeper cream */
-    --color-bg-card:      #ffffff;   /* pure white cards for contrast */
-    --color-bg-elevated:  #fcf7e6;   /* dropdowns / elevated panels */
-    --color-bg-hover:     #e7d8a9;   /* warm mustard-tinted hover */
+    --color-bg-primary:   #F4F3EF;   /* Concrete White — page bg */
+    --color-bg-secondary: #ECEAE3;   /* sidebar / topbar — one step warmer */
+    --color-bg-card:      #FAFAF7;   /* cards — lifted from bg */
+    --color-bg-elevated:  #E8E6DF;   /* dropdowns / modals */
+    --color-bg-hover:     #DED9CF;   /* hover state */
 
-    --color-border:       #d4c38a;
-    --color-border-hover: #b8a468;
+    --color-border:       #D5D0C5;   /* subtle separator */
+    --color-border-hover: #C2A23A;   /* Industrial Mustard — punchy border */
 
-    --color-text-primary:   #1c1b16;   /* warm near-black */
-    --color-text-secondary: #3e3d38;   /* dark charcoal */
-    --color-text-muted:     #6e6b5c;   /* warm muted grey */
+    --color-text-primary:   #2F2F2C;   /* Structural Charcoal */
+    --color-text-secondary: #4A4A46;   /* mid charcoal */
+    --color-text-muted:     #7A7870;   /* warm muted */
 
-    --color-accent:       #2563eb;
-    --color-accent-hover: #1d4ed8;
-    --color-accent-dim:   rgba(37, 99, 235, 0.10);
+    --color-accent:       #C2A23A;   /* Industrial Mustard — primary CTA */
+    --color-accent-hover: #A8891F;   /* darker mustard on hover */
+    --color-accent-dim:   rgba(194, 162, 58, 0.12);
 
-    --color-scrollbar:       #d4c38a;
-    --color-scrollbar-hover: #b8a468;
+    --color-scrollbar:       #D5D0C5;
+    --color-scrollbar-hover: #C2A23A;
 
-    --shadow-card: 0 2px 8px -2px rgba(120, 100, 40, 0.14);
+    --shadow-card: 0 1px 4px -1px rgba(47, 47, 44, 0.08), 0 4px 12px -4px rgba(47, 47, 44, 0.06);
   }
 
   html, body, #root {
@@ -151,11 +152,26 @@
 
 [data-theme="light"] .placeholder-slate-500::placeholder { color: var(--color-text-muted) !important; }
 
-/* Badge text — darker shades for proper contrast on cream */
-[data-theme="light"] .badge-ahead   { color: #047857 !important; }
-[data-theme="light"] .badge-ontrack { color: #1d4ed8 !important; }
-[data-theme="light"] .badge-behind  { color: #b91c1c !important; }
-[data-theme="light"] .badge-warning { color: #b45309 !important; }
+/* Badge text — darker shades for proper contrast on concrete-white */
+[data-theme="light"] .badge-ahead   { color: #166534 !important; }
+[data-theme="light"] .badge-ontrack { color: #1e40af !important; }
+[data-theme="light"] .badge-behind  { color: #991b1b !important; }
+[data-theme="light"] .badge-warning { color: #92400e !important; }
+
+/* Primary button — mustard CTA in light mode */
+[data-theme="light"] .btn-primary {
+  background-color: #C2A23A !important;
+  box-shadow: 0 2px 8px -2px rgba(194, 162, 58, 0.35) !important;
+  color: #1C1C1A !important;
+}
+[data-theme="light"] .btn-primary:hover {
+  background-color: #A8891F !important;
+}
+
+/* Nav active indicator — mustard in light mode */
+[data-theme="light"] .bg-mq-500\/15 { background-color: rgba(194, 162, 58, 0.12) !important; }
+[data-theme="light"] .text-mq-400   { color: #A8891F !important; }
+[data-theme="light"] .bg-mq-500     { background-color: #C2A23A !important; }
 
 /* ═══════════════════════════════════════════════════════════════════════
    COMPONENT CLASSES — use semantic CSS vars so they auto-adapt

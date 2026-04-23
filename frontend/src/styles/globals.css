@@ -4,72 +4,111 @@
 
 /* ═══════════════════════════════════════════════════════════════════════
    THEME SYSTEM
-   Dark (default) — rich navy with blue accents.
-   Light — warm whitemustard cream with black-grey text (complement of blue).
-   Switch via `[data-theme="light"]` on <html>.
+     Dark  (default)  — navy + blue accent (engineering HUD).
+     Light ([data-theme="light"]) — "construction atelier":
+       paper-warm whites, graphite text, industrial-mustard CTA.
+     Anchors (user-locked):
+       #F4F3EF  Concrete White     — page
+       #C2A23A  Industrial Mustard — CTA / highlight
+       #2F2F2C  Structural Charcoal — text
    ═════════════════════════════════════════════════════════════════════ */
 
 @layer base {
   :root {
-    /* ── Surfaces ────────────────────────────────────────────── */
+    /* Surfaces */
     --color-bg-primary:   #0d1526;
     --color-bg-secondary: #16213a;
     --color-bg-card:      #1e293b;
     --color-bg-elevated:  #263347;
     --color-bg-hover:     #2d3d54;
 
-    /* ── Borders ─────────────────────────────────────────────── */
+    /* Borders */
     --color-border:       #2d3d54;
     --color-border-hover: #3f536e;
+    --color-border-strong: #3f536e;
 
-    /* ── Text ────────────────────────────────────────────────── */
+    /* Text */
     --color-text-primary:   #f1f5f9;
     --color-text-secondary: #cbd5e1;
     --color-text-muted:     #64748b;
 
-    /* ── Accent (blue — brand) ───────────────────────────────── */
+    /* Accent (blue — brand) */
     --color-accent:       #3b82f6;
     --color-accent-hover: #60a5fa;
+    --color-accent-soft:  rgba(59, 130, 246, 0.15);
     --color-accent-dim:   rgba(59, 130, 246, 0.15);
+    --color-accent-text:  #ffffff;
+    --color-accent-ring:  rgba(59, 130, 246, 0.35);
 
-    /* ── Scrollbar ───────────────────────────────────────────── */
+    /* Scrollbar */
     --color-scrollbar:       #2d3d54;
     --color-scrollbar-hover: #3f536e;
 
-    /* ── Shadows ─────────────────────────────────────────────── */
+    /* Shadows — layered for depth */
+    --shadow-xs:   0 1px 2px rgba(0, 0, 0, 0.40);
+    --shadow-sm:   0 2px 4px -1px rgba(0, 0, 0, 0.35);
     --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.35);
+    --shadow-md:   0 4px 12px -2px rgba(0, 0, 0, 0.40), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
+    --shadow-lg:   0 12px 24px -6px rgba(0, 0, 0, 0.50), 0 4px 8px -4px rgba(0, 0, 0, 0.30);
+    --shadow-cta:  0 2px 6px -1px rgba(59, 130, 246, 0.45), 0 1px 2px rgba(0,0,0,0.3);
+
+    /* Focus ring */
+    --ring-accent: 0 0 0 3px rgba(59, 130, 246, 0.35);
   }
 
-  /* ── Light theme ────────────────────────────────────────────────
-     Anchors:
-       #F4F3EF  Concrete White     — page bg (warm off-white, plaster feel)
-       #C2A23A  Industrial Mustard — accent / CTA
-       #2F2F2C  Structural Charcoal — text / headers
-     Surfaces step between the anchors; mustard used for CTAs + borders.
-     Color theory: mustard (≈50°) + blue-grey (≈210°) interactive states
-     sit ~160° apart — split-complementary harmony, energetic but stable. */
+  /* ── Light theme ──────────────────────────────────────────────────
+     Palette philosophy:
+       Surfaces are a 5-step paper scale — each step ~3-5% warmer/darker
+       than the last, so hierarchy reads without being loud.
+       Text uses a true 3-step charcoal ramp for confident contrast.
+       Mustard is reserved: primary CTA, focus ring, active indicator —
+       never used for plain surfaces or body borders.
+       Split-complementary harmony with the dark-mode blue kept intact.    */
   [data-theme="light"] {
-    --color-bg-primary:   #F4F3EF;   /* Concrete White — page bg */
-    --color-bg-secondary: #ECEAE3;   /* sidebar / topbar — one step warmer */
-    --color-bg-card:      #FAFAF7;   /* cards — lifted from bg */
-    --color-bg-elevated:  #E8E6DF;   /* dropdowns / modals */
-    --color-bg-hover:     #DED9CF;   /* hover state */
+    /* Surfaces — paper-warm, 5 steps */
+    --color-bg-primary:   #F4F3EF;   /* Concrete White — page */
+    --color-bg-secondary: #EDEBE3;   /* sidebar / topbar */
+    --color-bg-card:      #FCFBF7;   /* cards — almost pure, lifts off page */
+    --color-bg-elevated:  #F8F6EF;   /* popovers / menus */
+    --color-bg-hover:     #E8E4D7;   /* subtle tap state */
 
-    --color-border:       #D5D0C5;   /* subtle separator */
-    --color-border-hover: #C2A23A;   /* Industrial Mustard — punchy border */
+    /* Borders — warm stone, not grey */
+    --color-border:        #E0DBCC;   /* hairline separator */
+    --color-border-hover:  #C2A23A;   /* mustard on interaction */
+    --color-border-strong: #CFC7B2;   /* emphasized divider */
 
-    --color-text-primary:   #2F2F2C;   /* Structural Charcoal */
-    --color-text-secondary: #4A4A46;   /* mid charcoal */
-    --color-text-muted:     #7A7870;   /* warm muted */
+    /* Text — graphite ramp */
+    --color-text-primary:   #26241F;  /* near-black, warm */
+    --color-text-secondary: #55524A;  /* body */
+    --color-text-muted:     #8A8577;  /* captions / meta */
 
-    --color-accent:       #C2A23A;   /* Industrial Mustard — primary CTA */
-    --color-accent-hover: #A8891F;   /* darker mustard on hover */
-    --color-accent-dim:   rgba(194, 162, 58, 0.12);
+    /* Accent — Industrial Mustard */
+    --color-accent:       #C2A23A;
+    --color-accent-hover: #AA8B23;
+    --color-accent-soft:  rgba(194, 162, 58, 0.14);
+    --color-accent-dim:   rgba(194, 162, 58, 0.14);
+    --color-accent-text:  #1E1C15;   /* high-contrast on mustard */
+    --color-accent-ring:  rgba(194, 162, 58, 0.40);
 
-    --color-scrollbar:       #D5D0C5;
+    /* Scrollbar */
+    --color-scrollbar:       #D5CFBF;
     --color-scrollbar-hover: #C2A23A;
 
-    --shadow-card: 0 1px 4px -1px rgba(47, 47, 44, 0.08), 0 4px 12px -4px rgba(47, 47, 44, 0.06);
+    /* Shadows — soft, warm, tinted toward charcoal (not black) */
+    --shadow-xs:   0 1px 2px rgba(47, 47, 44, 0.05);
+    --shadow-sm:   0 1px 2px rgba(47, 47, 44, 0.06), 0 1px 3px rgba(47, 47, 44, 0.04);
+    --shadow-card: 0 1px 2px rgba(47, 47, 44, 0.04),
+                   0 4px 10px -4px rgba(47, 47, 44, 0.08),
+                   0 0 0 1px rgba(47, 47, 44, 0.02);
+    --shadow-md:   0 4px 12px -2px rgba(47, 47, 44, 0.10),
+                   0 2px 4px -2px rgba(47, 47, 44, 0.06);
+    --shadow-lg:   0 18px 36px -12px rgba(47, 47, 44, 0.18),
+                   0 8px 16px -8px rgba(47, 47, 44, 0.10);
+    --shadow-cta:  0 1px 2px rgba(47, 47, 44, 0.15),
+                   0 4px 10px -2px rgba(194, 162, 58, 0.35),
+                   inset 0 1px 0 rgba(255, 255, 255, 0.20);
+
+    --ring-accent: 0 0 0 3px rgba(194, 162, 58, 0.40);
   }
 
   html, body, #root {
@@ -77,109 +116,161 @@
     color: var(--color-text-primary);
   }
 
+  /* Light theme typography polish: tighter tracking & antialiasing on
+     warm paper — text reads crisper, avoids the "washed-out" feel of
+     raw sans-serif on cream. */
+  [data-theme="light"] body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--color-scrollbar) transparent;
   }
-
-  *::-webkit-scrollbar { width: 6px; }
-  *::-webkit-scrollbar-track { background: transparent; }
-  *::-webkit-scrollbar-thumb {
+  *::-webkit-scrollbar        { width: 6px; height: 6px; }
+  *::-webkit-scrollbar-track  { background: transparent; }
+  *::-webkit-scrollbar-thumb  {
     background-color: var(--color-scrollbar);
     border-radius: 3px;
   }
   *::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-scrollbar-hover);
   }
+
+  /* Text selection */
+  [data-theme="light"] ::selection {
+    background-color: rgba(194, 162, 58, 0.30);
+    color: #1E1C15;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
    LIGHT-MODE OVERRIDES FOR HARDCODED TAILWIND CLASSES
-   The codebase uses many `bg-slate-*`, `text-slate-*`, and arbitrary-value
-   classes (`bg-[#0d1526]` etc.). Rather than touch every page, we map the
-   dark-surface/dark-text semantic tokens to cream/charcoal in light mode
-   via attribute-selector specificity (beats Tailwind's single-class rules).
+   Pages ship with many `bg-slate-*` / `text-slate-*` / `bg-mq-*` /
+   arbitrary-value classes. Rather than touch every page we remap them
+   here via attribute-selector specificity.
    ═════════════════════════════════════════════════════════════════════ */
 
-/* Surface hexes — page bg / sidebar / card / elevated / hover / border */
-[data-theme="light"] .bg-\[\#0d1526\] { background-color: var(--color-bg-primary) !important; }
+/* ── Arbitrary hex surfaces (page / sidebar / card / elevated / hover) ── */
+[data-theme="light"] .bg-\[\#0d1526\] { background-color: var(--color-bg-primary)   !important; }
 [data-theme="light"] .bg-\[\#16213a\] { background-color: var(--color-bg-secondary) !important; }
-[data-theme="light"] .bg-\[\#1e293b\] { background-color: var(--color-bg-card) !important; }
-[data-theme="light"] .bg-\[\#263347\] { background-color: var(--color-bg-elevated) !important; }
-[data-theme="light"] .bg-\[\#2d3d54\] { background-color: var(--color-bg-hover) !important; }
-[data-theme="light"] .bg-\[\#3f536e\] { background-color: var(--color-border-hover) !important; }
+[data-theme="light"] .bg-\[\#1e293b\] { background-color: var(--color-bg-card)      !important; }
+[data-theme="light"] .bg-\[\#263347\] { background-color: var(--color-bg-elevated)  !important; }
+[data-theme="light"] .bg-\[\#2d3d54\] { background-color: var(--color-bg-hover)     !important; }
+[data-theme="light"] .bg-\[\#3f536e\] { background-color: var(--color-border-strong)!important; }
 
 [data-theme="light"] .hover\:bg-\[\#1e293b\]:hover { background-color: var(--color-bg-elevated) !important; }
-[data-theme="light"] .hover\:bg-\[\#263347\]:hover { background-color: var(--color-bg-hover) !important; }
+[data-theme="light"] .hover\:bg-\[\#263347\]:hover { background-color: var(--color-bg-hover)    !important; }
 
-[data-theme="light"] .border-\[\#2d3d54\] { border-color: var(--color-border) !important; }
-[data-theme="light"] .border-\[\#3f536e\] { border-color: var(--color-border-hover) !important; }
-[data-theme="light"] .hover\:border-\[\#2d3d54\]:hover { border-color: var(--color-border) !important; }
-[data-theme="light"] .hover\:border-\[\#3f536e\]:hover { border-color: var(--color-border-hover) !important; }
+[data-theme="light"] .border-\[\#2d3d54\]        { border-color: var(--color-border) !important; }
+[data-theme="light"] .border-\[\#3f536e\]        { border-color: var(--color-border-strong) !important; }
+[data-theme="light"] .hover\:border-\[\#2d3d54\]:hover { border-color: var(--color-border)        !important; }
+[data-theme="light"] .hover\:border-\[\#3f536e\]:hover { border-color: var(--color-border-hover)  !important; }
 
-/* Slate surface classes (backgrounds) */
-[data-theme="light"] .bg-slate-950 { background-color: var(--color-bg-primary) !important; }
+/* ── Slate surfaces ──────────────────────────────────────────────── */
+[data-theme="light"] .bg-slate-950 { background-color: var(--color-bg-primary)   !important; }
 [data-theme="light"] .bg-slate-925 { background-color: var(--color-bg-secondary) !important; }
 [data-theme="light"] .bg-slate-900 { background-color: var(--color-bg-secondary) !important; }
-[data-theme="light"] .bg-slate-850 { background-color: var(--color-bg-card) !important; }
-[data-theme="light"] .bg-slate-800 { background-color: var(--color-bg-card) !important; }
-[data-theme="light"] .bg-slate-700 { background-color: var(--color-bg-elevated) !important; }
-[data-theme="light"] .bg-slate-600 { background-color: var(--color-bg-hover) !important; }
+[data-theme="light"] .bg-slate-850 { background-color: var(--color-bg-card)      !important; }
+[data-theme="light"] .bg-slate-800 { background-color: var(--color-bg-card)      !important; }
+[data-theme="light"] .bg-slate-700 { background-color: var(--color-bg-elevated)  !important; }
+[data-theme="light"] .bg-slate-600 { background-color: var(--color-bg-hover)     !important; }
+
+/* Slate with opacity — common pattern for "dimmer" surfaces */
+[data-theme="light"] .bg-slate-800\/50  { background-color: rgba(252, 251, 247, 0.65) !important; }
+[data-theme="light"] .bg-slate-800\/40  { background-color: rgba(252, 251, 247, 0.55) !important; }
+[data-theme="light"] .bg-slate-800\/30  { background-color: rgba(252, 251, 247, 0.45) !important; }
+[data-theme="light"] .bg-slate-900\/50  { background-color: rgba(237, 235, 227, 0.70) !important; }
 
 [data-theme="light"] .hover\:bg-slate-800\/50:hover { background-color: var(--color-bg-elevated) !important; }
-[data-theme="light"] .hover\:bg-slate-800:hover     { background-color: var(--color-bg-elevated) !important; }
-[data-theme="light"] .hover\:bg-slate-700:hover     { background-color: var(--color-bg-hover) !important; }
+[data-theme="light"] .hover\:bg-slate-800:hover    { background-color: var(--color-bg-elevated) !important; }
+[data-theme="light"] .hover\:bg-slate-700:hover    { background-color: var(--color-bg-hover)    !important; }
 
-/* Slate borders */
-[data-theme="light"] .border-slate-800 { border-color: var(--color-border) !important; }
-[data-theme="light"] .border-slate-700 { border-color: var(--color-border) !important; }
-[data-theme="light"] .border-slate-600 { border-color: var(--color-border-hover) !important; }
+/* Slate borders (+ opacity variants) */
+[data-theme="light"] .border-slate-800     { border-color: var(--color-border) !important; }
+[data-theme="light"] .border-slate-700     { border-color: var(--color-border) !important; }
+[data-theme="light"] .border-slate-600     { border-color: var(--color-border-strong) !important; }
+[data-theme="light"] .border-slate-700\/50 { border-color: rgba(224, 219, 204, 0.70) !important; }
 [data-theme="light"] .hover\:border-slate-600:hover { border-color: var(--color-border-hover) !important; }
 
-/* Text colors — invert the dark-mode slate scale */
-[data-theme="light"] .text-white      { color: var(--color-text-primary) !important; }
-[data-theme="light"] .text-slate-100  { color: var(--color-text-primary) !important; }
-[data-theme="light"] .text-slate-200  { color: var(--color-text-primary) !important; }
+/* ── Text ──────────────────────────────────────────────────────── */
+[data-theme="light"] .text-white      { color: var(--color-text-primary)   !important; }
+[data-theme="light"] .text-slate-100  { color: var(--color-text-primary)   !important; }
+[data-theme="light"] .text-slate-200  { color: var(--color-text-primary)   !important; }
 [data-theme="light"] .text-slate-300  { color: var(--color-text-secondary) !important; }
 [data-theme="light"] .text-slate-400  { color: var(--color-text-secondary) !important; }
-[data-theme="light"] .text-slate-500  { color: var(--color-text-muted) !important; }
-[data-theme="light"] .text-slate-600  { color: var(--color-text-muted) !important; }
-[data-theme="light"] .text-slate-700  { color: #a39e85 !important; }
+[data-theme="light"] .text-slate-500  { color: var(--color-text-muted)     !important; }
+[data-theme="light"] .text-slate-600  { color: var(--color-text-muted)     !important; }
+[data-theme="light"] .text-slate-700  { color: #A6A092                      !important; }
 
-[data-theme="light"] .hover\:text-white:hover      { color: var(--color-text-primary) !important; }
-[data-theme="light"] .hover\:text-slate-200:hover  { color: var(--color-text-primary) !important; }
-[data-theme="light"] .hover\:text-slate-300:hover  { color: var(--color-text-secondary) !important; }
+[data-theme="light"] .hover\:text-white:hover     { color: var(--color-text-primary)   !important; }
+[data-theme="light"] .hover\:text-slate-200:hover { color: var(--color-text-primary)   !important; }
+[data-theme="light"] .hover\:text-slate-300:hover { color: var(--color-text-secondary) !important; }
 
-[data-theme="light"] .placeholder-slate-500::placeholder { color: var(--color-text-muted) !important; }
+[data-theme="light"] .placeholder-slate-500::placeholder,
+[data-theme="light"] .placeholder-slate-400::placeholder { color: var(--color-text-muted) !important; }
 
-/* Badge text — darker shades for proper contrast on concrete-white */
-[data-theme="light"] .badge-ahead   { color: #166534 !important; }
-[data-theme="light"] .badge-ontrack { color: #1e40af !important; }
-[data-theme="light"] .badge-behind  { color: #991b1b !important; }
-[data-theme="light"] .badge-warning { color: #92400e !important; }
-
-/* Primary button — mustard CTA in light mode */
-[data-theme="light"] .btn-primary {
-  background-color: #C2A23A !important;
-  box-shadow: 0 2px 8px -2px rgba(194, 162, 58, 0.35) !important;
-  color: #1C1C1A !important;
-}
-[data-theme="light"] .btn-primary:hover {
-  background-color: #A8891F !important;
-}
-
-/* Nav active indicator — mustard in light mode */
-[data-theme="light"] .bg-mq-500\/15 { background-color: rgba(194, 162, 58, 0.12) !important; }
-[data-theme="light"] .text-mq-400   { color: #A8891F !important; }
-[data-theme="light"] .bg-mq-500     { background-color: #C2A23A !important; }
+/* ── Status badge text — deeper shades for contrast on cream ────── */
+[data-theme="light"] .badge-ahead   { color: #145A2D !important; background-color: rgba(16, 185, 129, 0.10) !important; border-color: rgba(16, 185, 129, 0.30) !important; }
+[data-theme="light"] .badge-ontrack { color: #1D3F9E !important; background-color: rgba(37, 99, 235, 0.10)  !important; border-color: rgba(37, 99, 235, 0.28)  !important; }
+[data-theme="light"] .badge-behind  { color: #8C1818 !important; background-color: rgba(239, 68, 68, 0.10)  !important; border-color: rgba(239, 68, 68, 0.30)  !important; }
+[data-theme="light"] .badge-warning { color: #7A4706 !important; background-color: rgba(245, 158, 11, 0.12) !important; border-color: rgba(245, 158, 11, 0.32) !important; }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   COMPONENT CLASSES — use semantic CSS vars so they auto-adapt
+   mq-* BRAND COLOR REMAP (light mode)
+   Dark theme: mq-* is a blue scale (#3b82f6 etc.).
+   Light theme: we shift the whole scale onto the mustard family so
+   brand CTAs / highlights read as "Industrial Mustard" — without
+   having to rename classes throughout the codebase.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Solid mq backgrounds */
+[data-theme="light"] .bg-mq-400     { background-color: #D4B44D !important; }
+[data-theme="light"] .bg-mq-500     { background-color: #C2A23A !important; }
+[data-theme="light"] .bg-mq-600     { background-color: #AA8B23 !important; }
+[data-theme="light"] .bg-mq-700     { background-color: #8E7318 !important; }
+
+/* mq backgrounds with opacity — soft tints for nav pills, info panels */
+[data-theme="light"] .bg-mq-500\/15 { background-color: rgba(194, 162, 58, 0.14) !important; }
+[data-theme="light"] .bg-mq-500\/50 { background-color: rgba(194, 162, 58, 0.45) !important; }
+[data-theme="light"] .bg-mq-600\/5  { background-color: rgba(170, 139, 35, 0.06) !important; }
+[data-theme="light"] .bg-mq-600\/10 { background-color: rgba(170, 139, 35, 0.10) !important; }
+[data-theme="light"] .bg-mq-600\/15 { background-color: rgba(170, 139, 35, 0.14) !important; }
+[data-theme="light"] .bg-mq-600\/20 { background-color: rgba(170, 139, 35, 0.18) !important; }
+
+/* mq borders */
+[data-theme="light"] .border-mq-500      { border-color: #C2A23A !important; }
+[data-theme="light"] .border-mq-600      { border-color: #AA8B23 !important; }
+[data-theme="light"] .border-mq-500\/50  { border-color: rgba(194, 162, 58, 0.50) !important; }
+[data-theme="light"] .border-mq-600\/20  { border-color: rgba(170, 139, 35, 0.25) !important; }
+[data-theme="light"] .border-mq-600\/25  { border-color: rgba(170, 139, 35, 0.32) !important; }
+[data-theme="light"] .border-mq-600\/30  { border-color: rgba(170, 139, 35, 0.40) !important; }
+
+/* mq text */
+[data-theme="light"] .text-mq-300   { color: #8E7318 !important; }
+[data-theme="light"] .text-mq-400   { color: #8E7318 !important; }
+
+/* Gradients (from-mq-500 → to-mq-700) — used on hero CTAs / stat headers */
+[data-theme="light"] .from-mq-500   { --tw-gradient-from: #C2A23A !important; --tw-gradient-to: rgba(194,162,58,0) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+[data-theme="light"] .to-mq-700     { --tw-gradient-to: #8E7318 !important; }
+
+/* Colored shadow utility: shadow-mq-500/30 → warm mustard drop */
+[data-theme="light"] .shadow-mq-500\/30 { --tw-shadow-color: rgba(194, 162, 58, 0.35) !important; --tw-shadow: var(--tw-shadow-colored) !important; }
+[data-theme="light"] .shadow-mq-600\/30 { --tw-shadow-color: rgba(170, 139, 35, 0.30) !important; --tw-shadow: var(--tw-shadow-colored) !important; }
+
+/* Ring utility (focus) */
+[data-theme="light"] .ring-mq-500       { --tw-ring-color: rgba(194, 162, 58, 0.60) !important; }
+[data-theme="light"] .focus\:ring-mq-500:focus { --tw-ring-color: rgba(194, 162, 58, 0.60) !important; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   COMPONENT CLASSES
    ═════════════════════════════════════════════════════════════════════ */
 
 @layer components {
   .card {
-    @apply rounded-xl backdrop-blur-sm;
+    @apply rounded-xl;
     background-color: var(--color-bg-card);
     border: 1px solid var(--color-border);
     box-shadow: var(--shadow-card);
@@ -191,65 +282,86 @@
   .card-hover:hover {
     background-color: var(--color-bg-elevated);
     border-color: var(--color-border-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
   }
 
   /* ── Buttons ────────────────────────────────────────────────── */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-mq-600 px-4 py-2.5
-           text-sm font-semibold text-white transition-all duration-200
-           hover:bg-mq-500 active:scale-[0.98]
-           shadow-sm shadow-mq-600/30
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5
+           text-sm font-semibold transition-all duration-150
+           active:scale-[0.98]
            disabled:opacity-50 disabled:cursor-not-allowed;
+    background-color: var(--color-accent);
+    color: var(--color-accent-text);
+    box-shadow: var(--shadow-cta);
+    letter-spacing: -0.005em;
+  }
+  .btn-primary:hover {
+    background-color: var(--color-accent-hover);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--color-accent-hover) inset;
+  }
+  .btn-primary:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-cta), var(--ring-accent);
   }
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 rounded-lg
            px-4 py-2.5 text-sm font-medium
-           transition-all duration-200 active:scale-[0.98]
+           transition-all duration-150 active:scale-[0.98]
            disabled:opacity-50 disabled:cursor-not-allowed;
     background-color: var(--color-bg-card);
     border: 1px solid var(--color-border);
     color: var(--color-text-secondary);
+    box-shadow: var(--shadow-xs);
   }
   .btn-secondary:hover {
     background-color: var(--color-bg-elevated);
-    border-color: var(--color-border-hover);
+    border-color: var(--color-border-strong);
     color: var(--color-text-primary);
+  }
+  .btn-secondary:focus-visible {
+    outline: none;
+    box-shadow: var(--ring-accent);
+    border-color: var(--color-accent);
   }
 
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5
-           text-sm font-medium transition-all duration-200;
+           text-sm font-medium transition-all duration-150;
     color: var(--color-text-secondary);
   }
   .btn-ghost:hover {
-    background-color: var(--color-bg-card);
+    background-color: var(--color-bg-elevated);
     color: var(--color-text-primary);
   }
 
   /* ── Form elements ──────────────────────────────────────────── */
   .input {
-    @apply w-full rounded-lg px-3.5 py-2.5 text-sm outline-none transition-all duration-200;
+    @apply w-full rounded-lg px-3.5 py-2.5 text-sm outline-none transition-all duration-150;
     background-color: var(--color-bg-card);
     border: 1px solid var(--color-border);
     color: var(--color-text-primary);
   }
   .input::placeholder { color: var(--color-text-muted); }
+  .input:hover        { border-color: var(--color-border-strong); }
   .input:focus {
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 2px var(--color-accent-dim);
+    box-shadow: var(--ring-accent);
   }
 
   .label {
     @apply block text-sm font-medium mb-1.5;
     color: var(--color-text-secondary);
+    letter-spacing: -0.005em;
   }
 
-  /* ── Badges (status chips — stay semantic across themes) ──────── */
+  /* ── Badges ──────────────────────────────────────────────────── */
   .badge {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+    letter-spacing: 0.01em;
   }
-  /* Dark (default) — lighter text shades read better on navy surface */
   .badge-ahead    { @apply badge bg-emerald-500/15 text-emerald-400 border border-emerald-500/25; }
   .badge-ontrack  { @apply badge bg-blue-500/15    text-blue-400    border border-blue-500/25; }
   .badge-behind   { @apply badge bg-red-500/15     text-red-400     border border-red-500/25; }
@@ -259,16 +371,22 @@
   .section-title {
     @apply text-lg font-semibold font-display;
     color: var(--color-text-primary);
+    letter-spacing: -0.015em;
   }
 
   .page-title {
     @apply text-2xl font-bold font-display tracking-tight;
     color: var(--color-text-primary);
+    letter-spacing: -0.025em;
   }
 
   /* ── Stat card ──────────────────────────────────────────────── */
   .stat-card {
-    @apply card p-5 flex flex-col gap-1;
+    @apply card p-5 flex flex-col gap-1 transition-all duration-200;
+  }
+  .stat-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-border-strong);
   }
 
   /* ── Table ──────────────────────────────────────────────────── */
@@ -276,9 +394,43 @@
     @apply transition-colors duration-100;
   }
   .table-row-hover:hover {
-    background-color: var(--color-bg-card);
+    background-color: var(--color-bg-elevated);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LIGHT-THEME FINE DETAILS
+   Small, opinionated polish that can't be expressed as a simple remap.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Heavier-feeling cards — the layered shadow + hairline inset border does
+   most of the lifting. Tailwind `shadow-*` utilities get silently upgraded
+   so existing cards look correct without editing markup. */
+[data-theme="light"] .shadow-sm { box-shadow: var(--shadow-sm) !important; }
+[data-theme="light"] .shadow,
+[data-theme="light"] .shadow-md { box-shadow: var(--shadow-md) !important; }
+[data-theme="light"] .shadow-lg { box-shadow: var(--shadow-lg) !important; }
+[data-theme="light"] .shadow-xl { box-shadow: var(--shadow-lg) !important; }
+
+/* Nav active-state: subtle mustard wash + left bar (handled via bg-mq-500
+   remap above). The active link text uses text-mq-400 which we point at
+   the darker mustard for strong contrast on cream. */
+
+/* Divider lines inside cards (common: divide-slate-800) */
+[data-theme="light"] .divide-slate-800 > :not([hidden]) ~ :not([hidden]) { border-color: var(--color-border) !important; }
+[data-theme="light"] .divide-slate-700 > :not([hidden]) ~ :not([hidden]) { border-color: var(--color-border) !important; }
+
+/* Common "bg-white/5" type frosted overlays used on KPI chips */
+[data-theme="light"] .bg-white\/5  { background-color: rgba(47, 47, 44, 0.04) !important; }
+[data-theme="light"] .bg-white\/10 { background-color: rgba(47, 47, 44, 0.06) !important; }
+[data-theme="light"] .bg-black\/20 { background-color: rgba(47, 47, 44, 0.05) !important; }
+[data-theme="light"] .bg-black\/30 { background-color: rgba(47, 47, 44, 0.07) !important; }
+
+/* Links */
+[data-theme="light"] a.text-blue-400,
+[data-theme="light"] a.text-blue-500 { color: var(--color-accent-hover) !important; }
+[data-theme="light"] a.text-blue-400:hover,
+[data-theme="light"] a.text-blue-500:hover { color: var(--color-accent) !important; text-decoration: underline; text-underline-offset: 3px; }
 
 /* Three.js canvas container */
 .ifc-viewer-container canvas {

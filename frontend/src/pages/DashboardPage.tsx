@@ -84,14 +84,15 @@ const fadeUp = {
 
 // ── HealthRing (SVG circular progress) ───────────────────────────────────
 
-function HealthRing({ score, size = 52 }: { score: number; size?: number }) {
+function HealthRing({ score, size = 52, isLight }: { score: number; size?: number; isLight?: boolean }) {
   const r = size / 2 - 5;
   const circ = 2 * Math.PI * r;
   const dash = (score / 100) * circ;
   const color = score >= 70 ? "#10b981" : score >= 45 ? "#f59e0b" : "#ef4444";
+  const trackColor = isLight ? "#E0DBCC" : "#263347";
   return (
     <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#263347" strokeWidth={5} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={trackColor} strokeWidth={5} />
       <circle cx={size / 2} cy={size / 2} r={r}
         fill="none" stroke={color} strokeWidth={5}
         strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
@@ -534,7 +535,7 @@ function ProjectHealthRow({ proj }: { proj: ProjectHealthCard }) {
       className="flex items-center gap-4 rounded-lg p-3 transition-colors hover:bg-slate-800/50 group"
     >
       <div className="relative shrink-0">
-        <HealthRing score={proj.health_score} />
+        <HealthRing score={proj.health_score} isLight={isLight} />
         <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white">
           {proj.health_score.toFixed(0)}
         </span>

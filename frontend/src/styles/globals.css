@@ -441,10 +441,29 @@
   background-color: #E8E4D7;   /* warm stone for light mode */
 }
 
-/* Missing arbitrary-hex overrides */
+/* Missing arbitrary-hex overrides (plain + opacity variants) */
 [data-theme="light"] .bg-\[\#1a2842\]        { background-color: var(--color-bg-elevated) !important; }
 [data-theme="light"] .bg-\[\#1a2842\]\/40    { background-color: rgba(248,246,239,0.50)   !important; }
 [data-theme="light"] .border-\[\#1a2842\]    { border-color: var(--color-border)          !important; }
+
+/* Opacity variants of dark navy surfaces — Tailwind generates distinct
+   class names for each opacity, so they each need their own override.    */
+[data-theme="light"] .bg-\[\#1e293b\]\/40    { background-color: rgba(252,251,247,0.80)   !important; }
+[data-theme="light"] .bg-\[\#1e293b\]\/50    { background-color: rgba(252,251,247,0.75)   !important; }
+[data-theme="light"] .bg-\[\#1e293b\]\/60    { background-color: rgba(252,251,247,0.80)   !important; }
+[data-theme="light"] .bg-\[\#1e293b\]\/80    { background-color: rgba(252,251,247,0.90)   !important; }
+[data-theme="light"] .bg-\[\#263347\]\/80    { background-color: rgba(232,228,215,0.90)   !important; }
+[data-theme="light"] .bg-\[\#263347\]\/60    { background-color: rgba(232,228,215,0.75)   !important; }
+[data-theme="light"] .bg-\[\#263347\]\/40    { background-color: rgba(232,228,215,0.60)   !important; }
+
+/* Progress bar planned track — `bg-[#3a506b]/80` used in TradeRow */
+[data-theme="light"] .bg-\[\#3a506b\]        { background-color: #CFC7B2                  !important; }
+[data-theme="light"] .bg-\[\#3a506b\]\/80    { background-color: rgba(207,199,178,0.90)   !important; }
+[data-theme="light"] .bg-\[\#3a506b\]\/60    { background-color: rgba(207,199,178,0.70)   !important; }
+
+/* Tooltip / popover backdrop — `bg-[#0d1117]`, `bg-[#111827]` etc. used in some charts */
+[data-theme="light"] .bg-\[\#0d1117\]        { background-color: var(--color-bg-elevated) !important; }
+[data-theme="light"] .bg-\[\#111827\]        { background-color: var(--color-bg-elevated) !important; }
 
 /* Three.js canvas container */
 .ifc-viewer-container canvas {

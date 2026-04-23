@@ -62,16 +62,19 @@ export default function TradeRow({
         onClick && "cursor-pointer",
         isSelected
           ? "bg-emerald-500/10 border border-emerald-500/20"
-          : "border border-transparent hover:bg-[#1e293b] hover:border-[#2d3d54]",
+          : "border border-transparent hover:bg-slate-800/50 hover:border-slate-700",
         className
       )}
     >
       {/* Name column */}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 mb-1.5">
-          {/* Icon placeholder */}
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-[#263347] shrink-0">
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="text-slate-400">
+          {/* Icon placeholder — uses semantic CSS vars so it adapts */}
+          <div
+            className="flex h-6 w-6 items-center justify-center rounded shrink-0"
+            style={{ backgroundColor: "var(--color-bg-elevated)" }}
+          >
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ color: "var(--color-text-muted)" }}>
               <path d="M8 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3z" fill="currentColor"/>
             </svg>
           </div>
@@ -92,16 +95,22 @@ export default function TradeRow({
           )}
         </div>
 
-        {/* Dual progress bar */}
-        <div className="relative h-2 w-full overflow-hidden rounded-full bg-[#263347]">
-          {/* Planned bar (background track) */}
+        {/* Dual progress bar — use CSS vars for track/planned so it adapts */}
+        <div
+          className="relative h-2 w-full overflow-hidden rounded-full"
+          style={{ backgroundColor: "var(--color-bg-elevated)" }}
+        >
+          {/* Planned bar (soft tint behind actual) */}
           {plannedPercent != null && (
             <div
-              className="absolute inset-y-0 left-0 rounded-full bg-[#3a506b]/80"
-              style={{ width: `${Math.min(planned, 100)}%` }}
+              className="absolute inset-y-0 left-0 rounded-full"
+              style={{
+                width: `${Math.min(planned, 100)}%`,
+                backgroundColor: "var(--color-border-strong)",
+              }}
             />
           )}
-          {/* Actual bar (foreground) */}
+          {/* Actual bar */}
           <div
             className={clsx(
               "absolute inset-y-0 left-0 rounded-full transition-all",
@@ -113,7 +122,7 @@ export default function TradeRow({
 
         {/* Percent labels */}
         <div className="mt-1 flex items-center gap-2 text-[10px]">
-          <span className="font-mono font-semibold text-white">{actualPercent.toFixed(0)}%</span>
+          <span className="font-mono font-semibold text-slate-200">{actualPercent.toFixed(0)}%</span>
           {plannedPercent != null && (
             <span className="text-slate-500 font-mono">/ {plannedPercent.toFixed(0)}%</span>
           )}
@@ -127,7 +136,7 @@ export default function TradeRow({
       <div className="hidden sm:flex items-center gap-4 shrink-0 text-xs">
         {tasksCompleted != null && tasksTotal != null && (
           <div className="text-center">
-            <p className="font-semibold text-white tabular-nums">{tasksCompleted} / {tasksTotal}</p>
+            <p className="font-semibold text-slate-200 tabular-nums">{tasksCompleted} / {tasksTotal}</p>
             <p className="text-slate-500 text-[10px]">Tasks</p>
           </div>
         )}

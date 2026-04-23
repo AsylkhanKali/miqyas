@@ -55,7 +55,8 @@ const ACCENT_COLORS: Record<string, { ring: string; value: string; icon: string 
   red:     { ring: "border-red-500/20 bg-red-500/5",          value: "text-red-400",     icon: "bg-red-500/15 text-red-400" },
   blue:    { ring: "border-mq-600/20 bg-mq-600/5",            value: "text-mq-400",      icon: "bg-mq-600/15 text-mq-400" },
   amber:   { ring: "border-amber-500/20 bg-amber-500/5",      value: "text-amber-400",   icon: "bg-amber-500/15 text-amber-400" },
-  neutral: { ring: "border-[#2d3d54] bg-[#1e293b]/40",        value: "text-white",       icon: "bg-[#263347] text-slate-300" },
+  // neutral uses CSS vars so it adapts to both themes without overrides
+  neutral: { ring: "border-slate-700",                        value: "text-slate-100",   icon: "bg-slate-700/60 text-slate-300" },
 };
 
 export default function ProgressCard({

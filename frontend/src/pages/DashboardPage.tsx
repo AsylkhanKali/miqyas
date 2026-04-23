@@ -184,8 +184,12 @@ export default function DashboardPage() {
         systemApi.investorDashboard(),
         systemApi.progressTimeline(),
       ]);
-      if (dashRes.status === "fulfilled") setData(dashRes.value.data);
-      if (tlRes.status  === "fulfilled") setTimeline(tlRes.value.data);
+      if (dashRes.status === "fulfilled") {
+        setData(dashRes.value.data);
+      } else if (showRefresh) {
+        toast.error("Could not reach the server — check your connection");
+      }
+      if (tlRes.status === "fulfilled") setTimeline(tlRes.value.data);
     } finally {
       setLoading(false);
       setRefreshing(false);

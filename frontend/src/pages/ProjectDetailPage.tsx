@@ -49,14 +49,42 @@ export default function ProjectDetailPage() {
   const [tab, setTab] = useState<TabKey>("overview");
   const [bimModels, setBimModels] = useState<BIMModel[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [bimRefreshing, setBimRefreshing] = useState(false);
+  const [schedRefreshing, setSchedRefreshing] = useState(false);
+
+  const fetchBimModels = useCallback(async () => {
+    if (!projectId) return;
+    setBimRefreshing(true);
+    try {
+      const r = await bimApi.listModels(projectId);
+      setBimModels(r.data);
+    } catch {
+      toast.error("Failed to load BIM models");
+    } finally {
+      setBimRefreshing(false);
+    }
+  }, [projectId]);
+
+  const fetchSchedules = useCallback(async () => {
+    if (!projectId) return;
+    setSchedRefreshing(true);
+    try {
+      const r = await schedulesApi.list(projectId);
+      setSchedules(r.data);
+    } catch {
+      toast.error("Failed to load schedules");
+    } finally {
+      setSchedRefreshing(false);
+    }
+  }, [projectId]);
 
   useEffect(() => {
     if (projectId) {
       fetchProject(projectId);
-      bimApi.listModels(projectId).then((r) => setBimModels(r.data));
-      schedulesApi.list(projectId).then((r) => setSchedules(r.data));
+      fetchBimModels();
+      fetchSchedules();
     }
-  }, [projectId, fetchProject]);
+  }, [projectId, fetchProject, fetchBimModels, fetchSchedules]);
 
   if (loading || !currentProject) {
     return (
@@ -140,8 +168,8 @@ export default function ProjectDetailPage() {
         transition={{ duration: 0.2 }}
       >
         {tab === "overview" && <OverviewTab project={currentProject} bimCount={bimModels.length} scheduleCount={schedules.length} />}
-        {tab === "bim" && <BIMTab projectId={currentProject.id} models={bimModels} onRefresh={() => bimApi.listModels(currentProject.id).then(r => setBimModels(r.data))} />}
-        {tab === "schedule" && <ScheduleTab projectId={currentProject.id} schedules={schedules} onRefresh={() => schedulesApi.list(currentProject.id).then(r => setSchedules(r.data))} />}
+        {tab === "bim" && <BIMTab projectId={currentProject.id} models={bimModels} onRefresh={fetchBimModels} refreshing={bimRefreshing} />}
+        {tab === "schedule" && <ScheduleTab projectId={currentProject.id} schedules={schedules} onRefresh={fetchSchedules} refreshing={schedRefreshing} />}
         {tab === "captures" && <CapturesTab projectId={currentProject.id} bimModels={bimModels} schedules={schedules} />}
       </motion.div>
     </div>
@@ -172,7 +200,7 @@ function OverviewTab({ project, bimCount, scheduleCount }: { project: any; bimCo
   );
 }
 
-function BIMTab({ projectId, models, onRefresh }: { projectId: string; models: BIMModel[]; onRefresh: () => void }) {
+function BIMTab({ projectId, models, onRefresh, refreshing }: { projectId: string; models: BIMModel[]; onRefresh: () => void; refreshing?: boolean }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [reparsing, setReparsing] = useState<string | null>(null);
@@ -209,6 +237,13 @@ function BIMTab({ projectId, models, onRefresh }: { projectId: string; models: B
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-slate-400">{models.length} model{models.length !== 1 ? "s" : ""}</p>
+        <button onClick={onRefresh} disabled={refreshing} className="btn-ghost text-xs">
+          <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
+          Refresh
+        </button>
+      </div>
       <FileDropzone
         accept={{ "application/x-ifc": [".ifc"] }}
         label={uploading ? `Uploading… ${uploadProgress}%` : "Upload another IFC model"}
@@ -275,7 +310,7 @@ function BIMTab({ projectId, models, onRefresh }: { projectId: string; models: B
   );
 }
 
-function ScheduleTab({ projectId, schedules, onRefresh }: { projectId: string; schedules: Schedule[]; onRefresh: () => void }) {
+function ScheduleTab({ projectId, schedules, onRefresh, refreshing }: { projectId: string; schedules: Schedule[]; onRefresh: () => void; refreshing?: boolean }) {
   const handleUpload = async (file: File | null) => {
     if (!file) return;
     try {
@@ -289,6 +324,13 @@ function ScheduleTab({ projectId, schedules, onRefresh }: { projectId: string; s
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-slate-400">{schedules.length} schedule{schedules.length !== 1 ? "s" : ""}</p>
+        <button onClick={onRefresh} disabled={refreshing} className="btn-ghost text-xs">
+          <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
+          Refresh
+        </button>
+      </div>
       <FileDropzone
         accept={{ "application/octet-stream": [".xer", ".xml"] }}
         label="Upload schedule file"
@@ -388,6 +430,7 @@ function CapturesTab({
   const [reprojBim, setReprojBim] = useState<string>("");
 
   const fetchCaptures = useCallback(async () => {
+    setLoading(true);
     try {
       const res = await capturesApi.list(projectId);
       setCaptures(res.data);
@@ -1038,15 +1081,13 @@ function CapturesTab({
         </div>
       )}
 
-      {/* Refresh button */}
-      {captures.length > 0 && (
-        <div className="flex justify-end">
-          <button onClick={fetchCaptures} className="btn-ghost text-xs">
-            <RefreshCw size={13} />
-            Refresh
-          </button>
-        </div>
-      )}
+      {/* Refresh button — always visible so user can retry even on empty state */}
+      <div className="flex justify-end">
+        <button onClick={fetchCaptures} disabled={loading} className="btn-ghost text-xs">
+          <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+          {loading ? "Refreshing…" : "Refresh"}
+        </button>
+      </div>
     </div>
   );
 }

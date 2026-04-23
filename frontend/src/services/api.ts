@@ -80,7 +80,7 @@ export const bimApi = {
     api.get<BIMModelInfo>(`/projects/${projectId}/bim/models/${modelId}/info`),
 
   getFileUrl: (projectId: string, modelId: string) =>
-    `/api/v1/projects/${projectId}/bim/models/${modelId}/file`,
+    `${import.meta.env.VITE_API_URL || ""}/api/v1/projects/${projectId}/bim/models/${modelId}/file`,
 
   reparse: (projectId: string, modelId: string) =>
     api.post<{ model_id: string; task_id: string; status: string; message: string }>(

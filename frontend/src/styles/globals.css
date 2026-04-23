@@ -100,61 +100,62 @@
    via attribute-selector specificity (beats Tailwind's single-class rules).
    ═════════════════════════════════════════════════════════════════════ */
 
-[data-theme="light"] {
-  /* ── Surface hexes used across layout/page components ──────────── */
-  .bg-\[\#0d1526\] { background-color: var(--color-bg-primary) !important; }
-  .bg-\[\#16213a\] { background-color: var(--color-bg-secondary) !important; }
-  .bg-\[\#1e293b\] { background-color: var(--color-bg-card) !important; }
-  .bg-\[\#263347\] { background-color: var(--color-bg-elevated) !important; }
-  .bg-\[\#2d3d54\] { background-color: var(--color-bg-hover) !important; }
-  .bg-\[\#3f536e\] { background-color: var(--color-border-hover) !important; }
+/* Surface hexes — page bg / sidebar / card / elevated / hover / border */
+[data-theme="light"] .bg-\[\#0d1526\] { background-color: var(--color-bg-primary) !important; }
+[data-theme="light"] .bg-\[\#16213a\] { background-color: var(--color-bg-secondary) !important; }
+[data-theme="light"] .bg-\[\#1e293b\] { background-color: var(--color-bg-card) !important; }
+[data-theme="light"] .bg-\[\#263347\] { background-color: var(--color-bg-elevated) !important; }
+[data-theme="light"] .bg-\[\#2d3d54\] { background-color: var(--color-bg-hover) !important; }
+[data-theme="light"] .bg-\[\#3f536e\] { background-color: var(--color-border-hover) !important; }
 
-  .hover\:bg-\[\#1e293b\]:hover { background-color: var(--color-bg-elevated) !important; }
-  .hover\:bg-\[\#263347\]:hover { background-color: var(--color-bg-hover) !important; }
+[data-theme="light"] .hover\:bg-\[\#1e293b\]:hover { background-color: var(--color-bg-elevated) !important; }
+[data-theme="light"] .hover\:bg-\[\#263347\]:hover { background-color: var(--color-bg-hover) !important; }
 
-  .border-\[\#2d3d54\] { border-color: var(--color-border) !important; }
-  .border-\[\#3f536e\] { border-color: var(--color-border-hover) !important; }
-  .hover\:border-\[\#2d3d54\]:hover { border-color: var(--color-border) !important; }
-  .hover\:border-\[\#3f536e\]:hover { border-color: var(--color-border-hover) !important; }
+[data-theme="light"] .border-\[\#2d3d54\] { border-color: var(--color-border) !important; }
+[data-theme="light"] .border-\[\#3f536e\] { border-color: var(--color-border-hover) !important; }
+[data-theme="light"] .hover\:border-\[\#2d3d54\]:hover { border-color: var(--color-border) !important; }
+[data-theme="light"] .hover\:border-\[\#3f536e\]:hover { border-color: var(--color-border-hover) !important; }
 
-  /* ── Slate surface classes (backgrounds) ──────────────────────── */
-  .bg-slate-950 { background-color: var(--color-bg-primary) !important; }
-  .bg-slate-925 { background-color: var(--color-bg-secondary) !important; }
-  .bg-slate-900 { background-color: var(--color-bg-secondary) !important; }
-  .bg-slate-850 { background-color: var(--color-bg-card) !important; }
-  .bg-slate-800 { background-color: var(--color-bg-card) !important; }
-  .bg-slate-700 { background-color: var(--color-bg-elevated) !important; }
-  .bg-slate-600 { background-color: var(--color-bg-hover) !important; }
+/* Slate surface classes (backgrounds) */
+[data-theme="light"] .bg-slate-950 { background-color: var(--color-bg-primary) !important; }
+[data-theme="light"] .bg-slate-925 { background-color: var(--color-bg-secondary) !important; }
+[data-theme="light"] .bg-slate-900 { background-color: var(--color-bg-secondary) !important; }
+[data-theme="light"] .bg-slate-850 { background-color: var(--color-bg-card) !important; }
+[data-theme="light"] .bg-slate-800 { background-color: var(--color-bg-card) !important; }
+[data-theme="light"] .bg-slate-700 { background-color: var(--color-bg-elevated) !important; }
+[data-theme="light"] .bg-slate-600 { background-color: var(--color-bg-hover) !important; }
 
-  .hover\:bg-slate-800\/50:hover { background-color: var(--color-bg-elevated) !important; }
-  .hover\:bg-slate-800:hover     { background-color: var(--color-bg-elevated) !important; }
-  .hover\:bg-slate-700:hover     { background-color: var(--color-bg-hover) !important; }
+[data-theme="light"] .hover\:bg-slate-800\/50:hover { background-color: var(--color-bg-elevated) !important; }
+[data-theme="light"] .hover\:bg-slate-800:hover     { background-color: var(--color-bg-elevated) !important; }
+[data-theme="light"] .hover\:bg-slate-700:hover     { background-color: var(--color-bg-hover) !important; }
 
-  /* ── Slate borders ────────────────────────────────────────────── */
-  .border-slate-800 { border-color: var(--color-border) !important; }
-  .border-slate-700 { border-color: var(--color-border) !important; }
-  .border-slate-600 { border-color: var(--color-border-hover) !important; }
-  .hover\:border-slate-600:hover { border-color: var(--color-border-hover) !important; }
+/* Slate borders */
+[data-theme="light"] .border-slate-800 { border-color: var(--color-border) !important; }
+[data-theme="light"] .border-slate-700 { border-color: var(--color-border) !important; }
+[data-theme="light"] .border-slate-600 { border-color: var(--color-border-hover) !important; }
+[data-theme="light"] .hover\:border-slate-600:hover { border-color: var(--color-border-hover) !important; }
 
-  /* ── Text colors — invert the dark-mode slate scale ───────────── */
-  .text-white      { color: var(--color-text-primary) !important; }
-  .text-slate-100  { color: var(--color-text-primary) !important; }
-  .text-slate-200  { color: var(--color-text-primary) !important; }
-  .text-slate-300  { color: var(--color-text-secondary) !important; }
-  .text-slate-400  { color: var(--color-text-secondary) !important; }
-  .text-slate-500  { color: var(--color-text-muted) !important; }
-  .text-slate-600  { color: var(--color-text-muted) !important; }
-  .text-slate-700  { color: #a39e85 !important; }   /* very muted / disabled */
+/* Text colors — invert the dark-mode slate scale */
+[data-theme="light"] .text-white      { color: var(--color-text-primary) !important; }
+[data-theme="light"] .text-slate-100  { color: var(--color-text-primary) !important; }
+[data-theme="light"] .text-slate-200  { color: var(--color-text-primary) !important; }
+[data-theme="light"] .text-slate-300  { color: var(--color-text-secondary) !important; }
+[data-theme="light"] .text-slate-400  { color: var(--color-text-secondary) !important; }
+[data-theme="light"] .text-slate-500  { color: var(--color-text-muted) !important; }
+[data-theme="light"] .text-slate-600  { color: var(--color-text-muted) !important; }
+[data-theme="light"] .text-slate-700  { color: #a39e85 !important; }
 
-  .hover\:text-white:hover      { color: var(--color-text-primary) !important; }
-  .hover\:text-slate-200:hover  { color: var(--color-text-primary) !important; }
-  .hover\:text-slate-300:hover  { color: var(--color-text-secondary) !important; }
+[data-theme="light"] .hover\:text-white:hover      { color: var(--color-text-primary) !important; }
+[data-theme="light"] .hover\:text-slate-200:hover  { color: var(--color-text-primary) !important; }
+[data-theme="light"] .hover\:text-slate-300:hover  { color: var(--color-text-secondary) !important; }
 
-  .placeholder-slate-500::placeholder { color: var(--color-text-muted) !important; }
+[data-theme="light"] .placeholder-slate-500::placeholder { color: var(--color-text-muted) !important; }
 
-  /* ── Brand-accent (mq-400 etc.) stays blue — complements mustard ─ */
-  /* (no overrides needed — blue on cream reads great) */
-}
+/* Badge text — darker shades for proper contrast on cream */
+[data-theme="light"] .badge-ahead   { color: #047857 !important; }
+[data-theme="light"] .badge-ontrack { color: #1d4ed8 !important; }
+[data-theme="light"] .badge-behind  { color: #b91c1c !important; }
+[data-theme="light"] .badge-warning { color: #b45309 !important; }
 
 /* ═══════════════════════════════════════════════════════════════════════
    COMPONENT CLASSES — use semantic CSS vars so they auto-adapt
@@ -232,18 +233,11 @@
   .badge {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
   }
-  .badge-ahead    { @apply badge bg-emerald-500/15 text-emerald-600 border border-emerald-500/25; }
-  .badge-ontrack  { @apply badge bg-blue-500/15    text-blue-600    border border-blue-500/25; }
-  .badge-behind   { @apply badge bg-red-500/15     text-red-600     border border-red-500/25; }
-  .badge-warning  { @apply badge bg-amber-500/15   text-amber-700   border border-amber-500/25; }
-
-  /* In dark mode, badges look better with lighter text shades */
-  :root:not([data-theme="light"]) {
-    .badge-ahead   { @apply text-emerald-400; }
-    .badge-ontrack { @apply text-blue-400; }
-    .badge-behind  { @apply text-red-400; }
-    .badge-warning { @apply text-amber-400; }
-  }
+  /* Dark (default) — lighter text shades read better on navy surface */
+  .badge-ahead    { @apply badge bg-emerald-500/15 text-emerald-400 border border-emerald-500/25; }
+  .badge-ontrack  { @apply badge bg-blue-500/15    text-blue-400    border border-blue-500/25; }
+  .badge-behind   { @apply badge bg-red-500/15     text-red-400     border border-red-500/25; }
+  .badge-warning  { @apply badge bg-amber-500/15   text-amber-400   border border-amber-500/25; }
 
   /* ── Typography ─────────────────────────────────────────────── */
   .section-title {

@@ -9,9 +9,7 @@
  */
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useSettingsStore } from "@/store/settingsStore";
 import {
   TrendingUp,
   TrendingDown,
@@ -27,7 +25,6 @@ import {
   Activity,
   Building2,
   Flag,
-  FlaskConical,
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -375,7 +372,6 @@ function ProjectCard({ project }: { project: Project }) {
 
 export default function ExecutiveOverviewPage() {
   const [filter, setFilter] = useState<"all" | "on-track" | "at-risk" | "delayed">("all");
-  const { useFakeData } = useSettingsStore();
   const stats = portfolioStats();
 
   const filtered = filter === "all" ? PROJECTS : PROJECTS.filter(p => p.status === filter);
@@ -395,46 +391,14 @@ export default function ExecutiveOverviewPage() {
           <h1 className="text-2xl font-bold text-white">Portfolio Dashboard</h1>
           <p className="mt-0.5 text-sm text-slate-400">Week ending {today} · {PROJECTS.length} active projects</p>
         </div>
-        <div className="flex items-center gap-2">
-          {useFakeData ? (
-            <span className="flex items-center gap-1 rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-[10px] font-medium text-amber-400">
-              <FlaskConical size={10} /> Demo data
-            </span>
-          ) : (
-            <span className="flex items-center gap-1.5 rounded-full border border-red-500/25 bg-red-500/10 px-2.5 py-1 text-[10px] font-medium text-red-400">
-              Live data off — <Link to="/settings" className="underline underline-offset-2 hover:text-red-300">enable demo mode</Link>
-            </span>
-          )}
-          <div className="flex items-center gap-1.5 rounded-lg border border-[#2d3d54] bg-[#1e293b] px-3 py-1.5 text-[10px] text-slate-400">
-            <Calendar size={11} />
-            Weekly report
-          </div>
+        <div className="flex items-center gap-1.5 rounded-lg border border-[#2d3d54] bg-[#1e293b] px-3 py-1.5 text-[10px] text-slate-400">
+          <Calendar size={11} />
+          Weekly report
         </div>
       </div>
 
-      {/* ── No-data state when fake data is off ────────────────────────── */}
-      {!useFakeData && (
-        <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-[#2d3d54] py-24 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#1e293b]">
-            <FlaskConical size={24} className="text-slate-500" />
-          </div>
-          <div>
-            <p className="font-medium text-slate-300">Live data not connected yet</p>
-            <p className="mt-1 text-sm text-slate-500 max-w-xs">
-              Enable demo mode in Settings to see a realistic portfolio view with sample data.
-            </p>
-          </div>
-          <Link
-            to="/settings"
-            className="rounded-lg bg-mq-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-mq-500"
-          >
-            Go to Settings
-          </Link>
-        </div>
-      )}
-
       {/* ── Portfolio KPI strip ─────────────────────────────────────────── */}
-      {useFakeData && (<>
+      <>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         {/* Avg progress */}
         <div className="col-span-2 lg:col-span-2 rounded-xl border border-[#2d3d54] bg-[#16213a] p-5">
@@ -589,11 +553,7 @@ export default function ExecutiveOverviewPage() {
         </div>
       </div>
 
-      {/* ── Footer ─────────────────────────────────────────────────────── */}
-      <p className="text-center text-[10px] text-slate-700 pb-2">
-        Demo data · {today} · <Link to="/settings" className="hover:text-slate-500 underline underline-offset-2">Settings</Link>
-      </p>
-      </>)}
+      </>
     </div>
   );
 }

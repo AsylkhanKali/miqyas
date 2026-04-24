@@ -1,11 +1,11 @@
 """BIM/IFC upload, element browsing, and IFC file serving router."""
 
+import tempfile
 from pathlib import Path
 from uuid import UUID
 
-import aiofiles
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,6 +13,7 @@ from app.core.config import get_settings
 from app.core.database import get_db
 from app.models import BIMElement, BIMModel, Project
 from app.schemas import BIMElementListResponse, BIMElementResponse, BIMModelResponse
+from app.services.storage import get_storage
 
 router = APIRouter(prefix="/projects/{project_id}/bim", tags=["bim"])
 settings = get_settings()
@@ -31,18 +32,26 @@ async def upload_ifc(
     if not file.filename or not file.filename.lower().endswith(".ifc"):
         raise HTTPException(status_code=400, detail="Only .ifc files are accepted")
 
-    # Save file to disk
-    storage_dir = settings.ifc_storage_dir / str(project_id)
-    storage_dir.mkdir(parents=True, exist_ok=True)
-    dest = storage_dir / file.filename
-    async with aiofiles.open(dest, "wb") as f:
-        content = await file.read()
-        await f.write(content)
+    # Write to a local temp file first, then push to the configured storage backend.
+    # storage_path stores the STORAGE KEY (not a local path) so it works for both
+    # local and S3/R2 backends across redeploys.
+    content = await file.read()
+    storage_key = f"ifc/{project_id}/{file.filename}"
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".ifc") as tmp:
+        tmp.write(content)
+        tmp_path = Path(tmp.name)
+
+    try:
+        storage = get_storage()
+        await storage.upload(tmp_path, storage_key)
+    finally:
+        tmp_path.unlink(missing_ok=True)
 
     bim_model = BIMModel(
         project_id=project_id,
         filename=file.filename,
-        storage_path=str(dest),
+        storage_path=storage_key,   # storage key, resolved at read-time
         file_size_bytes=len(content),
         parse_status="pending",
     )
@@ -111,12 +120,28 @@ async def download_ifc_file(
     if model.project_id != project_id:
         raise HTTPException(status_code=404, detail="BIM model not found in this project")
 
-    file_path = Path(model.storage_path)
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail="IFC file not found on disk")
+    storage = get_storage()
 
+    if not await storage.exists(model.storage_path):
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "IFC file not found in storage. "
+                "If you are on local storage this means the file was lost after a server restart. "
+                "Please re-upload the file or switch to S3/R2 storage for persistence."
+            ),
+        )
+
+    # S3/R2 → redirect to a short-lived presigned URL so the download goes
+    # directly from the object store to the browser (no double-streaming).
+    if not storage.is_local():
+        url = await storage.presigned_url(model.storage_path, expires_in=3600)
+        return RedirectResponse(url=url)
+
+    # Local storage → stream the file through FastAPI as before.
+    local_path = await storage.get_local_path(model.storage_path)
     return FileResponse(
-        path=str(file_path),
+        path=str(local_path),
         media_type="application/octet-stream",
         filename=model.filename,
         headers={"Cache-Control": "public, max-age=3600"},
@@ -146,11 +171,12 @@ async def reparse_bim_model(
     if model.project_id != project_id:
         raise HTTPException(status_code=404, detail="BIM model not found in this project")
 
-    if not Path(model.storage_path).exists():
+    storage = get_storage()
+    if not await storage.exists(model.storage_path):
         raise HTTPException(
             status_code=409,
             detail=(
-                "IFC file no longer exists on disk — cannot re-parse. "
+                "IFC file no longer exists in storage — cannot re-parse. "
                 "Re-upload the file."
             ),
         )
@@ -171,6 +197,39 @@ async def reparse_bim_model(
         "status": "queued",
         "message": "Re-parse scheduled. Poll /models/{id}/info for parse_status.",
     }
+
+
+@router.post("/models/{model_id}/force-reset", status_code=status.HTTP_200_OK)
+async def force_reset_bim_model(
+    project_id: UUID,
+    model_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Force a stuck model back to 'failed' status.
+
+    Use when parse_status is stuck at 'pending' or 'parsing' and no Celery
+    worker is processing it (e.g. worker crashed / OOM killed).  The user
+    can then hit Re-parse once the worker is healthy again.
+    """
+    model = await db.get(BIMModel, model_id)
+    if not model:
+        raise HTTPException(status_code=404, detail="BIM model not found")
+    if model.project_id != project_id:
+        raise HTTPException(status_code=404, detail="BIM model not found in this project")
+
+    if model.parse_status not in ("pending", "parsing"):
+        raise HTTPException(
+            status_code=409,
+            detail=f"Model is already in terminal state: {model.parse_status!r}. "
+                   "Only pending/parsing models can be force-reset.",
+        )
+
+    model.parse_status = "failed"
+    model.parse_error = "Manually reset — task appeared stuck (worker may have been restarting)"
+    await db.commit()
+
+    return {"model_id": str(model_id), "parse_status": "failed"}
 
 
 @router.get("/models/{model_id}/info")

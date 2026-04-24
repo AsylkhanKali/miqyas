@@ -48,6 +48,7 @@ export interface BIMModel {
   element_count: number;
   parse_status: string;
   parse_error: string | null;
+  file_size_bytes: number | null;
   created_at: string;
   updated_at: string;
 }

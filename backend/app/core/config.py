@@ -54,11 +54,14 @@ class Settings(BaseSettings):
     frame_storage_dir: Path = Path("./uploads/frames")
     report_storage_dir: Path = Path("./uploads/reports")
 
-    # AWS
+    # AWS / Cloudflare R2 (S3-compatible)
     aws_access_key_id: str = ""
     aws_secret_access_key: str = ""
-    aws_region: str = "me-south-1"
+    aws_region: str = "auto"          # R2 uses "auto", AWS uses e.g. "us-east-1"
     s3_bucket: str = "miqyas-uploads"
+    # For Cloudflare R2: "https://<account_id>.r2.cloudflarestorage.com"
+    # Leave blank for standard AWS S3
+    s3_endpoint_url: str = ""
 
     # Procore
     procore_client_id: str = ""

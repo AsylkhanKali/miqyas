@@ -4,6 +4,7 @@ import asyncio
 import logging
 from uuid import UUID
 
+from celery.exceptions import SoftTimeLimitExceeded
 from app.core.config import get_settings
 from app.tasks.worker import celery_app
 
@@ -43,6 +44,27 @@ def parse_schedule_task(self, schedule_id: str):
         count = loop.run_until_complete(_run())
         logger.info(f"Schedule parse complete: {count} activities")
         return {"status": "success", "activity_count": count}
+    except SoftTimeLimitExceeded:
+        logger.error(f"Schedule parse timed out for {schedule_id}")
+        try:
+            from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+            from app.models import Schedule
+
+            async def _mark_failed():
+                engine = create_async_engine(settings.database_url)
+                async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+                async with async_session() as session:
+                    sched = await session.get(Schedule, UUID(schedule_id))
+                    if sched:
+                        sched.parse_status = "failed"
+                        sched.parse_error = "Parse timed out (file may be too large)"
+                        await session.commit()
+
+            loop2 = asyncio.new_event_loop()
+            loop2.run_until_complete(_mark_failed())
+        except Exception as inner:
+            logger.error(f"Could not mark schedule as failed: {inner}")
+        return {"status": "failed", "error": "timeout"}
     except Exception as exc:
         logger.error(f"Schedule parse failed: {exc}")
         raise self.retry(exc=exc, countdown=30)

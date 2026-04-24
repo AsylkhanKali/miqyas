@@ -59,6 +59,7 @@ class BIMModelResponse(TimestampMixin):
     element_count: int
     parse_status: str
     parse_error: str | None = None
+    file_size_bytes: int | None = None
 
 
 class BIMElementResponse(TimestampMixin):

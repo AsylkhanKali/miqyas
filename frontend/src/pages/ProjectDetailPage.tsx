@@ -200,10 +200,42 @@ function OverviewTab({ project, bimCount, scheduleCount }: { project: any; bimCo
   );
 }
 
+// How long (ms) before we show the "Reset stuck" button
+const STUCK_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
+
 function BIMTab({ projectId, models, onRefresh, refreshing }: { projectId: string; models: BIMModel[]; onRefresh: () => void; refreshing?: boolean }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [reparsing, setReparsing] = useState<string | null>(null);
+  const [resetting, setResetting] = useState<string | null>(null);
+  // Track when each model entered pending/parsing so we can detect stuck tasks
+  const pendingSince = useRef<Record<string, number>>({});
+  const [now, setNow] = useState(() => Date.now());
+
+  // Auto-poll every 5 s while any model is in a non-terminal state
+  useEffect(() => {
+    const hasPending = models.some((m) => m.parse_status === "pending" || m.parse_status === "parsing");
+    if (!hasPending) return;
+    const timer = setInterval(() => { onRefresh(); setNow(Date.now()); }, 5000);
+    return () => clearInterval(timer);
+  }, [models, onRefresh]);
+
+  // Track when each model first entered pending/parsing
+  useEffect(() => {
+    models.forEach((m) => {
+      if ((m.parse_status === "pending" || m.parse_status === "parsing") && !pendingSince.current[m.id]) {
+        pendingSince.current[m.id] = Date.now();
+      }
+      if (m.parse_status !== "pending" && m.parse_status !== "parsing") {
+        delete pendingSince.current[m.id];
+      }
+    });
+  }, [models]);
+
+  const isStuck = (m: BIMModel) =>
+    (m.parse_status === "pending" || m.parse_status === "parsing") &&
+    pendingSince.current[m.id] != null &&
+    now - pendingSince.current[m.id] > STUCK_THRESHOLD_MS;
 
   const handleReparse = async (modelId: string) => {
     setReparsing(modelId);
@@ -216,6 +248,20 @@ function BIMTab({ projectId, models, onRefresh, refreshing }: { projectId: strin
       toast.error(detail ?? "Re-parse failed");
     } finally {
       setReparsing(null);
+    }
+  };
+
+  const handleForceReset = async (modelId: string) => {
+    setResetting(modelId);
+    try {
+      await bimApi.forceReset(projectId, modelId);
+      toast.success("Model reset to failed — you can now re-parse it");
+      onRefresh();
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      toast.error(detail ?? "Reset failed");
+    } finally {
+      setResetting(null);
     }
   };
 
@@ -280,13 +326,29 @@ function BIMTab({ projectId, models, onRefresh, refreshing }: { projectId: strin
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                {/* Force-reset button — appears after 5 min stuck in pending/parsing */}
+                {isStuck(m) && (
+                  <button
+                    onClick={() => handleForceReset(m.id)}
+                    disabled={resetting === m.id}
+                    title="Task appears stuck — click to reset so you can re-parse"
+                    className="flex items-center gap-1.5 rounded-md border border-red-700 bg-red-900/30 px-2.5 py-1 text-xs text-red-300 hover:bg-red-900/50 disabled:opacity-50 transition-colors"
+                  >
+                    <AlertCircle size={12} />
+                    {resetting === m.id ? "Resetting…" : "Reset stuck"}
+                  </button>
+                )}
                 <button
                   onClick={() => handleReparse(m.id)}
-                  disabled={reparsing === m.id}
-                  title="Re-parse IFC geometry"
+                  disabled={reparsing === m.id || m.parse_status === "parsing" || m.parse_status === "pending"}
+                  title={
+                    m.parse_status === "parsing" ? "Currently parsing…" :
+                    m.parse_status === "pending" ? "Queued for parsing" :
+                    "Re-parse IFC geometry"
+                  }
                   className="flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs text-slate-300 hover:border-slate-600 hover:text-white disabled:opacity-50 transition-colors"
                 >
-                  <RefreshCw size={12} className={reparsing === m.id ? "animate-spin" : ""} />
+                  <RefreshCw size={12} className={(reparsing === m.id || m.parse_status === "parsing") ? "animate-spin" : ""} />
                   {reparsing === m.id ? "Re-parsing…" : "Re-parse"}
                 </button>
                 {m.parse_status === "parsed" ? (
@@ -296,6 +358,11 @@ function BIMTab({ projectId, models, onRefresh, refreshing }: { projectId: strin
                   >
                     Open Viewer
                   </Link>
+                ) : m.parse_status === "parsing" || m.parse_status === "pending" ? (
+                  <span className="badge badge-warning flex items-center gap-1.5">
+                    <Loader2 size={10} className="animate-spin" />
+                    {m.parse_status === "parsing" ? "Parsing…" : "Queued"}
+                  </span>
                 ) : (
                   <span className={`badge ${m.parse_status === "failed" ? "badge-behind" : "badge-warning"}`}>
                     {m.parse_status}
@@ -311,6 +378,14 @@ function BIMTab({ projectId, models, onRefresh, refreshing }: { projectId: strin
 }
 
 function ScheduleTab({ projectId, schedules, onRefresh, refreshing }: { projectId: string; schedules: Schedule[]; onRefresh: () => void; refreshing?: boolean }) {
+  // Auto-poll every 5 s while any schedule is still being parsed
+  useEffect(() => {
+    const hasPending = schedules.some((s) => s.parse_status === "pending" || s.parse_status === "parsing");
+    if (!hasPending) return;
+    const timer = setInterval(() => onRefresh(), 5000);
+    return () => clearInterval(timer);
+  }, [schedules, onRefresh]);
+
   const handleUpload = async (file: File | null) => {
     if (!file) return;
     try {
@@ -357,9 +432,16 @@ function ScheduleTab({ projectId, schedules, onRefresh, refreshing }: { projectI
                   </p>
                 </div>
               </div>
-              <span className={`badge ${s.parse_status === "parsed" ? "badge-ahead" : s.parse_status === "failed" ? "badge-behind" : "badge-warning"}`}>
-                {s.parse_status}
-              </span>
+              {s.parse_status === "parsing" || s.parse_status === "pending" ? (
+                <span className="badge badge-warning flex items-center gap-1.5">
+                  <Loader2 size={10} className="animate-spin" />
+                  {s.parse_status === "parsing" ? "Parsing…" : "Queued"}
+                </span>
+              ) : (
+                <span className={`badge ${s.parse_status === "parsed" ? "badge-ahead" : s.parse_status === "failed" ? "badge-behind" : "badge-warning"}`}>
+                  {s.parse_status}
+                </span>
+              )}
             </Link>
           ))}
         </div>

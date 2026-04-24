@@ -86,6 +86,11 @@ export const bimApi = {
     api.post<{ model_id: string; task_id: string; status: string; message: string }>(
       `/projects/${projectId}/bim/models/${modelId}/reparse`,
     ),
+
+  forceReset: (projectId: string, modelId: string) =>
+    api.post<{ model_id: string; parse_status: string }>(
+      `/projects/${projectId}/bim/models/${modelId}/force-reset`,
+    ),
 };
 
 // ── Schedules ───────────────────────────────────────────────────────────

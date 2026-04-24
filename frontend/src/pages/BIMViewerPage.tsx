@@ -106,6 +106,8 @@ export default function BIMViewerPage() {
   const [modelInfo, setModelInfo] = useState<BIMModelInfo | null>(null);
   const [ifcFileUrl, setIfcFileUrl] = useState<string | null>(null);
   const [reparsing, setReparsing] = useState(false);
+  // Set when mesh-mode fetch returns 404 (file lost on server restart)
+  const [meshFileNotFound, setMeshFileNotFound] = useState(false);
 
   // Stable ref so the Three.js animation loop can read the latest
   // selectedElement without re-running the entire scene-init effect.
@@ -237,9 +239,13 @@ export default function BIMViewerPage() {
     setReparsing(true);
     try {
       await bimApi.reparse(projectId, modelId);
+      setMeshFileNotFound(false);
       toast.success("Re-parse scheduled. Refresh in a minute to see results.");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Re-parse failed";
+      // Extract FastAPI detail from Axios response if available
+      const axiosDetail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      const msg = axiosDetail ?? (err instanceof Error ? err.message : "Re-parse failed");
       toast.error(msg);
     } finally {
       setReparsing(false);
@@ -479,6 +485,7 @@ export default function BIMViewerPage() {
             showTrajectory={showTrajectory}
             renderMode={renderMode}
             ifcFileUrl={ifcFileUrl}
+            onFileNotFound={() => setMeshFileNotFound(true)}
           />
 
           {/* No-geometry banner — backend bbox is empty for all elements */}
@@ -504,6 +511,25 @@ export default function BIMViewerPage() {
               >
                 {reparsing ? "Re-parsing…" : "Re-parse IFC"}
               </button>
+            </div>
+          )}
+
+          {/* IFC file not found on server — lost after Railway restart */}
+          {meshFileNotFound && (
+            <div className="absolute left-1/2 top-16 z-20 -translate-x-1/2 w-max max-w-sm rounded-lg border border-amber-500/40 bg-amber-950/95 px-4 py-3 text-xs text-amber-200 backdrop-blur-sm flex items-center gap-3 shadow-xl">
+              <AlertCircle size={14} className="shrink-0 text-amber-400" />
+              <div>
+                <div className="font-semibold text-amber-300">IFC file not found on server</div>
+                <div className="mt-0.5 text-amber-200/70">
+                  The file was lost after a server restart. Re-upload it from the project page.
+                </div>
+              </div>
+              <Link
+                to={projectId ? `/projects/${projectId}` : "/projects"}
+                className="shrink-0 rounded px-2.5 py-1 text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-100 border border-amber-500/40 transition-colors"
+              >
+                Go to project
+              </Link>
             </div>
           )}
 
@@ -791,6 +817,7 @@ function IFCViewerCanvas({
   showTrajectory = false,
   renderMode = "mesh",
   ifcFileUrl,
+  onFileNotFound,
 }: {
   elements: BIMElement[];
   selectedElementRef: React.RefObject<BIMElement | null>;
@@ -799,6 +826,7 @@ function IFCViewerCanvas({
   showTrajectory?: boolean;
   renderMode?: RenderMode;
   ifcFileUrl?: string | null;
+  onFileNotFound?: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -986,6 +1014,11 @@ function IFCViewerCanvas({
           ifcMeshLoaded = meshes.length > 0;
           loader.dispose();
         } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          // 404 = IFC file was lost on disk (ephemeral Railway filesystem)
+          if (msg.includes("404")) {
+            onFileNotFound?.();
+          }
           console.warn("web-ifc mesh loading failed, falling back to bbox:", err);
         }
       }

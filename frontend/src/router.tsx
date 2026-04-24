@@ -12,6 +12,8 @@ import IntegrationsPage from "@/pages/IntegrationsPage";
 import ReprojectionViewPage from "@/pages/ReprojectionViewPage";
 import PlanTrackerPage from "@/pages/PlanTrackerPage";
 import TradesPage from "@/pages/TradesPage";
+import ExecutiveOverviewPage from "@/pages/ExecutiveOverviewPage";
+import BIMModelPickerPage from "@/pages/BIMModelPickerPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 
 export const router = createBrowserRouter([
@@ -20,12 +22,14 @@ export const router = createBrowserRouter([
     errorElement: <ErrorBoundary><div /></ErrorBoundary>,
     children: [
       { path: "/",                                               element: <DashboardPage /> },
+      { path: "/executive",                                      element: <ExecutiveOverviewPage /> },
       { path: "/projects",                                       element: <ProjectsPage /> },
       { path: "/projects/new",                                   element: <NewProjectPage /> },
       { path: "/projects/:projectId",                            element: <ProjectDetailPage /> },
       { path: "/projects/:projectId/plan-tracker",               element: <PlanTrackerPage /> },
       { path: "/projects/:projectId/trades",                     element: <TradesPage /> },
       { path: "/projects/:projectId/schedules/:scheduleId",      element: <ScheduleDetailPage /> },
+      { path: "/projects/:projectId/bim",                         element: <BIMModelPickerPage /> },
       { path: "/projects/:projectId/integrations",               element: <IntegrationsPage /> },
       { path: "/reports",                                        element: <ReportsPage /> },
       { path: "/schedule",                                       element: <ProjectsPage /> },

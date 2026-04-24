@@ -17,6 +17,7 @@ import {
   CalendarCheck,
   Users,
   BarChart3,
+  Building2,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -51,6 +52,11 @@ const TOP_NAV: NavItem[] = [
     path: () => "/",
   },
   {
+    label: "Executive",
+    icon: Building2,
+    path: () => "/executive",
+  },
+  {
     label: "Projects",
     icon: FolderKanban,
     path: () => "/projects",
@@ -74,7 +80,8 @@ const PROJECT_NAV: NavItem[] = [
   {
     label: "BIM Viewer",
     icon: Box,
-    path: (id) => id ? `/viewer/${id}/` : "/viewer",
+    path: (id) => id ? `/projects/${id}/bim` : "/projects",
+    requiresProject: true,
   },
   {
     label: "Reports",
@@ -314,9 +321,10 @@ export default function AppLayout() {
             )}
             {!currentProject && (
               <span className="font-medium text-slate-300">
-                {TOP_NAV.find((n) =>
-                  n.path() === "/" ? location.pathname === "/" : location.pathname.startsWith(n.path())
-                )?.label ?? "Dashboard"}
+                {TOP_NAV.find((n) => {
+                  const p = n.path();
+                  return p === "/" ? location.pathname === "/" : location.pathname.startsWith(p);
+                })?.label ?? "Dashboard"}
               </span>
             )}
           </div>

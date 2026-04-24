@@ -14,6 +14,7 @@ Extracts:
 """
 
 import logging
+from pathlib import Path
 from typing import Any
 from uuid import UUID
 
@@ -96,8 +97,19 @@ class IFCParserService:
         model.parse_status = "parsing"
         await self.db.flush()
 
+        # Resolve the storage key to a local filesystem path.
+        # For local storage this is instant; for S3/R2 it downloads to a temp file.
+        from app.services.storage import get_storage
+        storage = get_storage()
+        tmp_path: Path | None = None
+
         try:
-            ifc_file = ifcopenshell.open(model.storage_path)
+            local_path = await storage.get_local_path(model.storage_path)
+            # get_local_path returns a temp file for S3 — track it for cleanup
+            if not storage.is_local():
+                tmp_path = local_path
+
+            ifc_file = ifcopenshell.open(str(local_path))
             elements = self._extract_elements(ifc_file)
 
             # Update model metadata from IFC header
@@ -124,6 +136,10 @@ class IFCParserService:
             await self.db.flush()
             logger.error(f"IFC parse failed for {model.filename}: {e}")
             raise
+        finally:
+            # Remove temp file if we downloaded from S3/R2
+            if tmp_path and tmp_path.exists():
+                tmp_path.unlink(missing_ok=True)
 
     def _extract_elements(self, ifc_file: ifcopenshell.file) -> list[dict[str, Any]]:
         """Extract all physical elements from the IFC file."""

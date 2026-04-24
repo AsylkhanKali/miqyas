@@ -23,6 +23,36 @@ def _get_sync_session() -> Session:
     return SessionLocal()
 
 
+async def _mark_bim_status(bim_model_id: str, status: str, error: str | None = None) -> None:
+    """Write parse_status + parse_error in a brand-new session.
+
+    Used from exception handlers where the main session has already been
+    rolled back (SQLAlchemy rolls back on context-manager exit with an
+    unhandled exception), so we open a fresh connection to commit the update.
+    """
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+    from app.models.bim import BIMModel
+
+    engine = create_async_engine(settings.database_url)
+    async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    async with async_session() as session:
+        model = await session.get(BIMModel, UUID(bim_model_id))
+        if model and model.parse_status != "parsed":   # never overwrite a success
+            model.parse_status = status
+            if error is not None:
+                model.parse_error = error[:500]
+            await session.commit()
+
+
+def _run_mark_status(bim_model_id: str, status: str, error: str | None = None) -> None:
+    """Sync wrapper around _mark_bim_status for use inside Celery tasks."""
+    try:
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(_mark_bim_status(bim_model_id, status, error))
+    except Exception as inner:
+        logger.error(f"Could not update model status to {status!r}: {inner}")
+
+
 @celery_app.task(bind=True, name="app.tasks.ifc_tasks.parse_ifc", max_retries=2)
 def parse_ifc_task(self, bim_model_id: str):
     """
@@ -30,6 +60,14 @@ def parse_ifc_task(self, bim_model_id: str):
 
     Since IFCParserService uses async DB sessions, we run it in an event loop.
     For Celery, we use a sync wrapper approach.
+
+    Status flow:
+      pending → parsing (set inside IFCParserService.parse)
+              → parsed  (success)
+              → failed  (exception or soft-time-limit)
+
+    Important: the main session is rolled back on exception, so failures are
+    committed via a *fresh* session in each except handler.
     """
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -50,31 +88,29 @@ def parse_ifc_task(self, bim_model_id: str):
         count = loop.run_until_complete(_run())
         logger.info(f"IFC parse complete: {count} elements")
         return {"status": "success", "element_count": count}
+
     except SoftTimeLimitExceeded:
-        # 10-minute soft limit hit — mark model as failed so the UI stops
-        # showing "pending" and the user can upload a smaller file or retry.
+        # 10-minute soft limit — mark as failed so the UI stops showing "pending".
         logger.error(f"IFC parse timed out for model {bim_model_id}")
-        try:
-            from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-            from app.models.bim import BIMModel
-
-            async def _mark_failed():
-                engine = create_async_engine(settings.database_url)
-                async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-                async with async_session() as session:
-                    model = await session.get(BIMModel, UUID(bim_model_id))
-                    if model:
-                        model.parse_status = "failed"
-                        model.parse_error = "Parse timed out (file may be too large)"
-                        await session.commit()
-
-            loop2 = asyncio.new_event_loop()
-            loop2.run_until_complete(_mark_failed())
-        except Exception as inner:
-            logger.error(f"Could not mark model as failed: {inner}")
+        _run_mark_status(bim_model_id, "failed", "Parse timed out (file may be too large)")
         return {"status": "failed", "error": "timeout"}
+
     except Exception as exc:
-        logger.error(f"IFC parse failed: {exc}")
+        logger.error(f"IFC parse failed (attempt {self.request.retries + 1}): {exc}")
+
+        # The main async session was rolled back by its context manager, so the
+        # "failed" flush inside IFCParserService.parse() was lost.  Persist it
+        # now in a fresh session so the UI reflects the real state instead of
+        # staying stuck at "pending".
+        if self.request.retries >= self.max_retries:
+            # Final attempt exhausted — mark permanently as failed.
+            _run_mark_status(bim_model_id, "failed", str(exc))
+        else:
+            # Intermediate retry — still mark failed so UI doesn't stay "pending",
+            # the next retry will flip it back to "parsing" when it starts.
+            _run_mark_status(bim_model_id, "failed",
+                             f"Attempt {self.request.retries + 1} failed, retrying… ({exc})")
+
         raise self.retry(exc=exc, countdown=30)
 
 

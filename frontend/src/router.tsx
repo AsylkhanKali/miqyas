@@ -14,6 +14,7 @@ import PlanTrackerPage from "@/pages/PlanTrackerPage";
 import TradesPage from "@/pages/TradesPage";
 import ExecutiveOverviewPage from "@/pages/ExecutiveOverviewPage";
 import BIMModelPickerPage from "@/pages/BIMModelPickerPage";
+import SettingsPage from "@/pages/SettingsPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 
 export const router = createBrowserRouter([
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
       { path: "/projects/:projectId/schedules/:scheduleId",      element: <ScheduleDetailPage /> },
       { path: "/projects/:projectId/bim",                         element: <BIMModelPickerPage /> },
       { path: "/projects/:projectId/integrations",               element: <IntegrationsPage /> },
+      { path: "/settings",                                        element: <SettingsPage /> },
       { path: "/reports",                                        element: <ReportsPage /> },
       { path: "/schedule",                                       element: <ProjectsPage /> },
       { path: "*",                                               element: <NotFoundPage /> },

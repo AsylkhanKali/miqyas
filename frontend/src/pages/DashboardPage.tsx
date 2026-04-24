@@ -12,6 +12,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/store/themeContext";
+import { useSettingsStore } from "@/store/settingsStore";
 import { motion } from "framer-motion";
 import {
   Plus,
@@ -23,6 +24,7 @@ import {
   CheckCircle,
   Clock,
   Camera,
+  FlaskConical,
 } from "lucide-react";
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
@@ -166,11 +168,53 @@ function deriveTrades(data: InvestorDashboard): TradeSummary[] {
   });
 }
 
+// ── Fake data ─────────────────────────────────────────────────────────────
+
+const FAKE_DASHBOARD: InvestorDashboard = {
+  total_projects: 5,
+  total_elements_analyzed: 8420,
+  avg_health_score: 71,
+  elements_at_risk: 312,
+  generated_at: new Date().toISOString(),
+  deviation_breakdown: {
+    total: 8420,
+    ahead: 610,
+    on_track: 6320,
+    behind: 890,
+    not_started: 480,
+    extra_work: 120,
+  },
+  projects: [
+    { id: "p1", name: "Al Nakheel Tower",      code: "ANT-01", health_score: 82, health_label: "Healthy",   behind_count: 42,  total_elements: 2100, last_capture_at: new Date(Date.now() - 86400000).toISOString() },
+    { id: "p2", name: "King Road Mixed-Use",   code: "KRM-03", health_score: 61, health_label: "At Risk",   behind_count: 118, total_elements: 1840, last_capture_at: new Date(Date.now() - 2 * 86400000).toISOString() },
+    { id: "p3", name: "Corniche Residences",   code: "COR-07", health_score: 44, health_label: "Critical",  behind_count: 203, total_elements: 1560, last_capture_at: new Date(Date.now() - 3 * 86400000).toISOString() },
+    { id: "p4", name: "NEOM Logistics Hub",    code: "NLH-02", health_score: 91, health_label: "Healthy",   behind_count: 14,  total_elements: 1920, last_capture_at: new Date().toISOString() },
+    { id: "p5", name: "Olaya District Office", code: "ODP-11", health_score: 58, health_label: "At Risk",   behind_count: 88,  total_elements: 1000, last_capture_at: new Date().toISOString() },
+  ],
+  critical_elements: [
+    { element_name: "Block B partitions L3", ifc_type: "IfcWall",   project_name: "Corniche Residences",   project_id: "p3", observed_percent: 62,  scheduled_percent: 100, deviation_days: -18, activity_name: "Internal partition works",    is_critical_path: true },
+    { element_name: "AHU Zone 4 commissioning", ifc_type: "IfcFlowTerminal", project_name: "Olaya District Office", project_id: "p5", observed_percent: 71, scheduled_percent: 100, deviation_days: -12, activity_name: "MEP commissioning", is_critical_path: true },
+    { element_name: "Level 4 slab rebar",    ifc_type: "IfcSlab",   project_name: "King Road Mixed-Use",   project_id: "p2", observed_percent: 61,  scheduled_percent: 85,  deviation_days: -8,  activity_name: "Level 4 structural works",    is_critical_path: true },
+    { element_name: "Podium roof waterproof", ifc_type: "IfcCovering", project_name: "King Road Mixed-Use", project_id: "p2", observed_percent: 78, scheduled_percent: 100, deviation_days: -5, activity_name: "Waterproofing works",         is_critical_path: false },
+  ],
+};
+
+const FAKE_TIMELINE: ProgressTimePoint[] = [
+  { date: "2024-10-01", actual: 12, planned: 14, elements: 1200 },
+  { date: "2024-11-01", actual: 22, planned: 24, elements: 2100 },
+  { date: "2024-12-01", actual: 33, planned: 35, elements: 3400 },
+  { date: "2025-01-01", actual: 44, planned: 46, elements: 5100 },
+  { date: "2025-02-01", actual: 56, planned: 57, elements: 6800 },
+  { date: "2025-03-01", actual: 67, planned: 68, elements: 7900 },
+  { date: "2025-04-01", actual: 71, planned: 72, elements: 8420 },
+];
+
 // ── Main component ────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
   const { theme } = useTheme();
   const isLight = theme === "light";
+  const { useFakeData } = useSettingsStore();
 
   const [data,     setData]     = useState<InvestorDashboard | null>(null);
   const [timeline, setTimeline] = useState<ProgressTimePoint[]>([]);
@@ -178,6 +222,13 @@ export default function DashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
 
   const load = async (showRefresh = false) => {
+    if (useFakeData) {
+      setData(FAKE_DASHBOARD);
+      setTimeline(FAKE_TIMELINE);
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
     if (showRefresh) setRefreshing(true);
     else setLoading(true);
     try {
@@ -197,7 +248,7 @@ export default function DashboardPage() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [useFakeData]);
 
   if (loading) {
     return (
@@ -242,7 +293,14 @@ export default function DashboardPage() {
       {/* ── Header ──────────────────────────────────────────────────── */}
       <motion.div variants={fadeUp} className="flex items-end justify-between">
         <div>
-          <h1 className="page-title">Dashboard</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="page-title">Dashboard</h1>
+            {useFakeData && (
+              <span className="flex items-center gap-1 rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-medium text-amber-400">
+                <FlaskConical size={10} /> Demo data
+              </span>
+            )}
+          </div>
           <p className="mt-1 text-sm text-slate-400">
             Construction progress · AI-powered deviation detection
           </p>

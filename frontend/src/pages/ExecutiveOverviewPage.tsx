@@ -1,477 +1,561 @@
 /**
  * ExecutiveOverviewPage — Buildots-style portfolio dashboard.
  *
- * Designed for leadership: one glance shows which projects need attention.
- * Layout:
- *   1. Header + portfolio KPI strip
- *   2. Project tiles grid (health ring, progress bar, status)
- *   3. S-curve (actual vs planned, all projects combined)
- *   4. Critical elements table (top issues across portfolio)
+ * Shows every active project at a glance: RAG status, planned vs actual
+ * progress, week-over-week trend, milestone status, PM commentary, and
+ * a cross-portfolio activity delay drill-down.
+ *
+ * Uses realistic fake data until the backend analytics pipeline is wired up.
  */
 
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  RefreshCw,
-  AlertTriangle,
-  CheckCircle2,
-  Clock,
   TrendingUp,
   TrendingDown,
   Minus,
-  ArrowRight,
-  Building2,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  ChevronDown,
+  ChevronUp,
+  MessageSquare,
+  Calendar,
+  BarChart2,
   Activity,
-  ShieldAlert,
+  Building2,
+  Flag,
 } from "lucide-react";
-import { format } from "date-fns";
 import clsx from "clsx";
-import { systemApi } from "@/services/api";
-import type { InvestorDashboard, ProjectHealthCard, CriticalElement, ProgressTimePoint } from "@/types";
-import { useTheme } from "@/store/themeContext";
-import SCurveChart from "@/components/ui/SCurveChart";
-import toast from "react-hot-toast";
 
-// ── Animations ────────────────────────────────────────────────────────────
+// ── Fake data ─────────────────────────────────────────────────────────────
 
-const stagger = {
-  hidden: { opacity: 0 },
-  show:   { opacity: 1, transition: { staggerChildren: 0.05 } },
-};
-const fadeUp = {
-  hidden: { opacity: 0, y: 10 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" } },
-};
-
-// ── Health ring ───────────────────────────────────────────────────────────
-
-function HealthRing({ score, size = 64, isLight }: { score: number; size?: number; isLight: boolean }) {
-  const r     = size / 2 - 6;
-  const circ  = 2 * Math.PI * r;
-  const dash  = (score / 100) * circ;
-  const color = score >= 70 ? "#10b981" : score >= 45 ? "#f59e0b" : "#ef4444";
-  const track = isLight ? "#E0DBCC" : "#263347";
-  return (
-    <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={track} strokeWidth={6} />
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={6}
-        strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" />
-    </svg>
-  );
+interface Milestone {
+  name: string;
+  due: string;
+  status: "done" | "on-track" | "at-risk" | "delayed";
 }
 
-// ── Project tile ──────────────────────────────────────────────────────────
-
-const STATUS_META = {
-  Healthy:   { icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", dot: "bg-emerald-400" },
-  "At Risk": { icon: AlertTriangle, color: "text-amber-400",  bg: "bg-amber-500/10  border-amber-500/20",  dot: "bg-amber-400" },
-  Critical:  { icon: ShieldAlert,  color: "text-red-400",     bg: "bg-red-500/10    border-red-500/20",    dot: "bg-red-400" },
-};
-
-function ProjectTile({ proj, isLight }: { proj: ProjectHealthCard; isLight: boolean }) {
-  const meta    = STATUS_META[proj.health_label] ?? STATUS_META["At Risk"];
-  const Icon    = meta.icon;
-  const pct     = proj.total_elements > 0
-    ? Math.round(((proj.total_elements - proj.behind_count) / proj.total_elements) * 100)
-    : null;
-  const daysAgo = proj.last_capture_at
-    ? Math.round((Date.now() - new Date(proj.last_capture_at).getTime()) / 86_400_000)
-    : null;
-
-  return (
-    <motion.div variants={fadeUp}>
-      <Link
-        to={`/projects/${proj.id}`}
-        className="card group block overflow-hidden transition-all duration-200 hover:-translate-y-0.5"
-        style={{ boxShadow: "var(--shadow-card)" }}
-      >
-        {/* Colour bar at top */}
-        <div className={clsx("h-1 w-full", {
-          "bg-emerald-500": proj.health_label === "Healthy",
-          "bg-amber-500":   proj.health_label === "At Risk",
-          "bg-red-500":     proj.health_label === "Critical",
-        })} />
-
-        <div className="p-5">
-          {/* Header */}
-          <div className="flex items-start justify-between gap-3 mb-4">
-            <div className="min-w-0">
-              <p className="text-xs font-mono font-medium text-slate-500 mb-0.5">{proj.code}</p>
-              <h3 className="text-sm font-semibold text-white leading-tight truncate group-hover:text-mq-400 transition-colors">
-                {proj.name}
-              </h3>
-            </div>
-            <span className={clsx(
-              "shrink-0 flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium",
-              meta.bg, meta.color,
-            )}>
-              <span className={clsx("h-1.5 w-1.5 rounded-full", meta.dot)} />
-              {proj.health_label}
-            </span>
-          </div>
-
-          {/* Health ring + score */}
-          <div className="flex items-center gap-4 mb-4">
-            <div className="relative shrink-0">
-              <HealthRing score={proj.health_score} size={64} isLight={isLight} />
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-sm font-bold text-white leading-none">{proj.health_score.toFixed(0)}</span>
-                <span className="text-[8px] text-slate-500 uppercase tracking-wide">health</span>
-              </div>
-            </div>
-
-            <div className="flex-1 space-y-2">
-              {/* Progress bar */}
-              <div>
-                <div className="flex justify-between text-[10px] mb-1">
-                  <span className="text-slate-500">On Track</span>
-                  <span className="font-mono font-semibold text-white">{pct != null ? `${pct}%` : "—"}</span>
-                </div>
-                <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: "var(--color-bg-elevated)" }}>
-                  <div
-                    className={clsx("h-1.5 rounded-full transition-all", {
-                      "bg-emerald-500": (pct ?? 0) >= 70,
-                      "bg-amber-500":   (pct ?? 0) >= 45 && (pct ?? 0) < 70,
-                      "bg-red-500":     (pct ?? 0) < 45,
-                    })}
-                    style={{ width: `${pct ?? 0}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Behind count */}
-              <div className="flex items-center gap-1.5">
-                {proj.behind_count > 0 ? (
-                  <>
-                    <TrendingDown size={11} className="text-red-400 shrink-0" />
-                    <span className="text-[10px] text-red-400 font-medium">{proj.behind_count} behind</span>
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 size={11} className="text-emerald-400 shrink-0" />
-                    <span className="text-[10px] text-emerald-400">All on track</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="flex items-center justify-between border-t pt-3" style={{ borderColor: "var(--color-border)" }}>
-            <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
-              <Clock size={10} />
-              {daysAgo === 0 ? "Today" : daysAgo === 1 ? "Yesterday" : daysAgo != null ? `${daysAgo}d ago` : "No captures"}
-            </div>
-            <div className="flex items-center gap-1 text-[10px] text-slate-600 group-hover:text-mq-400 transition-colors">
-              View <ArrowRight size={10} />
-            </div>
-          </div>
-        </div>
-      </Link>
-    </motion.div>
-  );
+interface DelayedActivity {
+  project: string;
+  activity: string;
+  planned: number;
+  actual: number;
+  delayDays: number;
+  critical: boolean;
 }
 
-// ── KPI chip ──────────────────────────────────────────────────────────────
+interface Project {
+  id: string;
+  name: string;
+  code: string;
+  location: string;
+  pm: string;
+  planned: number;       // % overall planned complete
+  actual: number;        // % overall actual complete
+  lastWeekActual: number;
+  status: "on-track" | "at-risk" | "delayed";
+  milestones: Milestone[];
+  pmComment: string;
+  updatedDaysAgo: number;
+  budget: string;
+  type: string;
+}
 
-function KPIChip({
-  label,
-  value,
-  sub,
-  icon: Icon,
-  trend,
-  accent = "neutral",
-}: {
-  label: string;
-  value: string | number;
-  sub?: string;
-  icon: React.ElementType;
-  trend?: "up" | "down" | "flat";
-  accent?: "green" | "red" | "amber" | "blue" | "neutral";
-}) {
-  const colors = {
-    green:   { bg: "bg-emerald-500/10 border-emerald-500/20", icon: "text-emerald-400", value: "text-emerald-400" },
-    red:     { bg: "bg-red-500/10     border-red-500/20",     icon: "text-red-400",     value: "text-red-400" },
-    amber:   { bg: "bg-amber-500/10   border-amber-500/20",   icon: "text-amber-400",   value: "text-amber-400" },
-    blue:    { bg: "bg-mq-600/10      border-mq-600/20",      icon: "text-mq-400",      value: "text-mq-400" },
-    neutral: { bg: "border-slate-800",                         icon: "text-slate-400",   value: "text-white" },
-  }[accent];
+const PROJECTS: Project[] = [
+  {
+    id: "p1",
+    name: "Al Nakheel Tower",
+    code: "ANT-01",
+    location: "Riyadh, KSA",
+    pm: "Khalid Al-Rashidi",
+    planned: 68,
+    actual: 71,
+    lastWeekActual: 67,
+    status: "on-track",
+    budget: "$42M",
+    type: "Mixed-use high-rise",
+    milestones: [
+      { name: "Structural topping out", due: "Mar 15", status: "done" },
+      { name: "MEP rough-in floors 1–20", due: "Apr 30", status: "on-track" },
+      { name: "Façade complete", due: "Jul 10", status: "on-track" },
+    ],
+    pmComment:
+      "Concrete works ahead of schedule — gained back 4 days vs last month. MEP procurement on track. No critical blockers this week.",
+    updatedDaysAgo: 1,
+  },
+  {
+    id: "p2",
+    name: "King Road Mixed-Use",
+    code: "KRM-03",
+    location: "Jeddah, KSA",
+    pm: "Sara Al-Mutairi",
+    planned: 54,
+    actual: 49,
+    lastWeekActual: 48,
+    status: "at-risk",
+    budget: "$28M",
+    type: "Commercial + residential",
+    milestones: [
+      { name: "Basement slab pour", due: "Feb 28", status: "done" },
+      { name: "Level 5 structure", due: "Apr 15", status: "at-risk" },
+      { name: "Retail fit-out start", due: "Jun 1", status: "at-risk" },
+    ],
+    pmComment:
+      "Rebar delivery delays pushed Level 4 slab by 6 days. Recovery plan approved — adding a night shift next week. Targeting to close 3% gap by end of month.",
+    updatedDaysAgo: 2,
+  },
+  {
+    id: "p3",
+    name: "Corniche Residences",
+    code: "COR-07",
+    location: "Dammam, KSA",
+    pm: "Mohammed Al-Ghamdi",
+    planned: 81,
+    actual: 74,
+    lastWeekActual: 73,
+    status: "delayed",
+    budget: "$19M",
+    type: "Residential",
+    milestones: [
+      { name: "Shell & core", due: "Jan 20", status: "delayed" },
+      { name: "Internal partitions", due: "Mar 5", status: "delayed" },
+      { name: "Handover Block A", due: "May 30", status: "at-risk" },
+    ],
+    pmComment:
+      "Subcontractor dispute on Block B interior works resolved last week. Backlog of ~180 partition walls outstanding. Escalation to client issued on revised handover date.",
+    updatedDaysAgo: 3,
+  },
+  {
+    id: "p4",
+    name: "NEOM Logistics Hub",
+    code: "NLH-02",
+    location: "NEOM, KSA",
+    pm: "Faisal Al-Zahrani",
+    planned: 33,
+    actual: 35,
+    lastWeekActual: 31,
+    status: "on-track",
+    budget: "$67M",
+    type: "Industrial / logistics",
+    milestones: [
+      { name: "Piling complete", due: "Feb 10", status: "done" },
+      { name: "Ground floor slab", due: "Apr 22", status: "on-track" },
+      { name: "Steel erection start", due: "Jun 15", status: "on-track" },
+    ],
+    pmComment:
+      "Best week so far — piling finished 8 days early. Ground floor formwork ahead of plan. Weather conditions ideal. No issues to report.",
+    updatedDaysAgo: 1,
+  },
+  {
+    id: "p5",
+    name: "Olaya District Office Park",
+    code: "ODP-11",
+    location: "Riyadh, KSA",
+    pm: "Nora Al-Shehri",
+    planned: 91,
+    actual: 87,
+    lastWeekActual: 85,
+    status: "at-risk",
+    budget: "$55M",
+    type: "Office",
+    milestones: [
+      { name: "M&E commissioning", due: "Mar 28", status: "at-risk" },
+      { name: "Snagging complete", due: "Apr 18", status: "at-risk" },
+      { name: "Client handover", due: "May 2", status: "at-risk" },
+    ],
+    pmComment:
+      "HVAC commissioning taking longer than expected — 3 AHU units failed first test. Vendor re-testing scheduled for next week. Handover date under review with client.",
+    updatedDaysAgo: 0,
+  },
+];
 
-  const TrendIcon = trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus;
-  const trendColor = trend === "up" ? "text-emerald-400" : trend === "down" ? "text-red-400" : "text-slate-500";
+const DELAYED_ACTIVITIES: DelayedActivity[] = [
+  { project: "COR-07", activity: "Block B internal partitions – Level 3", planned: 100, actual: 62, delayDays: 18, critical: true },
+  { project: "ODP-11", activity: "AHU commissioning – Zone 4 & 5",        planned: 100, actual: 71, delayDays: 12, critical: true },
+  { project: "KRM-03", activity: "Level 4 slab reinforcement",             planned: 85,  actual: 61, delayDays: 8,  critical: true },
+  { project: "COR-07", activity: "Electrical rough-in Block B floors 4–6", planned: 70,  actual: 48, delayDays: 7,  critical: false },
+  { project: "ODP-11", activity: "Snagging walkthrough – Towers A & B",    planned: 60,  actual: 40, delayDays: 6,  critical: false },
+  { project: "KRM-03", activity: "Waterproofing – podium roof",             planned: 100, actual: 78, delayDays: 5,  critical: false },
+];
 
+// ── Helpers ───────────────────────────────────────────────────────────────
+
+const STATUS = {
+  "on-track": { label: "On Track", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/25", bar: "bg-emerald-500", dot: "bg-emerald-400" },
+  "at-risk":  { label: "At Risk",  color: "text-amber-400",   bg: "bg-amber-500/10  border-amber-500/25",   bar: "bg-amber-500",   dot: "bg-amber-400" },
+  "delayed":  { label: "Delayed",  color: "text-red-400",     bg: "bg-red-500/10    border-red-500/25",     bar: "bg-red-500",     dot: "bg-red-400" },
+};
+
+const MILESTONE_STATUS = {
+  "done":     { label: "Done",     color: "text-emerald-400", icon: CheckCircle2 },
+  "on-track": { label: "On Track", color: "text-slate-400",   icon: Clock },
+  "at-risk":  { label: "At Risk",  color: "text-amber-400",   icon: AlertTriangle },
+  "delayed":  { label: "Delayed",  color: "text-red-400",     icon: AlertTriangle },
+};
+
+function delta(project: Project) {
+  return project.actual - project.lastWeekActual;
+}
+
+function gap(project: Project) {
+  return project.actual - project.planned;
+}
+
+// ── Portfolio KPIs ────────────────────────────────────────────────────────
+
+function portfolioStats() {
+  const onTrack = PROJECTS.filter(p => p.status === "on-track").length;
+  const atRisk  = PROJECTS.filter(p => p.status === "at-risk").length;
+  const delayed = PROJECTS.filter(p => p.status === "delayed").length;
+  const avgPlanned = Math.round(PROJECTS.reduce((s, p) => s + p.planned, 0) / PROJECTS.length);
+  const avgActual  = Math.round(PROJECTS.reduce((s, p) => s + p.actual,  0) / PROJECTS.length);
+  return { onTrack, atRisk, delayed, avgPlanned, avgActual };
+}
+
+// ── Sub-components ────────────────────────────────────────────────────────
+
+function ProgressBar({ planned, actual, thin = false }: { planned: number; actual: number; thin?: boolean }) {
+  const h = thin ? "h-1.5" : "h-2";
   return (
-    <div className={clsx("card border p-5", colors.bg)}>
-      <div className="flex items-start justify-between mb-3">
-        <div className={clsx("flex h-9 w-9 items-center justify-center rounded-lg", colors.bg)}>
-          <Icon size={17} className={colors.icon} />
-        </div>
-        {trend && <TrendIcon size={14} className={trendColor} />}
-      </div>
-      <p className={clsx("text-3xl font-bold font-display leading-none", colors.value)}>{value}</p>
-      <p className="text-xs font-medium text-slate-400 mt-1">{label}</p>
-      {sub && <p className="text-[10px] text-slate-600 mt-0.5">{sub}</p>}
+    <div className="relative">
+      {/* planned track */}
+      <div className={clsx("w-full rounded-full bg-slate-700/60", h)} />
+      {/* planned marker */}
+      <div
+        className="absolute top-0 bottom-0 w-0.5 bg-slate-400/60 rounded-full"
+        style={{ left: `${planned}%` }}
+        title={`Planned: ${planned}%`}
+      />
+      {/* actual fill */}
+      <div
+        className={clsx("absolute top-0 bottom-0 rounded-full transition-all", h,
+          actual >= planned ? "bg-emerald-500" : actual >= planned - 5 ? "bg-amber-500" : "bg-red-500"
+        )}
+        style={{ width: `${actual}%` }}
+      />
     </div>
   );
 }
 
-// ── Critical element row ──────────────────────────────────────────────────
-
-function CriticalRow({ el }: { el: CriticalElement }) {
-  const gap = el.scheduled_percent - el.observed_percent;
+function WeekDelta({ value }: { value: number }) {
+  if (value > 0) return (
+    <span className="flex items-center gap-0.5 text-[10px] font-semibold text-emerald-400">
+      <TrendingUp size={10} /> +{value}%
+    </span>
+  );
+  if (value < 0) return (
+    <span className="flex items-center gap-0.5 text-[10px] font-semibold text-red-400">
+      <TrendingDown size={10} /> {value}%
+    </span>
+  );
   return (
-    <tr className="border-b transition-colors hover:bg-slate-800/30" style={{ borderColor: "var(--color-border)" }}>
-      <td className="py-3 pr-4">
-        <p className="text-sm font-medium text-white truncate max-w-[180px]">{el.element_name}</p>
-        <p className="text-[10px] text-slate-500 font-mono">{el.ifc_type}</p>
-      </td>
-      <td className="py-3 pr-4 hidden sm:table-cell">
-        <Link to={`/projects/${el.project_id}`} className="text-xs text-slate-400 hover:text-mq-400 transition-colors">
-          {el.project_name}
-        </Link>
-      </td>
-      <td className="py-3 pr-4">
-        <div className="flex items-center gap-2">
-          <div className="w-20 h-1.5 rounded-full bg-slate-700">
-            <div className="h-1.5 rounded-full bg-red-500" style={{ width: `${Math.min(el.observed_percent, 100)}%` }} />
-          </div>
-          <span className="text-xs font-mono text-slate-300">{el.observed_percent.toFixed(0)}%</span>
-        </div>
-        <p className="text-[10px] text-slate-600 mt-0.5">of {el.scheduled_percent.toFixed(0)}% planned</p>
-      </td>
-      <td className="py-3 pr-4 hidden md:table-cell">
-        <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 border border-red-500/30 px-2 py-0.5 text-[10px] font-semibold text-red-400">
-          <TrendingDown size={9} />
-          -{gap.toFixed(0)}pp
-        </span>
-      </td>
-      <td className="py-3">
-        {el.is_critical_path && (
-          <span className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-medium text-amber-400">
-            Critical Path
-          </span>
-        )}
-      </td>
-    </tr>
+    <span className="flex items-center gap-0.5 text-[10px] text-slate-500">
+      <Minus size={10} /> 0%
+    </span>
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────
-
-export default function ExecutiveOverviewPage() {
-  const { theme } = useTheme();
-  const isLight = theme === "light";
-
-  const [data,      setData]      = useState<InvestorDashboard | null>(null);
-  const [timeline,  setTimeline]  = useState<ProgressTimePoint[]>([]);
-  const [loading,   setLoading]   = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const load = async (showRefresh = false) => {
-    if (showRefresh) setRefreshing(true);
-    else setLoading(true);
-    try {
-      const [dashRes, tlRes] = await Promise.allSettled([
-        systemApi.investorDashboard(),
-        systemApi.progressTimeline(),
-      ]);
-      if (dashRes.status === "fulfilled") setData(dashRes.value.data);
-      else if (showRefresh) toast.error("Could not reach the server");
-      if (tlRes.status === "fulfilled") setTimeline(tlRes.value.data);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  useEffect(() => { load(); }, []);
-
-  // ── Loading skeleton ────────────────────────────────────────────────────
-  if (loading) {
-    return (
-      <div className="space-y-6 animate-pulse">
-        <div className="flex items-end justify-between">
-          <div className="space-y-2">
-            <div className="skeleton-pulse h-7 w-52 rounded-lg" />
-            <div className="skeleton-pulse h-4 w-72 rounded" />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => <div key={i} className="skeleton-pulse h-32 rounded-xl" />)}
-        </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[...Array(3)].map((_, i) => <div key={i} className="skeleton-pulse h-52 rounded-xl" />)}
-        </div>
-      </div>
-    );
-  }
-
-  // ── Derived metrics ─────────────────────────────────────────────────────
-  const bd       = data?.deviation_breakdown;
-  const total    = bd?.total ?? 0;
-  const onTrack  = (bd?.ahead ?? 0) + (bd?.on_track ?? 0);
-  const onTrackPct = total > 0 ? Math.round((onTrack / total) * 100) : null;
-  const healthLabel =
-    (data?.avg_health_score ?? 0) >= 70 ? "Healthy"
-    : (data?.avg_health_score ?? 0) >= 45 ? "At Risk"
-    : "Critical";
-
-  const criticals = (data?.critical_elements ?? []).slice(0, 8);
-  const projectsSorted = [...(data?.projects ?? [])].sort((a, b) => a.health_score - b.health_score);
+function ProjectCard({ project }: { project: Project }) {
+  const [expanded, setExpanded] = useState(false);
+  const st  = STATUS[project.status];
+  const g   = gap(project);
+  const d   = delta(project);
 
   return (
-    <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-6">
+    <motion.div
+      layout
+      className="rounded-xl border border-[#2d3d54] bg-[#16213a] overflow-hidden"
+    >
+      {/* Status stripe */}
+      <div className={clsx("h-1", {
+        "bg-emerald-500": project.status === "on-track",
+        "bg-amber-500":   project.status === "at-risk",
+        "bg-red-500":     project.status === "delayed",
+      })} />
+
+      <div className="p-5">
+        {/* Header row */}
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-[10px] font-mono font-medium text-slate-500">{project.code}</span>
+              <span className="text-[10px] text-slate-600">·</span>
+              <span className="text-[10px] text-slate-500">{project.location}</span>
+            </div>
+            <h3 className="text-sm font-semibold text-white leading-tight">{project.name}</h3>
+            <p className="text-[10px] text-slate-500 mt-0.5">{project.type} · {project.budget}</p>
+          </div>
+          <div className={clsx(
+            "shrink-0 flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold",
+            st.bg, st.color
+          )}>
+            <span className={clsx("h-1.5 w-1.5 rounded-full shrink-0", st.dot)} />
+            {st.label}
+          </div>
+        </div>
+
+        {/* Progress */}
+        <div className="space-y-2 mb-4">
+          <div className="flex items-center justify-between text-[10px]">
+            <span className="text-slate-500">Overall progress</span>
+            <div className="flex items-center gap-3">
+              <span className="text-slate-500">Plan <span className="font-mono text-slate-300">{project.planned}%</span></span>
+              <span className="font-mono font-bold text-white">{project.actual}%</span>
+            </div>
+          </div>
+          <ProgressBar planned={project.planned} actual={project.actual} />
+          <div className="flex items-center justify-between">
+            <span className={clsx("text-[10px] font-semibold", g >= 0 ? "text-emerald-400" : "text-red-400")}>
+              {g >= 0 ? `+${g}pp vs plan` : `${g}pp vs plan`}
+            </span>
+            <div className="flex items-center gap-1 text-[10px] text-slate-500">
+              This week: <WeekDelta value={d} />
+            </div>
+          </div>
+        </div>
+
+        {/* Milestones */}
+        <div className="space-y-1.5 mb-4">
+          {project.milestones.map((m, i) => {
+            const ms = MILESTONE_STATUS[m.status];
+            const Icon = ms.icon;
+            return (
+              <div key={i} className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <Icon size={11} className={clsx("shrink-0", ms.color)} />
+                  <span className="text-[10px] text-slate-400 truncate">{m.name}</span>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="text-[10px] text-slate-500 font-mono">{m.due}</span>
+                  <span className={clsx("text-[10px] font-medium", ms.color)}>{ms.label}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Footer: PM + expand */}
+        <div className="border-t border-[#2d3d54] pt-3">
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="flex w-full items-center justify-between text-left"
+          >
+            <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+              <MessageSquare size={10} />
+              <span className="font-medium text-slate-400">{project.pm}</span>
+              <span className="text-slate-600">·</span>
+              <span>{project.updatedDaysAgo === 0 ? "Today" : project.updatedDaysAgo === 1 ? "Yesterday" : `${project.updatedDaysAgo}d ago`}</span>
+            </div>
+            {expanded
+              ? <ChevronUp size={13} className="text-slate-500" />
+              : <ChevronDown size={13} className="text-slate-500" />
+            }
+          </button>
+
+          {expanded && (
+            <motion.p
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="mt-2 text-[11px] leading-relaxed text-slate-400 border-l-2 border-slate-700 pl-3"
+            >
+              {project.pmComment}
+            </motion.p>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────
+
+export default function ExecutiveOverviewPage() {
+  const [filter, setFilter] = useState<"all" | "on-track" | "at-risk" | "delayed">("all");
+  const stats = portfolioStats();
+
+  const filtered = filter === "all" ? PROJECTS : PROJECTS.filter(p => p.status === filter);
+
+  const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+  return (
+    <div className="space-y-6">
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <motion.div variants={fadeUp} className="flex items-end justify-between">
+      <div className="flex items-end justify-between">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Building2 size={18} className="text-mq-400" />
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Executive Overview</span>
+            <Building2 size={15} className="text-mq-400" />
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Executive Overview</span>
           </div>
-          <h1 className="page-title">Portfolio Dashboard</h1>
-          <p className="mt-1 text-sm text-slate-400">
-            {data
-              ? `${data.total_projects} project${data.total_projects !== 1 ? "s" : ""} · Updated ${format(new Date(data.generated_at), "MMM d · HH:mm")}`
-              : "Construction progress across all projects"}
-          </p>
+          <h1 className="text-2xl font-bold text-white">Portfolio Dashboard</h1>
+          <p className="mt-0.5 text-sm text-slate-400">Week ending {today} · {PROJECTS.length} active projects</p>
         </div>
-        <button onClick={() => load(true)} disabled={refreshing} className="btn-ghost text-xs">
-          <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
-          Refresh
-        </button>
-      </motion.div>
+        <div className="flex items-center gap-1.5 rounded-lg border border-[#2d3d54] bg-[#1e293b] px-3 py-1.5 text-[10px] text-slate-400">
+          <Calendar size={11} />
+          Weekly report
+        </div>
+      </div>
 
-      {/* ── KPI strip ──────────────────────────────────────────────────── */}
-      <motion.div variants={fadeUp} className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <KPIChip
-          label="Active Projects"
-          value={data?.total_projects ?? 0}
-          sub={`${(data?.total_elements_analyzed ?? 0).toLocaleString()} elements`}
-          icon={Building2}
-          accent="blue"
-        />
-        <KPIChip
-          label="Portfolio Health"
-          value={data ? `${data.avg_health_score.toFixed(0)}` : "—"}
-          sub={healthLabel}
-          icon={Activity}
-          accent={data?.avg_health_score != null ? data.avg_health_score >= 70 ? "green" : data.avg_health_score >= 45 ? "amber" : "red" : "neutral"}
-          trend={data?.avg_health_score != null ? data.avg_health_score >= 70 ? "up" : data.avg_health_score >= 45 ? "flat" : "down" : undefined}
-        />
-        <KPIChip
-          label="On Track"
-          value={onTrackPct != null ? `${onTrackPct}%` : "—"}
-          sub={`${onTrack} of ${total} elements`}
-          icon={CheckCircle2}
-          accent={onTrackPct != null ? onTrackPct >= 70 ? "green" : onTrackPct >= 45 ? "amber" : "red" : "neutral"}
-          trend={onTrackPct != null ? onTrackPct >= 70 ? "up" : "down" : undefined}
-        />
-        <KPIChip
-          label="At Risk"
-          value={data?.elements_at_risk ?? 0}
-          sub={`${bd?.behind ?? 0} behind · ${bd?.not_started ?? 0} not started`}
-          icon={AlertTriangle}
-          accent={(data?.elements_at_risk ?? 0) > 0 ? "red" : "green"}
-          trend={(data?.elements_at_risk ?? 0) > 0 ? "down" : "up"}
-        />
-      </motion.div>
+      {/* ── Portfolio KPI strip ─────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+        {/* Avg progress */}
+        <div className="col-span-2 lg:col-span-2 rounded-xl border border-[#2d3d54] bg-[#16213a] p-5">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500 mb-3">Portfolio Progress</p>
+          <div className="flex items-end gap-4 mb-3">
+            <div>
+              <p className="text-3xl font-bold font-mono text-white">{stats.avgActual}%</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Actual complete</p>
+            </div>
+            <div className="pb-1">
+              <p className="text-lg font-mono text-slate-400">{stats.avgPlanned}%</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Planned</p>
+            </div>
+            <div className="pb-1 ml-auto">
+              <WeekDelta value={Math.round(
+                PROJECTS.reduce((s, p) => s + delta(p), 0) / PROJECTS.length * 10) / 10
+              } />
+              <p className="text-[10px] text-slate-500 mt-0.5">This week</p>
+            </div>
+          </div>
+          <ProgressBar planned={stats.avgPlanned} actual={stats.avgActual} />
+        </div>
 
-      {/* ── Project tiles ──────────────────────────────────────────────── */}
-      <motion.div variants={fadeUp}>
+        {/* On track */}
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5 flex flex-col justify-between">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/15 mb-3">
+            <CheckCircle2 size={16} className="text-emerald-400" />
+          </div>
+          <div>
+            <p className="text-3xl font-bold text-emerald-400">{stats.onTrack}</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">On Track</p>
+          </div>
+        </div>
+
+        {/* At risk */}
+        <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-5 flex flex-col justify-between">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/15 mb-3">
+            <AlertTriangle size={16} className="text-amber-400" />
+          </div>
+          <div>
+            <p className="text-3xl font-bold text-amber-400">{stats.atRisk}</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">At Risk</p>
+          </div>
+        </div>
+
+        {/* Delayed */}
+        <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5 flex flex-col justify-between">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/15 mb-3">
+            <BarChart2 size={16} className="text-red-400" />
+          </div>
+          <div>
+            <p className="text-3xl font-bold text-red-400">{stats.delayed}</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">Delayed</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Project tiles ───────────────────────────────────────────────── */}
+      <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="section-title">Projects</h2>
-          <Link to="/projects" className="flex items-center gap-1 text-xs text-mq-400 hover:text-mq-300 transition-colors">
-            All projects <ArrowRight size={12} />
-          </Link>
-        </div>
-
-        {projectsSorted.length === 0 ? (
-          <div className="card flex flex-col items-center justify-center py-16 text-slate-500">
-            <Building2 size={32} className="mb-3 opacity-40" />
-            <p className="text-sm font-medium">No projects yet</p>
-            <p className="text-xs mt-1">Create a project to see it here</p>
-            <Link to="/projects/new" className="btn-primary mt-4 text-xs">
-              New Project
-            </Link>
-          </div>
-        ) : (
-          <motion.div
-            variants={stagger}
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            {projectsSorted.map((proj) => (
-              <ProjectTile key={proj.id} proj={proj} isLight={isLight} />
+          <h2 className="text-sm font-semibold text-white">Projects</h2>
+          {/* Filter pills */}
+          <div className="flex items-center gap-1">
+            {(["all", "on-track", "at-risk", "delayed"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={clsx(
+                  "rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors capitalize",
+                  filter === f
+                    ? "bg-mq-500/20 text-mq-400 border border-mq-500/30"
+                    : "text-slate-500 hover:text-slate-300"
+                )}
+              >
+                {f === "all" ? `All (${PROJECTS.length})` : f === "on-track" ? `On Track (${stats.onTrack})` : f === "at-risk" ? `At Risk (${stats.atRisk})` : `Delayed (${stats.delayed})`}
+              </button>
             ))}
-          </motion.div>
-        )}
-      </motion.div>
-
-      {/* ── S-curve ────────────────────────────────────────────────────── */}
-      <motion.div variants={fadeUp}>
-        <div className="card p-5">
-          <div className="mb-4">
-            <h2 className="section-title">Portfolio Progress Over Time</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              {timeline.length > 0
-                ? `${timeline.length} data point${timeline.length !== 1 ? "s" : ""} · actual vs planned across all projects`
-                : "S-curve appears after your first analysis"}
-            </p>
           </div>
-          <SCurveChart data={timeline} height={220} />
         </div>
-      </motion.div>
 
-      {/* ── Critical elements table ─────────────────────────────────────── */}
-      {criticals.length > 0 && (
-        <motion.div variants={fadeUp}>
-          <div className="card overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: "var(--color-border)" }}>
-              <div>
-                <h2 className="section-title">Critical Elements</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Elements most behind schedule across portfolio</p>
-              </div>
-              <span className="flex items-center gap-1.5 rounded-full bg-red-500/15 border border-red-500/30 px-2.5 py-1 text-xs font-semibold text-red-400">
-                <AlertTriangle size={11} />
-                {criticals.length} issues
-              </span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b" style={{ borderColor: "var(--color-border)" }}>
-                    {["Element", "Project", "Progress", "Gap", ""].map((h) => (
-                      <th key={h} className="px-0 pb-2.5 pt-3 pr-4 first:pl-5 text-left text-[10px] font-medium uppercase tracking-wider text-slate-500">
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="px-5">
-                  {criticals.map((el, i) => (
-                    <CriticalRow key={i} el={el} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            {(data?.critical_elements?.length ?? 0) > 8 && (
-              <div className="border-t px-5 py-3" style={{ borderColor: "var(--color-border)" }}>
-                <p className="text-xs text-slate-500">
-                  Showing 8 of {data!.critical_elements.length} critical elements
-                </p>
-              </div>
-            )}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {filtered.map((p) => (
+            <ProjectCard key={p.id} project={p} />
+          ))}
+        </div>
+      </div>
+
+      {/* ── Activity delay drill-down ───────────────────────────────────── */}
+      <div className="rounded-xl border border-[#2d3d54] bg-[#16213a] overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#2d3d54]">
+          <div>
+            <h2 className="text-sm font-semibold text-white flex items-center gap-2">
+              <Activity size={14} className="text-red-400" />
+              Top Delayed Activities
+            </h2>
+            <p className="text-[10px] text-slate-500 mt-0.5">Activities driving portfolio delays this week</p>
           </div>
-        </motion.div>
-      )}
+          <span className="flex items-center gap-1 rounded-full bg-red-500/10 border border-red-500/20 px-2.5 py-1 text-[10px] font-semibold text-red-400">
+            <AlertTriangle size={10} />
+            {DELAYED_ACTIVITIES.filter(a => a.critical).length} critical
+          </span>
+        </div>
 
-      {/* ── Footer timestamp ────────────────────────────────────────────── */}
-      {data && (
-        <motion.p variants={fadeUp} className="text-center text-[10px] text-slate-700">
-          Data as of {format(new Date(data.generated_at), "MMMM d, yyyy · HH:mm")}
-        </motion.p>
-      )}
-    </motion.div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-[#2d3d54]">
+                {["Project", "Activity", "Planned", "Actual", "Delay", ""].map((h) => (
+                  <th key={h} className="px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-500 first:pl-5">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {DELAYED_ACTIVITIES.map((a, i) => (
+                <tr key={i} className="border-b border-[#1e293b] hover:bg-slate-800/20 transition-colors last:border-0">
+                  <td className="px-5 py-3 text-[11px] font-mono font-semibold text-slate-400">{a.project}</td>
+                  <td className="px-5 py-3 text-[11px] text-slate-300 max-w-[220px]">
+                    <span className="line-clamp-1">{a.activity}</span>
+                  </td>
+                  <td className="px-5 py-3 text-[11px] font-mono text-slate-400">{a.planned}%</td>
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 h-1.5 rounded-full bg-slate-700">
+                        <div
+                          className="h-1.5 rounded-full bg-red-500"
+                          style={{ width: `${(a.actual / a.planned) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-[11px] font-mono text-slate-300">{a.actual}%</span>
+                    </div>
+                  </td>
+                  <td className="px-5 py-3">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 border border-red-500/20 px-2 py-0.5 text-[10px] font-semibold text-red-400">
+                      <TrendingDown size={9} />
+                      {a.delayDays}d
+                    </span>
+                  </td>
+                  <td className="px-5 py-3">
+                    {a.critical && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 text-[10px] font-medium text-amber-400">
+                        <Flag size={9} />
+                        Critical path
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── Footer ─────────────────────────────────────────────────────── */}
+      <p className="text-center text-[10px] text-slate-700 pb-2">
+        Data as of {today} · Fake data — wire up backend analytics to go live
+      </p>
+    </div>
   );
 }

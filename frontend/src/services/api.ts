@@ -91,6 +91,9 @@ export const bimApi = {
     api.post<{ model_id: string; parse_status: string }>(
       `/projects/${projectId}/bim/models/${modelId}/force-reset`,
     ),
+
+  deleteModel: (projectId: string, modelId: string) =>
+    api.delete(`/projects/${projectId}/bim/models/${modelId}`),
 };
 
 // ── Schedules ───────────────────────────────────────────────────────────

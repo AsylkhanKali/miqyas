@@ -7,19 +7,21 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Box,
   Upload,
   CheckCircle2,
   XCircle,
   Loader2,
-  Clock,
   ChevronRight,
   AlertCircle,
   FileBox,
+  RefreshCw,
+  Trash2,
 } from "lucide-react";
 import clsx from "clsx";
+import toast from "react-hot-toast";
 import { bimApi } from "@/services/api";
 import type { BIMModel } from "@/types";
 
@@ -34,19 +36,17 @@ function formatBytes(bytes: number | null | undefined): string {
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
+    day: "numeric", month: "short", year: "numeric",
   });
 }
 
 type ParseStatus = "pending" | "parsing" | "parsed" | "failed";
 
 const STATUS_META: Record<ParseStatus, { label: string; color: string; icon: React.ElementType }> = {
-  pending:  { label: "Queued",    color: "text-slate-400",  icon: Clock },
-  parsing:  { label: "Parsing…",  color: "text-mq-400",     icon: Loader2 },
-  parsed:   { label: "Ready",     color: "text-emerald-400", icon: CheckCircle2 },
-  failed:   { label: "Failed",    color: "text-red-400",    icon: XCircle },
+  pending:  { label: "Not parsed", color: "text-slate-400",   icon: AlertCircle },
+  parsing:  { label: "Parsing…",   color: "text-mq-400",      icon: Loader2 },
+  parsed:   { label: "Ready",      color: "text-emerald-400", icon: CheckCircle2 },
+  failed:   { label: "Failed",     color: "text-red-400",     icon: XCircle },
 };
 
 // ── component ──────────────────────────────────────────────────────────────
@@ -55,9 +55,17 @@ export default function BIMModelPickerPage() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
 
-  const [models, setModels]   = useState<BIMModel[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState<string | null>(null);
+  const [models,    setModels]    = useState<BIMModel[]>([]);
+  const [loading,   setLoading]   = useState(true);
+  const [error,     setError]     = useState<string | null>(null);
+  const [reparsing, setReparsing] = useState<Set<string>>(new Set());
+  const [deleting,  setDeleting]  = useState<Set<string>>(new Set());
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+
+  const reload = () => {
+    if (!projectId) return;
+    bimApi.listModels(projectId).then((r) => setModels(r.data)).catch(() => {});
+  };
 
   useEffect(() => {
     if (!projectId) return;
@@ -75,16 +83,43 @@ export default function BIMModelPickerPage() {
       (m) => m.parse_status === "pending" || m.parse_status === "parsing"
     );
     if (!hasLive) return;
-    const id = setInterval(() => {
-      if (!projectId) return;
-      bimApi.listModels(projectId).then((r) => setModels(r.data)).catch(() => {});
-    }, 4000);
+    const id = setInterval(reload, 4000);
     return () => clearInterval(id);
   }, [models, projectId]);
 
   const handleOpen = (model: BIMModel) => {
     if (model.parse_status !== "parsed") return;
     navigate(`/viewer/${projectId}/${model.id}`);
+  };
+
+  const handleReparse = async (e: React.MouseEvent, model: BIMModel) => {
+    e.stopPropagation();
+    if (!projectId) return;
+    setReparsing((s) => new Set(s).add(model.id));
+    try {
+      await bimApi.reparse(projectId, model.id);
+      toast.success("Re-parse started");
+      reload();
+    } catch {
+      toast.error("Failed to start re-parse");
+    } finally {
+      setReparsing((s) => { const n = new Set(s); n.delete(model.id); return n; });
+    }
+  };
+
+  const handleDelete = async (modelId: string) => {
+    if (!projectId) return;
+    setDeleting((s) => new Set(s).add(modelId));
+    setConfirmDelete(null);
+    try {
+      await bimApi.deleteModel(projectId, modelId);
+      setModels((m) => m.filter((x) => x.id !== modelId));
+      toast.success("Model deleted");
+    } catch {
+      toast.error("Failed to delete model");
+    } finally {
+      setDeleting((s) => { const n = new Set(s); n.delete(modelId); return n; });
+    }
   };
 
   // ── render ────────────────────────────────────────────────────────────────
@@ -146,76 +181,128 @@ export default function BIMModelPickerPage() {
       {/* Model list */}
       {!loading && models.length > 0 && (
         <div className="space-y-2">
-          {models.map((model, i) => {
-            const status = (model.parse_status ?? "pending") as ParseStatus;
-            const meta   = STATUS_META[status] ?? STATUS_META.pending;
-            const Icon   = meta.icon;
-            const ready  = status === "parsed";
+          <AnimatePresence initial={false}>
+            {models.map((model, i) => {
+              const status  = (model.parse_status ?? "pending") as ParseStatus;
+              const meta    = STATUS_META[status] ?? STATUS_META.pending;
+              const Icon    = meta.icon;
+              const ready   = status === "parsed";
+              const canReparse = status === "failed" || status === "pending";
+              const isReparsing = reparsing.has(model.id);
+              const isDeleting  = deleting.has(model.id);
 
-            return (
-              <motion.div
-                key={model.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                onClick={() => handleOpen(model)}
-                className={clsx(
-                  "group flex items-center gap-4 rounded-xl border px-5 py-4 transition-all",
-                  ready
-                    ? "cursor-pointer border-[#2d3d54] bg-[#16213a] hover:border-mq-500/50 hover:bg-[#1a2740]"
-                    : "cursor-default border-[#1e293b] bg-[#13192b] opacity-80"
-                )}
-              >
-                {/* Icon */}
-                <div
-                  className={clsx(
-                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-                    ready ? "bg-mq-500/15" : "bg-[#1e293b]"
-                  )}
+              return (
+                <motion.div
+                  key={model.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ delay: i * 0.04 }}
                 >
-                  <Box
-                    size={20}
-                    className={ready ? "text-mq-400" : "text-slate-600"}
-                  />
-                </div>
+                  <div
+                    onClick={() => handleOpen(model)}
+                    className={clsx(
+                      "group flex items-center gap-4 rounded-xl border px-5 py-4 transition-all",
+                      ready
+                        ? "cursor-pointer border-[#2d3d54] bg-[#16213a] hover:border-mq-500/50 hover:bg-[#1a2740]"
+                        : "cursor-default border-[#1e293b] bg-[#13192b]"
+                    )}
+                  >
+                    {/* Icon */}
+                    <div className={clsx(
+                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
+                      ready ? "bg-mq-500/15" : "bg-[#1e293b]"
+                    )}>
+                      <Box size={20} className={ready ? "text-mq-400" : "text-slate-600"} />
+                    </div>
 
-                {/* Info */}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-white">
-                    {model.filename}
-                  </p>
-                  <div className="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
-                    <span>{formatBytes(model.file_size_bytes)}</span>
-                    <span>·</span>
-                    <span>{formatDate(model.created_at)}</span>
-                    {model.element_count != null && model.element_count > 0 && (
-                      <>
+                    {/* Info */}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-white">{model.filename}</p>
+                      <div className="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
+                        <span>{formatBytes(model.file_size_bytes)}</span>
                         <span>·</span>
-                        <span>{model.element_count.toLocaleString()} elements</span>
-                      </>
+                        <span>{formatDate(model.created_at)}</span>
+                        {model.element_count > 0 && (
+                          <>
+                            <span>·</span>
+                            <span>{model.element_count.toLocaleString()} elements</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Status */}
+                    <div className={clsx("flex items-center gap-1.5 text-xs font-medium shrink-0", meta.color)}>
+                      <Icon size={13} className={clsx(status === "parsing" && "animate-spin")} />
+                      <span>{meta.label}</span>
+                    </div>
+
+                    {/* Re-parse button */}
+                    {canReparse && (
+                      <button
+                        onClick={(e) => handleReparse(e, model)}
+                        disabled={isReparsing}
+                        className="shrink-0 flex items-center gap-1.5 rounded-lg border border-[#2d3d54] bg-[#1e293b] px-2.5 py-1.5 text-xs text-slate-400 transition-colors hover:border-mq-500/40 hover:text-mq-400 disabled:opacity-50"
+                      >
+                        <RefreshCw size={11} className={clsx(isReparsing && "animate-spin")} />
+                        Parse
+                      </button>
+                    )}
+
+                    {/* Delete button */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setConfirmDelete(model.id); }}
+                      disabled={isDeleting}
+                      className="shrink-0 flex items-center justify-center rounded-lg p-1.5 text-slate-600 transition-colors hover:bg-red-500/10 hover:text-red-400 disabled:opacity-50"
+                    >
+                      {isDeleting
+                        ? <Loader2 size={14} className="animate-spin" />
+                        : <Trash2 size={14} />
+                      }
+                    </button>
+
+                    {/* Arrow */}
+                    {ready && (
+                      <ChevronRight size={16} className="shrink-0 text-slate-600 transition-colors group-hover:text-mq-400" />
                     )}
                   </div>
-                </div>
 
-                {/* Status badge */}
-                <div className={clsx("flex items-center gap-1.5 text-xs font-medium", meta.color)}>
-                  <Icon
-                    size={13}
-                    className={clsx(status === "parsing" && "animate-spin")}
-                  />
-                  <span>{meta.label}</span>
-                </div>
-
-                {/* Arrow for ready models */}
-                {ready && (
-                  <ChevronRight
-                    size={16}
-                    className="shrink-0 text-slate-600 transition-colors group-hover:text-mq-400"
-                  />
-                )}
-              </motion.div>
-            );
-          })}
+                  {/* Confirm delete */}
+                  <AnimatePresence>
+                    {confirmDelete === model.id && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mx-1 flex items-center justify-between rounded-b-xl border border-t-0 border-red-500/20 bg-red-500/5 px-5 py-3">
+                          <p className="text-xs text-slate-400">
+                            Delete <span className="font-medium text-white">{model.filename}</span>? This cannot be undone.
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setConfirmDelete(null)}
+                              className="rounded-lg px-3 py-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => handleDelete(model.id)}
+                              className="rounded-lg bg-red-500/20 border border-red-500/30 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/30 transition-colors"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
       )}
     </div>

@@ -1,8 +1,11 @@
 """BIM/IFC upload, element browsing, and IFC file serving router."""
 
+import logging
 import tempfile
 from pathlib import Path
 from uuid import UUID
+
+logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse, RedirectResponse
@@ -230,6 +233,33 @@ async def force_reset_bim_model(
     await db.commit()
 
     return {"model_id": str(model_id), "parse_status": "failed"}
+
+
+@router.delete("/models/{model_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_bim_model(
+    project_id: UUID,
+    model_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a BIM model, its elements, and its file from storage."""
+    model = await db.get(BIMModel, model_id)
+    if not model:
+        raise HTTPException(status_code=404, detail="BIM model not found")
+    if model.project_id != project_id:
+        raise HTTPException(status_code=404, detail="BIM model not found in this project")
+
+    # Remove file from storage (best-effort — don't fail if already gone)
+    try:
+        storage = get_storage()
+        if await storage.exists(model.storage_path):
+            await storage.delete(model.storage_path)
+    except Exception as e:
+        logger.warning(f"Storage delete failed for {model.storage_path}: {e}")
+
+    # Cascade-delete elements then the model
+    await db.execute(delete(BIMElement).where(BIMElement.bim_model_id == model_id))
+    await db.delete(model)
+    await db.commit()
 
 
 @router.get("/models/{model_id}/info")

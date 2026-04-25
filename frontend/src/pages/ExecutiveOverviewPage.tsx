@@ -25,8 +25,10 @@ import {
   Activity,
   Building2,
   Flag,
+  FlaskConical,
 } from "lucide-react";
 import clsx from "clsx";
+import { useSettingsStore } from "@/store/settingsStore";
 
 // ── Fake data ─────────────────────────────────────────────────────────────
 
@@ -372,11 +374,41 @@ function ProjectCard({ project }: { project: Project }) {
 
 export default function ExecutiveOverviewPage() {
   const [filter, setFilter] = useState<"all" | "on-track" | "at-risk" | "delayed">("all");
+  const { useFakeData } = useSettingsStore();
   const stats = portfolioStats();
 
   const filtered = filter === "all" ? PROJECTS : PROJECTS.filter(p => p.status === filter);
 
   const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+  if (!useFakeData) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-end justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Building2 size={15} className="text-mq-400" />
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Executive Overview</span>
+            </div>
+            <h1 className="text-2xl font-bold text-white">Portfolio Dashboard</h1>
+            <p className="mt-0.5 text-sm text-slate-400">Week ending {today}</p>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-[#2d3d54] py-28 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#1e293b]">
+            <FlaskConical size={24} className="text-slate-500" />
+          </div>
+          <div>
+            <p className="font-medium text-slate-300">No portfolio data yet</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Run the analysis pipeline across your projects to see real data,<br />
+              or enable <span className="font-medium text-slate-400">Demo mode</span> in Settings to preview sample data.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

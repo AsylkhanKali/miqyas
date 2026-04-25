@@ -23,8 +23,10 @@ import {
   CheckCircle2,
   Clock,
   Minus,
+  FlaskConical,
 } from "lucide-react";
 import clsx from "clsx";
+import { useSettingsStore } from "@/store/settingsStore";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -215,6 +217,7 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => {
 
 export default function ProgressOverviewPage() {
   const { projectId } = useParams<{ projectId: string }>();
+  const { useFakeData } = useSettingsStore();
 
   const [view,       setView]       = useState<ViewMode>("table");
   const [breakdown,  setBreakdown]  = useState<Breakdown>("location");
@@ -222,9 +225,10 @@ export default function ProgressOverviewPage() {
   const [statusFilter, setStatusFilter] = useState<ActivityStatus | "all">("all");
 
   const activities = useMemo(() => {
+    if (!useFakeData) return [];
     if (statusFilter === "all") return ALL_ACTIVITIES;
     return ALL_ACTIVITIES.filter((a) => a.status === statusFilter);
-  }, [statusFilter]);
+  }, [statusFilter, useFakeData]);
 
   const groups: LevelGroup[] = useMemo(() => {
     const map = new Map<string, Activity[]>();
@@ -249,13 +253,50 @@ export default function ProgressOverviewPage() {
   const collapseAll = () => setExpanded(new Set());
 
   const stats = useMemo(() => ({
-    total:       ALL_ACTIVITIES.length,
-    done:        ALL_ACTIVITIES.filter((a) => a.status === "done").length,
-    on_track:    ALL_ACTIVITIES.filter((a) => a.status === "on_track").length,
-    delayed:     ALL_ACTIVITIES.filter((a) => a.status === "delayed").length,
-    critical:    ALL_ACTIVITIES.filter((a) => a.status === "critical").length,
-    not_started: ALL_ACTIVITIES.filter((a) => a.status === "not_started").length,
-  }), []);
+    total:       activities.length,
+    done:        activities.filter((a) => a.status === "done").length,
+    on_track:    activities.filter((a) => a.status === "on_track").length,
+    delayed:     activities.filter((a) => a.status === "delayed").length,
+    critical:    activities.filter((a) => a.status === "critical").length,
+    not_started: activities.filter((a) => a.status === "not_started").length,
+  }), [activities]);
+
+  const handleExport = () => {
+    const header = ["Activity", "Level", "Trade", "Contractor", "Planned %", "Actual %", "Status", "Days Delay", "Planned Start", "Planned End"];
+    const rows = activities.map((a) => [
+      a.name, a.level, a.trade, a.contractor,
+      a.plannedPct, a.actualPct, STATUS_META[a.status].label,
+      a.daysDelay, a.plannedStart, a.plannedEnd,
+    ]);
+    const csv = [header, ...rows]
+      .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `progress-${projectId ?? "export"}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // ── No demo data ──
+  if (!useFakeData) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 py-28 text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#1e293b]">
+          <FlaskConical size={24} className="text-slate-500" />
+        </div>
+        <div>
+          <p className="font-medium text-slate-300">No progress data yet</p>
+          <p className="mt-1 text-sm text-slate-500">
+            Run the analysis pipeline on a capture to generate real data,<br />
+            or enable <span className="font-medium text-slate-400">Demo mode</span> in Settings to preview sample data.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5 py-4">
@@ -289,9 +330,13 @@ export default function ProgressOverviewPage() {
           </div>
 
           {/* Export */}
-          <button className="flex items-center gap-1.5 rounded-lg border border-[#2d3d54] bg-[#1e293b] px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:text-white">
+          <button
+            onClick={handleExport}
+            disabled={activities.length === 0}
+            className="flex items-center gap-1.5 rounded-lg border border-[#2d3d54] bg-[#1e293b] px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:border-mq-500/40 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed"
+          >
             <Download size={13} />
-            Export
+            Export CSV
           </button>
         </div>
       </div>

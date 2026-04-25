@@ -57,6 +57,21 @@ async def upload_ifc(
 
         storage = get_storage()
         await storage.upload(tmp_path, storage_key)
+    except OSError as e:
+        # ENOSPC (errno 28) = volume is full — give the user a clear message
+        # instead of a generic 500.
+        import errno
+        if e.errno == errno.ENOSPC:
+            raise HTTPException(
+                status_code=507,  # 507 Insufficient Storage
+                detail=(
+                    f"Storage volume is full — cannot save {file.filename} "
+                    f"({file_size / 1024 / 1024:.1f} MB). "
+                    "Free up space by deleting unused models/captures, "
+                    "upgrade your Railway volume, or switch to S3/R2 storage."
+                ),
+            )
+        raise
     finally:
         if tmp_path:
             tmp_path.unlink(missing_ok=True)

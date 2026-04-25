@@ -17,6 +17,7 @@ import {
   CalendarCheck,
   Users,
   BarChart3,
+  TrendingUp,
   Building2,
   Settings,
   ChevronLeft,
@@ -81,6 +82,12 @@ const PROJECT_NAV: NavItem[] = [
     label: "BIM Viewer",
     icon: Box,
     path: (id) => id ? `/projects/${id}/bim` : "/projects",
+    requiresProject: true,
+  },
+  {
+    label: "Progress",
+    icon: TrendingUp,
+    path: (id) => id ? `/projects/${id}/progress` : "/projects",
     requiresProject: true,
   },
   {

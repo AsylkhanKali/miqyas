@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/store/themeContext";
 import { useSettingsStore } from "@/store/settingsStore";
+import ActionsPanel, { FAKE_ACTIONS, FAKE_DELAY_CALLOUTS } from "@/components/ui/ActionsPanel";
 import { motion } from "framer-motion";
 import {
   Plus,
@@ -313,6 +314,11 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
+      {/* ── Actions Required ─────────────────────────────────────────── */}
+      <motion.div variants={fadeUp}>
+        <ActionsPanel items={FAKE_ACTIONS} delays={FAKE_DELAY_CALLOUTS} />
+      </motion.div>
+
       {/* ── Top KPI row ──────────────────────────────────────────────── */}
       <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 sm:grid-cols-3">
 
@@ -324,7 +330,7 @@ export default function DashboardPage() {
           rightValue={plannedPct}
           trendText={
             hasData
-              ? `${onTrackCount} elements on or ahead of schedule`
+              ? `${onTrackCount} elements on or ahead of schedule across ${data?.total_projects ?? 0} active projects`
               : "No analysis data yet"
           }
           trendDirection={
@@ -333,7 +339,7 @@ export default function DashboardPage() {
             : actualPct >= 45 ? "neutral"
             : "negative"
           }
-          dateRange={data ? `Updated ${format(new Date(data.generated_at), "MMM d · HH:mm")}` : undefined}
+          dateRange={data ? `Based on latest capture ${format(new Date(data.generated_at), "MMM d · HH:mm")}` : undefined}
           icon={<Activity size={17} />}
           accent={actualPct == null ? "neutral" : actualPct >= 70 ? "green" : actualPct >= 45 ? "amber" : "red"}
           linkTo={latestProjectId ? `/projects/${latestProjectId}` : "/projects"}
@@ -347,7 +353,7 @@ export default function DashboardPage() {
           subLabel="Behind + Not Started"
           trendText={
             (data?.elements_at_risk ?? 0) > 0
-              ? `${breakdown?.behind ?? 0} behind schedule · ${breakdown?.not_started ?? 0} not started`
+              ? `${breakdown?.behind ?? 0} elements behind across ${data?.total_projects ?? 0} active zones · ${breakdown?.not_started ?? 0} not started`
               : "All elements on track"
           }
           trendDirection={(data?.elements_at_risk ?? 0) > 0 ? "negative" : "positive"}

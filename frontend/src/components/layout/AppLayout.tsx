@@ -416,7 +416,7 @@ function NavLink({
       {isActive && (
         <motion.div
           layoutId="nav-indicator"
-          className="absolute -left-3 top-1/2 -translate-y-1/2 h-8 w-[3px] rounded-r-full bg-mq-500"
+          className="absolute -left-3 inset-y-0 my-auto h-8 w-[3px] rounded-r-full bg-mq-500"
           transition={{ duration: 0.2 }}
         />
       )}

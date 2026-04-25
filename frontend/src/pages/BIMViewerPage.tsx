@@ -108,7 +108,7 @@ export default function BIMViewerPage() {
   const [selectedCaptureId, setSelectedCaptureId] = useState<string | null>(null);
   const [showTrajectory, setShowTrajectory] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
-  const [highlightDelays, setHighlightDelays] = useState(true);
+  const [highlightDelays, setHighlightDelays] = useState(false);
 
   // Phase 4: mesh rendering state
   const [renderMode, setRenderMode] = useState<RenderMode>("mesh");
@@ -1233,36 +1233,30 @@ function IFCViewerCanvas({
           if (pulsingDelayedMeshes.size > 0) {
             pulsingDelayedMeshes.forEach((mesh) => {
               if (mesh === highlightedMesh) return;
-              const el = elements.find((e) => elementMeshMap.get(e.id) === mesh);
-              if (!el) return;
               const mat = mesh.material as THREE.MeshPhongMaterial;
-              const { hex, opacity } = getElementColor(el);
-              mat.color.set(hex);
+              // Only clear the emissive glow — base color was never changed.
               mat.emissive.set(0x000000);
               mat.emissiveIntensity = 0;
-              mat.opacity = opacity;
-              mat.transparent = opacity < 1;
             });
             pulsingDelayedMeshes.clear();
           }
           return;
         }
 
-        // sin wave 0..1 ~1.5Hz for an unmistakable pulse
-        const t = performance.now() * 0.005;
+        // sin wave 0..1 ~1 Hz — subtle red glow, keeps base category color
+        const t = performance.now() * 0.003;
         const pulse = 0.5 + 0.5 * Math.sin(t);
-        const intensity = 0.4 + pulse * 0.7;
+        const intensity = 0.25 + pulse * 0.5;
 
         delayedIds.forEach((elId) => {
           if (elId === selectedId) return; // selection takes precedence
           const mesh = elementMeshMap.get(elId);
           if (!mesh) return;
           const mat = mesh.material as THREE.MeshPhongMaterial;
-          mat.color.set(0xef4444);
+          // Keep base color intact — only add a red emissive glow so the
+          // element is still recognisable by category color.
           mat.emissive.set(0xff2a2a);
           mat.emissiveIntensity = intensity;
-          mat.opacity = 0.95;
-          mat.transparent = false;
           pulsingDelayedMeshes.add(mesh);
         });
       };

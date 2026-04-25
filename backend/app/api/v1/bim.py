@@ -35,27 +35,37 @@ async def upload_ifc(
     if not file.filename or not file.filename.lower().endswith(".ifc"):
         raise HTTPException(status_code=400, detail="Only .ifc files are accepted")
 
-    # Write to a local temp file first, then push to the configured storage backend.
-    # storage_path stores the STORAGE KEY (not a local path) so it works for both
-    # local and S3/R2 backends across redeploys.
-    content = await file.read()
+    # Stream the upload directly to a temp file — never buffer the whole
+    # file in memory.  For a 180 MB IFC, `await file.read()` would keep the
+    # entire payload in the Python process heap and routinely OOM-kill the
+    # Railway container.  Chunked streaming keeps peak RAM ≈ 1 MB regardless
+    # of file size.
     storage_key = f"ifc/{project_id}/{file.filename}"
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".ifc") as tmp:
-        tmp.write(content)
-        tmp_path = Path(tmp.name)
+    file_size = 0
+    tmp_path: Path | None = None
 
     try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".ifc") as tmp:
+            tmp_path = Path(tmp.name)
+            CHUNK = 1024 * 1024  # 1 MB
+            while True:
+                chunk = await file.read(CHUNK)
+                if not chunk:
+                    break
+                tmp.write(chunk)
+                file_size += len(chunk)
+
         storage = get_storage()
         await storage.upload(tmp_path, storage_key)
     finally:
-        tmp_path.unlink(missing_ok=True)
+        if tmp_path:
+            tmp_path.unlink(missing_ok=True)
 
     bim_model = BIMModel(
         project_id=project_id,
         filename=file.filename,
         storage_path=storage_key,   # storage key, resolved at read-time
-        file_size_bytes=len(content),
+        file_size_bytes=file_size,
         parse_status="pending",
     )
     db.add(bim_model)

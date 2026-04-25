@@ -20,12 +20,20 @@ import {
   GitBranch,
   Hexagon,
   AlertCircle,
+  Flame,
 } from "lucide-react";
 import clsx from "clsx";
 import type * as THREE from "three";
 import toast from "react-hot-toast";
 import { bimApi, progressApi, capturesApi } from "@/services/api";
 import type { BIMElement, BIMModel, BIMModelInfo, ElementCategory, ProgressItem, VideoCapture, DeviationType } from "@/types";
+import {
+  buildFakeSchedule,
+  delayedElementIds as deriveDelayedIds,
+  predictedDelayChain,
+} from "@/utils/fakeBimDelays";
+import TimelineSlider from "@/components/bim/TimelineSlider";
+import ElementInsightPanel from "@/components/bim/ElementInsightPanel";
 
 // IFC type constant → category hex color (constants verified from web-ifc package)
 // This lets the viewer render distinct colors even when DB element matching fails.
@@ -100,6 +108,7 @@ export default function BIMViewerPage() {
   const [selectedCaptureId, setSelectedCaptureId] = useState<string | null>(null);
   const [showTrajectory, setShowTrajectory] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
+  const [highlightDelays, setHighlightDelays] = useState(true);
 
   // Phase 4: mesh rendering state
   const [renderMode, setRenderMode] = useState<RenderMode>("mesh");
@@ -182,6 +191,16 @@ export default function BIMViewerPage() {
     progressData.forEach((p) => map.set(p.element_id, p));
     return map;
   }, [progressData]);
+
+  // Fake-but-deterministic schedule data — used until real progress + critical
+  // path analytics surface per-element planned/actual %. Drives the red-pulse
+  // delay highlight, the schedule status panel, and the predicted delay chain.
+  const fakeSchedule = useMemo(() => buildFakeSchedule(elements), [elements]);
+  const delayedIds   = useMemo(() => deriveDelayedIds(fakeSchedule), [fakeSchedule]);
+  const delayChain   = useMemo(
+    () => predictedDelayChain(elements, fakeSchedule, 8),
+    [elements, fakeSchedule],
+  );
 
   const toggleLevel = (level: string) => {
     setVisibleLevels((prev) => {
@@ -474,6 +493,21 @@ export default function BIMViewerPage() {
             >
               <Hexagon size={15} />
             </button>
+            {/* Delay highlight toggle — pulses delayed elements red */}
+            <button
+              onClick={() => setHighlightDelays((v) => !v)}
+              className={clsx(
+                "flex h-9 w-9 items-center justify-center rounded-lg border backdrop-blur-sm transition-colors",
+                highlightDelays
+                  ? "border-red-500 bg-red-600/20 text-red-400"
+                  : "border-slate-700 bg-slate-800/80 text-slate-400 hover:text-white"
+              )}
+              title={highlightDelays
+                ? `Highlighting ${delayedIds.size} delayed elements (click to disable)`
+                : "Highlight delayed elements"}
+            >
+              <Flame size={15} />
+            </button>
           </div>
 
           {/* 3D Canvas — extended with progress data + color mode + mesh rendering */}
@@ -485,8 +519,19 @@ export default function BIMViewerPage() {
             showTrajectory={showTrajectory}
             renderMode={renderMode}
             ifcFileUrl={ifcFileUrl}
+            delayedElementIds={delayedIds}
+            highlightDelays={highlightDelays}
             onFileNotFound={() => setMeshFileNotFound(true)}
           />
+
+          {/* Bottom timeline slider */}
+          {!showComparison && (
+            <TimelineSlider
+              captures={captures}
+              selectedCaptureId={selectedCaptureId}
+              onSelectCapture={setSelectedCaptureId}
+            />
+          )}
 
           {/* No-geometry banner — backend bbox is empty for all elements */}
           {noGeometry && (
@@ -675,6 +720,14 @@ export default function BIMViewerPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {/* Schedule status + evidence + predicted delay chain */}
+              <ElementInsightPanel
+                element={selectedElement}
+                schedule={fakeSchedule.get(selectedElement.id)}
+                delayChain={delayChain}
+                onSelectElement={setSelectedElement}
+              />
+
               {/* Identity */}
               <div>
                 <h3 className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-500">
@@ -817,6 +870,8 @@ function IFCViewerCanvas({
   showTrajectory = false,
   renderMode = "mesh",
   ifcFileUrl,
+  delayedElementIds,
+  highlightDelays = false,
   onFileNotFound,
 }: {
   elements: BIMElement[];
@@ -826,8 +881,15 @@ function IFCViewerCanvas({
   showTrajectory?: boolean;
   renderMode?: RenderMode;
   ifcFileUrl?: string | null;
+  delayedElementIds?: Set<string>;
+  highlightDelays?: boolean;
   onFileNotFound?: () => void;
 }) {
+  // Stable refs so the animation loop sees latest values without re-init
+  const delayedIdsRef = useRef<Set<string>>(delayedElementIds ?? new Set());
+  const highlightDelaysRef = useRef<boolean>(highlightDelays);
+  useEffect(() => { delayedIdsRef.current = delayedElementIds ?? new Set(); }, [delayedElementIds]);
+  useEffect(() => { highlightDelaysRef.current = highlightDelays; }, [highlightDelays]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -1157,11 +1219,60 @@ function IFCViewerCanvas({
         }
       };
 
+      // Track which meshes are currently pulsing so we can restore them
+      // when the user toggles the highlight off.
+      const pulsingDelayedMeshes = new Set<THREE.Mesh>();
+
+      const updateDelayPulse = () => {
+        const enabled = highlightDelaysRef.current;
+        const delayedIds = delayedIdsRef.current;
+        const selectedId = selectedElementRef.current?.id ?? null;
+
+        if (!enabled) {
+          // Restore previously-pulsing meshes to their base color
+          if (pulsingDelayedMeshes.size > 0) {
+            pulsingDelayedMeshes.forEach((mesh) => {
+              if (mesh === highlightedMesh) return;
+              const el = elements.find((e) => elementMeshMap.get(e.id) === mesh);
+              if (!el) return;
+              const mat = mesh.material as THREE.MeshPhongMaterial;
+              const { hex, opacity } = getElementColor(el);
+              mat.color.set(hex);
+              mat.emissive.set(0x000000);
+              mat.emissiveIntensity = 0;
+              mat.opacity = opacity;
+              mat.transparent = opacity < 1;
+            });
+            pulsingDelayedMeshes.clear();
+          }
+          return;
+        }
+
+        // sin wave 0..1 ~1.5Hz for an unmistakable pulse
+        const t = performance.now() * 0.005;
+        const pulse = 0.5 + 0.5 * Math.sin(t);
+        const intensity = 0.4 + pulse * 0.7;
+
+        delayedIds.forEach((elId) => {
+          if (elId === selectedId) return; // selection takes precedence
+          const mesh = elementMeshMap.get(elId);
+          if (!mesh) return;
+          const mat = mesh.material as THREE.MeshPhongMaterial;
+          mat.color.set(0xef4444);
+          mat.emissive.set(0xff2a2a);
+          mat.emissiveIntensity = intensity;
+          mat.opacity = 0.95;
+          mat.transparent = false;
+          pulsingDelayedMeshes.add(mesh);
+        });
+      };
+
       // Animation loop
       const animate = () => {
         animId = requestAnimationFrame(animate);
         controls.update();
         updateSelection();
+        updateDelayPulse();
         renderer.render(scene, camera);
       };
       animate();

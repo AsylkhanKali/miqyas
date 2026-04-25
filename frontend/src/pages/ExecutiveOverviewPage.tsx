@@ -10,7 +10,6 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import ActionsPanel, { FAKE_ACTIONS, FAKE_DELAY_CALLOUTS } from "@/components/ui/ActionsPanel";
 import {
   TrendingUp,
   TrendingDown,
@@ -456,9 +455,6 @@ export default function ExecutiveOverviewPage() {
           </div>
         </div>
       </div>
-
-      {/* ── Actions Required ───────────────────────────────────────────── */}
-      <ActionsPanel items={FAKE_ACTIONS} delays={FAKE_DELAY_CALLOUTS} />
 
       {/* ── Project tiles ───────────────────────────────────────────────── */}
       <div>

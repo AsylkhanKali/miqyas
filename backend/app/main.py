@@ -40,11 +40,89 @@ if settings.sentry_dsn:
     )
 
 
+async def _reset_stale_bim_models() -> None:
+    """
+    At startup, find any BIMModel rows stuck in 'pending' or 'parsing' and
+    reset them to 'failed' so the UI shows a re-parseable state instead of
+    an infinite spinner.
+
+    Why this happens:
+      - The Celery worker was not running when the file was uploaded, so the
+        task sat in Redis and was never consumed (status stays 'pending').
+      - The worker process was OOM-killed or restarted mid-parse, leaving the
+        model in 'parsing' forever (task_acks_late means the task may never
+        be re-queued).
+
+    We also try to re-queue a fresh parse task for each model so they get
+    processed automatically once the worker is healthy.
+    """
+    import asyncio
+    from sqlalchemy import select, update
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+    from app.models import BIMModel  # imported here to avoid circular import at module level
+
+    try:
+        engine = create_async_engine(settings.database_url)
+        async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+        async with async_session() as session:
+            result = await session.execute(
+                select(BIMModel).where(BIMModel.parse_status.in_(["pending", "parsing"]))
+            )
+            stale = result.scalars().all()
+
+            if not stale:
+                await engine.dispose()
+                return
+
+            logger.warning(
+                f"Found {len(stale)} BIM model(s) stuck in pending/parsing on startup — resetting to failed"
+            )
+
+            for model in stale:
+                old_status = model.parse_status
+                model.parse_status = "failed"
+                model.parse_error = (
+                    f"Reset on server startup — task was stuck in '{old_status}' "
+                    "(worker was not running or was restarted). Click 'Parse' to retry."
+                )
+
+            await session.commit()
+
+            # Re-queue a fresh parse for each stale model so they get processed
+            # as soon as the Celery worker comes up — best-effort, ignore broker errors.
+            from app.tasks.ifc_tasks import parse_ifc_task
+
+            requeued = 0
+            for model in stale:
+                try:
+                    parse_ifc_task.delay(str(model.id))
+                    requeued += 1
+                except Exception as exc:
+                    # Broker not available yet — the user can hit 'Parse' manually.
+                    logger.debug(f"Could not re-queue parse for {model.id}: {exc}")
+
+            logger.info(
+                f"Reset {len(stale)} stale BIM model(s) to 'failed'; re-queued {requeued} parse task(s)"
+            )
+
+        await engine.dispose()
+
+    except Exception as exc:
+        # Never let startup cleanup crash the whole app.
+        logger.warning(f"Stale BIM model cleanup skipped: {exc}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: ensure upload directories exist
     for d in [settings.upload_dir, settings.ifc_storage_dir, settings.video_storage_dir, settings.frame_storage_dir, settings.report_storage_dir]:
         d.mkdir(parents=True, exist_ok=True)
+
+    # Reset any BIM models left stuck in pending/parsing from a previous run
+    await _reset_stale_bim_models()
+
     yield
     # Shutdown: nothing to clean up yet
 

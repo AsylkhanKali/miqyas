@@ -97,6 +97,11 @@ export default function BIMModelPickerPage() {
     if (!projectId) return;
     setReparsing((s) => new Set(s).add(model.id));
     try {
+      // If the model is stuck in "parsing", force-reset it to "failed" first
+      // so the reparse endpoint can clear elements and re-queue cleanly.
+      if (model.parse_status === "parsing") {
+        await bimApi.forceReset(projectId, model.id);
+      }
       await bimApi.reparse(projectId, model.id);
       toast.success("Re-parse started");
       reload();
@@ -186,8 +191,11 @@ export default function BIMModelPickerPage() {
               const status  = (model.parse_status ?? "pending") as ParseStatus;
               const meta    = STATUS_META[status] ?? STATUS_META.pending;
               const Icon    = meta.icon;
-              const ready   = status === "parsed";
-              const canReparse = status === "failed" || status === "pending";
+              const ready      = status === "parsed";
+              // Allow re-parse for failed + never-started; allow force-reparse
+              // for "parsing" (worker may have crashed and left it stuck).
+              const canReparse = status === "failed" || status === "pending" || status === "parsing";
+              const parseLabel = status === "parsing" ? "Force re-parse" : "Parse";
               const isReparsing = reparsing.has(model.id);
               const isDeleting  = deleting.has(model.id);
 
@@ -233,7 +241,10 @@ export default function BIMModelPickerPage() {
                     </div>
 
                     {/* Status */}
-                    <div className={clsx("flex items-center gap-1.5 text-xs font-medium shrink-0", meta.color)}>
+                    <div
+                      className={clsx("flex items-center gap-1.5 text-xs font-medium shrink-0", meta.color)}
+                      title={status === "failed" && model.parse_error ? model.parse_error : undefined}
+                    >
                       <Icon size={13} className={clsx(status === "parsing" && "animate-spin")} />
                       <span>{meta.label}</span>
                     </div>
@@ -243,10 +254,18 @@ export default function BIMModelPickerPage() {
                       <button
                         onClick={(e) => handleReparse(e, model)}
                         disabled={isReparsing}
-                        className="shrink-0 flex items-center gap-1.5 rounded-lg border border-[#2d3d54] bg-[#1e293b] px-2.5 py-1.5 text-xs text-slate-400 transition-colors hover:border-mq-500/40 hover:text-mq-400 disabled:opacity-50"
+                        title={status === "parsing"
+                          ? "Worker may have crashed — force-reset and re-queue"
+                          : "Queue this model for IFC parsing"}
+                        className={clsx(
+                          "shrink-0 flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-50",
+                          status === "parsing"
+                            ? "border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+                            : "border-[#2d3d54] bg-[#1e293b] text-slate-400 hover:border-mq-500/40 hover:text-mq-400"
+                        )}
                       >
                         <RefreshCw size={11} className={clsx(isReparsing && "animate-spin")} />
-                        Parse
+                        {isReparsing ? "Starting…" : parseLabel}
                       </button>
                     )}
 

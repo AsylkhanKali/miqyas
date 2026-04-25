@@ -53,6 +53,38 @@ def _run_mark_status(bim_model_id: str, status: str, error: str | None = None) -
         logger.error(f"Could not update model status to {status!r}: {inner}")
 
 
+def _make_progress_writer(bim_model_id: str):
+    """
+    Returns a sync callable that writes parse_progress / parse_stage into
+    extra_data for the given model.  Uses a fresh synchronous session per
+    call so that each write is immediately visible to polling clients without
+    affecting the main async session.
+    """
+    import time
+    from app.models import BIMModel as _BIMModel
+
+    def write_progress(pct: int, stage: str) -> None:
+        try:
+            session = _get_sync_session()
+            try:
+                model = session.get(_BIMModel, UUID(bim_model_id))
+                if model:
+                    data = dict(model.extra_data or {})
+                    data.update({
+                        "parse_progress": pct,
+                        "parse_stage": stage,
+                        "parse_updated_at": time.time(),
+                    })
+                    model.extra_data = data
+                    session.commit()
+            finally:
+                session.close()
+        except Exception as e:
+            logger.debug(f"Progress write failed for {bim_model_id}: {e}")
+
+    return write_progress
+
+
 @celery_app.task(bind=True, name="app.tasks.ifc_tasks.parse_ifc", max_retries=2)
 def parse_ifc_task(self, bim_model_id: str):
     """
@@ -71,6 +103,8 @@ def parse_ifc_task(self, bim_model_id: str):
     """
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+    on_progress = _make_progress_writer(bim_model_id)
+
     async def _run():
         engine = create_async_engine(settings.database_url)
         async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -78,7 +112,7 @@ def parse_ifc_task(self, bim_model_id: str):
         async with async_session() as session:
             from app.services.ifc_parser import IFCParserService
             parser = IFCParserService(session)
-            count = await parser.parse(UUID(bim_model_id))
+            count = await parser.parse(UUID(bim_model_id), on_progress=on_progress)
             await session.commit()
             return count
 

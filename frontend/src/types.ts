@@ -51,6 +51,12 @@ export interface BIMModel {
   file_size_bytes: number | null;
   created_at: string;
   updated_at: string;
+  extra_data?: {
+    parse_progress?: number;   // 0-100
+    parse_stage?: string;      // human-readable stage label
+    parse_updated_at?: number; // unix timestamp of last progress write
+    [key: string]: unknown;
+  } | null;
 }
 
 export interface BIMModelInfo {

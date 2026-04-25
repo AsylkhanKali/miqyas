@@ -60,6 +60,7 @@ class BIMModelResponse(TimestampMixin):
     parse_status: str
     parse_error: str | None = None
     file_size_bytes: int | None = None
+    extra_data: dict | None = None  # includes parse_progress + parse_stage while parsing
 
 
 class BIMElementResponse(TimestampMixin):

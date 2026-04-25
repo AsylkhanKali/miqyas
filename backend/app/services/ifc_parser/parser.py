@@ -14,6 +14,7 @@ Extracts:
 """
 
 import logging
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -85,17 +86,32 @@ class IFCParserService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def parse(self, bim_model_id: UUID) -> int:
+    async def parse(
+        self,
+        bim_model_id: UUID,
+        on_progress: Callable[[int, str], None] | None = None,
+    ) -> int:
         """
         Parse the IFC file for the given BIMModel and insert elements.
         Returns the count of elements extracted.
+
+        on_progress(pct: int, stage: str) is called at key milestones so the
+        caller can persist incremental progress for UI polling.
         """
+        def _progress(pct: int, stage: str) -> None:
+            if on_progress:
+                try:
+                    on_progress(pct, stage)
+                except Exception:
+                    pass  # never let a progress write abort the parse
+
         model = await self.db.get(BIMModel, bim_model_id)
         if not model:
             raise ValueError(f"BIMModel {bim_model_id} not found")
 
         model.parse_status = "parsing"
         await self.db.flush()
+        _progress(2, "Initialising parser…")
 
         # Resolve the storage key to a local filesystem path.
         # For local storage this is instant; for S3/R2 it downloads to a temp file.
@@ -104,19 +120,30 @@ class IFCParserService:
         tmp_path: Path | None = None
 
         try:
+            _progress(5, "Downloading IFC file from storage…")
             local_path = await storage.get_local_path(model.storage_path)
             # get_local_path returns a temp file for S3 — track it for cleanup
             if not storage.is_local():
                 tmp_path = local_path
 
+            _progress(10, "Opening IFC model…")
             ifc_file = ifcopenshell.open(str(local_path))
-            elements = self._extract_elements(ifc_file)
+
+            _progress(15, "Extracting geometry and bounding boxes…")
+            elements = self._extract_elements(ifc_file, on_progress=on_progress)
 
             # Update model metadata from IFC header
+            _progress(88, f"Processing metadata · {len(elements):,} elements found…")
             model.ifc_schema_version = ifc_file.schema
-            model.extra_data = self._extract_header_metadata(ifc_file)
+            header_meta = self._extract_header_metadata(ifc_file)
+
+            # Preserve any parse_progress keys written during extraction
+            existing_extra = dict(model.extra_data or {})
+            existing_extra.update(header_meta)
+            model.extra_data = existing_extra
 
             # Persist elements
+            _progress(92, f"Writing {len(elements):,} elements to database…")
             db_elements = []
             for elem_data in elements:
                 db_elem = BIMElement(bim_model_id=bim_model_id, **elem_data)
@@ -125,6 +152,12 @@ class IFCParserService:
             self.db.add_all(db_elements)
             model.element_count = len(db_elements)
             model.parse_status = "parsed"
+            # Clear progress keys on success — status "parsed" is the source of truth
+            final_extra = dict(model.extra_data or {})
+            final_extra.pop("parse_progress", None)
+            final_extra.pop("parse_stage", None)
+            final_extra.pop("parse_updated_at", None)
+            model.extra_data = final_extra
             await self.db.flush()
 
             logger.info(f"Parsed {len(db_elements)} elements from {model.filename}")
@@ -141,10 +174,14 @@ class IFCParserService:
             if tmp_path and tmp_path.exists():
                 tmp_path.unlink(missing_ok=True)
 
-    def _extract_elements(self, ifc_file: ifcopenshell.file) -> list[dict[str, Any]]:
+    def _extract_elements(
+        self,
+        ifc_file: ifcopenshell.file,
+        on_progress: Callable[[int, str], None] | None = None,
+    ) -> list[dict[str, Any]]:
         """Extract all physical elements from the IFC file."""
         # Pre-compute bounding boxes and triangle meshes in one pass
-        bbox_map, mesh_map = self._compute_all_geometry(ifc_file)
+        bbox_map, mesh_map = self._compute_all_geometry(ifc_file, on_progress=on_progress)
 
         elements = []
         seen_guids = set()
@@ -181,7 +218,9 @@ class IFCParserService:
     _MAX_MESH_VERTICES = 10_000
 
     def _compute_all_geometry(
-        self, ifc_file: ifcopenshell.file
+        self,
+        ifc_file: ifcopenshell.file,
+        on_progress: Callable[[int, str], None] | None = None,
     ) -> tuple[dict[str, dict], dict[str, dict]]:
         """
         Compute bounding boxes AND triangle meshes for all elements in one pass.
@@ -214,6 +253,16 @@ class IFCParserService:
                     "placement-based bbox estimation."
                 )
                 return self._placement_bbox_fallback(ifc_file), mesh_map
+
+            # Estimate total shape count for progress % calculation.
+            # We use entity counts from the IFC file as a proxy (cheaper than
+            # a dry-run of the iterator).
+            total_estimate = max(
+                sum(len(ifc_file.by_type(t)) for t in EXTRACT_TYPES), 1
+            )
+            # Report every ~5% of estimated total, at least every 200 shapes.
+            report_interval = max(200, total_estimate // 20)
+            last_report_at = 0
 
             while True:
                 total_seen += 1
@@ -254,6 +303,13 @@ class IFCParserService:
                         logger.warning(
                             f"Geometry extraction failed for one element: {elem_err}"
                         )
+
+                # Periodic progress update — every report_interval shapes
+                if on_progress and (total_seen - last_report_at) >= report_interval:
+                    last_report_at = total_seen
+                    # Geometry extraction spans pct 15 → 85
+                    pct = min(85, 15 + int(total_seen / total_estimate * 70))
+                    on_progress(pct, f"Extracting geometry · {total_seen:,} / ~{total_estimate:,} shapes")
 
                 try:
                     if not iterator.next():

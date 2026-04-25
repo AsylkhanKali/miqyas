@@ -287,6 +287,34 @@ export default function BIMModelPickerPage() {
                     )}
                   </div>
 
+                  {/* Parse progress bar — shown while model is being parsed */}
+                  {status === "parsing" && model.extra_data?.parse_stage && (
+                    <div className="mx-1 border border-t-0 border-mq-500/20 bg-[#0d1829] rounded-b-xl px-5 py-3">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[11px] text-mq-400 font-medium truncate pr-4">
+                          {model.extra_data.parse_stage}
+                        </span>
+                        {typeof model.extra_data.parse_progress === "number" && (
+                          <span className="text-[11px] font-mono text-mq-300 shrink-0">
+                            {model.extra_data.parse_progress}%
+                          </span>
+                        )}
+                      </div>
+                      <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full bg-mq-500"
+                          initial={{ width: 0 }}
+                          animate={{
+                            width: `${typeof model.extra_data.parse_progress === "number"
+                              ? model.extra_data.parse_progress
+                              : 0}%`,
+                          }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   {/* Confirm delete */}
                   <AnimatePresence>
                     {confirmDelete === model.id && (

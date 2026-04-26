@@ -67,9 +67,9 @@ interface Project {
 const PROJECTS: Project[] = [
   {
     id: "p1",
-    name: "Aldaar Tower — Al Reem Island",
-    code: "ALD-T01",
-    location: "Abu Dhabi, UAE",
+    name: "Reem Hills — Tower B",
+    code: "RH-T02",
+    location: "Al Reem Island, Abu Dhabi",
     pm: "Khalid Al-Mansoori",
     planned: 68,
     actual: 71,
@@ -88,9 +88,9 @@ const PROJECTS: Project[] = [
   },
   {
     id: "p2",
-    name: "Aldaar Business Park — Khalifa City",
-    code: "ALD-BP03",
-    location: "Abu Dhabi, UAE",
+    name: "Aldaar Square",
+    code: "ALD-SQ03",
+    location: "Khalifa City A, Abu Dhabi",
     pm: "Sara Al-Hameli",
     planned: 54,
     actual: 49,
@@ -109,9 +109,9 @@ const PROJECTS: Project[] = [
   },
   {
     id: "p3",
-    name: "Aldaar Residences — Saadiyat",
-    code: "ALD-R07",
-    location: "Abu Dhabi, UAE",
+    name: "Bloom Living — Phase 2",
+    code: "BL-P2-07",
+    location: "Zayed City, Abu Dhabi",
     pm: "Mohammed Al-Mazrouei",
     planned: 81,
     actual: 74,
@@ -130,9 +130,9 @@ const PROJECTS: Project[] = [
   },
   {
     id: "p4",
-    name: "Aldaar Logistics Centre — KIZAD",
-    code: "ALD-LC02",
-    location: "Abu Dhabi, UAE",
+    name: "KIZAD Logistics Hub — Zone 4",
+    code: "KZD-Z4-02",
+    location: "KIZAD, Abu Dhabi",
     pm: "Faisal Al-Ketbi",
     planned: 33,
     actual: 35,
@@ -151,9 +151,9 @@ const PROJECTS: Project[] = [
   },
   {
     id: "p5",
-    name: "Aldaar HQ — Al Maryah Island",
+    name: "Aldaar HQ",
     code: "ALD-HQ11",
-    location: "Abu Dhabi, UAE",
+    location: "Al Maryah Island, Abu Dhabi",
     pm: "Noura Al-Bloushi",
     planned: 91,
     actual: 87,
@@ -173,12 +173,12 @@ const PROJECTS: Project[] = [
 ];
 
 const DELAYED_ACTIVITIES: DelayedActivity[] = [
-  { project: "ALD-R07",  activity: "Block B internal partitions – Level 3", planned: 100, actual: 62, delayDays: 18, critical: true },
-  { project: "ALD-HQ11", activity: "AHU commissioning – Zone 4 & 5",        planned: 100, actual: 71, delayDays: 12, critical: true },
-  { project: "ALD-BP03", activity: "Level 4 slab reinforcement",             planned: 85,  actual: 61, delayDays: 8,  critical: true },
-  { project: "ALD-R07",  activity: "Electrical rough-in Block B floors 4–6", planned: 70,  actual: 48, delayDays: 7,  critical: false },
-  { project: "ALD-HQ11", activity: "Snagging walkthrough – Towers A & B",    planned: 60,  actual: 40, delayDays: 6,  critical: false },
-  { project: "ALD-BP03", activity: "Waterproofing – podium roof",             planned: 100, actual: 78, delayDays: 5,  critical: false },
+  { project: "BL-P2-07",  activity: "Block B internal partitions – Level 3", planned: 100, actual: 62, delayDays: 18, critical: true },
+  { project: "ALD-HQ11",  activity: "AHU commissioning – Zone 4 & 5",        planned: 100, actual: 71, delayDays: 12, critical: true },
+  { project: "ALD-SQ03",  activity: "Level 4 slab reinforcement",             planned: 85,  actual: 61, delayDays: 8,  critical: true },
+  { project: "BL-P2-07",  activity: "Electrical rough-in Block B floors 4–6", planned: 70,  actual: 48, delayDays: 7,  critical: false },
+  { project: "ALD-HQ11",  activity: "Snagging walkthrough – Towers A & B",    planned: 60,  actual: 40, delayDays: 6,  critical: false },
+  { project: "ALD-SQ03",  activity: "Waterproofing – podium roof",             planned: 100, actual: 78, delayDays: 5,  critical: false },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────

@@ -185,17 +185,17 @@ const FAKE_DASHBOARD: InvestorDashboard = {
     extra_work: 120,
   },
   projects: [
-    { id: "p1", name: "Creek Harbour Tower",    code: "CHT-01", health_score: 82, health_label: "Healthy",  behind_count: 42,  total_elements: 2100, last_capture_at: new Date(Date.now() - 86400000).toISOString() },
-    { id: "p2", name: "Yas Bay Mixed-Use",      code: "YBM-03", health_score: 61, health_label: "At Risk",  behind_count: 118, total_elements: 1840, last_capture_at: new Date(Date.now() - 2 * 86400000).toISOString() },
-    { id: "p3", name: "Corniche Residences",    code: "COR-07", health_score: 44, health_label: "Critical", behind_count: 203, total_elements: 1560, last_capture_at: new Date(Date.now() - 3 * 86400000).toISOString() },
-    { id: "p4", name: "Jebel Ali Logistics Hub",code: "JAL-02", health_score: 91, health_label: "Healthy",  behind_count: 14,  total_elements: 1920, last_capture_at: new Date().toISOString() },
-    { id: "p5", name: "DIFC Gate Office Park",  code: "DGO-11", health_score: 58, health_label: "At Risk",  behind_count: 88,  total_elements: 1000, last_capture_at: new Date().toISOString() },
+    { id: "p1", name: "Reem Hills — Tower B",       code: "RH-T02",    health_score: 82, health_label: "Healthy",  behind_count: 42,  total_elements: 2100, last_capture_at: new Date(Date.now() - 86400000).toISOString() },
+    { id: "p2", name: "Aldaar Square",              code: "ALD-SQ03",  health_score: 61, health_label: "At Risk",  behind_count: 118, total_elements: 1840, last_capture_at: new Date(Date.now() - 2 * 86400000).toISOString() },
+    { id: "p3", name: "Bloom Living — Phase 2",     code: "BL-P2-07",  health_score: 44, health_label: "Critical", behind_count: 203, total_elements: 1560, last_capture_at: new Date(Date.now() - 3 * 86400000).toISOString() },
+    { id: "p4", name: "KIZAD Logistics Hub — Z4",   code: "KZD-Z4-02", health_score: 91, health_label: "Healthy",  behind_count: 14,  total_elements: 1920, last_capture_at: new Date().toISOString() },
+    { id: "p5", name: "Aldaar HQ",                  code: "ALD-HQ11",  health_score: 58, health_label: "At Risk",  behind_count: 88,  total_elements: 1000, last_capture_at: new Date().toISOString() },
   ],
   critical_elements: [
-    { element_name: "Block B partitions L3",    ifc_type: "IfcWall",        project_name: "Corniche Residences",     project_id: "p3", observed_percent: 62, scheduled_percent: 100, deviation_days: -18, activity_name: "Internal partition works", is_critical_path: true },
-    { element_name: "AHU Zone 4 commissioning", ifc_type: "IfcFlowTerminal",project_name: "DIFC Gate Office Park",   project_id: "p5", observed_percent: 71, scheduled_percent: 100, deviation_days: -12, activity_name: "MEP commissioning",       is_critical_path: true },
-    { element_name: "Level 4 slab rebar",       ifc_type: "IfcSlab",        project_name: "Yas Bay Mixed-Use",       project_id: "p2", observed_percent: 61, scheduled_percent: 85,  deviation_days: -8,  activity_name: "Level 4 structural works",  is_critical_path: true },
-    { element_name: "Podium roof waterproof",   ifc_type: "IfcCovering",    project_name: "Yas Bay Mixed-Use",       project_id: "p2", observed_percent: 78, scheduled_percent: 100, deviation_days: -5,  activity_name: "Waterproofing works",       is_critical_path: false },
+    { element_name: "Block B partitions L3",    ifc_type: "IfcWall",        project_name: "Bloom Living — Phase 2", project_id: "p3", observed_percent: 62, scheduled_percent: 100, deviation_days: -18, activity_name: "Internal partition works", is_critical_path: true },
+    { element_name: "AHU Zone 4 commissioning", ifc_type: "IfcFlowTerminal",project_name: "Aldaar HQ",              project_id: "p5", observed_percent: 71, scheduled_percent: 100, deviation_days: -12, activity_name: "MEP commissioning",       is_critical_path: true },
+    { element_name: "Level 4 slab rebar",       ifc_type: "IfcSlab",        project_name: "Aldaar Square",          project_id: "p2", observed_percent: 61, scheduled_percent: 85,  deviation_days: -8,  activity_name: "Level 4 structural works",  is_critical_path: true },
+    { element_name: "Podium roof waterproof",   ifc_type: "IfcCovering",    project_name: "Aldaar Square",          project_id: "p2", observed_percent: 78, scheduled_percent: 100, deviation_days: -5,  activity_name: "Waterproofing works",       is_critical_path: false },
   ],
 };
 

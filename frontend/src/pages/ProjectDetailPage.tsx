@@ -815,9 +815,13 @@ function CapturesTab({
                     <div className="flex items-center gap-3 min-w-0">
                       <Film size={18} className="shrink-0 text-purple-400" />
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-white">
+                        <Link
+                          to={`/projects/${projectId}/captures/${capture.id}`}
+                          className="truncate text-sm font-medium text-white hover:text-mq-400 transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {capture.filename}
-                        </p>
+                        </Link>
                         <div className="mt-0.5 flex flex-wrap items-center gap-3 text-xs text-slate-500">
                           {capture.frame_count > 0 && (
                             <span className="flex items-center gap-1">
@@ -843,7 +847,17 @@ function CapturesTab({
                         </div>
                       </div>
                     </div>
-                    <span className={`badge ${cfg.badge} shrink-0`}>{cfg.label}</span>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className={`badge ${cfg.badge}`}>{cfg.label}</span>
+                      <Link
+                        to={`/projects/${projectId}/captures/${capture.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1 rounded-md border border-[#2d3d54] bg-[#1e293b] px-2 py-1 text-[11px] text-slate-400 hover:border-mq-500/40 hover:text-mq-400 transition-colors"
+                      >
+                        <Workflow size={11} />
+                        Pipeline
+                      </Link>
+                    </div>
                   </div>
 
                   {/* Pipeline progress indicators */}

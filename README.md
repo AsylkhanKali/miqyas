@@ -3,13 +3,15 @@
 Платформа для автоматического мониторинга строительного прогресса: загружаешь видео с объекта, BIM-модель и расписание — система сравнивает реальное состояние с запланированным и выдаёт отчёты по отклонениям.
 
 # Dashboard
-<img width="1496" height="851" alt="Screenshot 2026-04-17 at 19 38 35" src="https://github.com/user-attachments/assets/b93fcce5-c64b-4d86-99b0-a66c010a4c1e" />
+
+<img width="1496" height="848" alt="Screenshot 2026-04-26 at 13 35 37" src="https://github.com/user-attachments/assets/89a02bb2-56c6-4f28-9ea9-0545eb28823d" />
 
 # Executive overview
-<img width="1496" height="850" alt="Screenshot 2026-04-26 at 13 34 52" src="https://github.com/user-attachments/assets/66c47324-588e-48d1-bb78-bcaf5f7e0efe" />
+<img width="1496" height="851" alt="Screenshot 2026-04-17 at 19 38 35" src="https://github.com/user-attachments/assets/b93fcce5-c64b-4d86-99b0-a66c010a4c1e" />
 
 # BIM Viewer
-<img width="1496" height="848" alt="Screenshot 2026-04-26 at 13 35 37" src="https://github.com/user-attachments/assets/89a02bb2-56c6-4f28-9ea9-0545eb28823d" />
+
+<img width="1496" height="850" alt="Screenshot 2026-04-26 at 13 34 52" src="https://github.com/user-attachments/assets/66c47324-588e-48d1-bb78-bcaf5f7e0efe" />
 
 
 ## Архитектура

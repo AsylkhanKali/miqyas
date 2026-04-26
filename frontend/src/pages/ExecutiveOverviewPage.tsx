@@ -67,9 +67,9 @@ interface Project {
 const PROJECTS: Project[] = [
   {
     id: "p1",
-    name: "Creek Harbour Tower",
-    code: "CHT-01",
-    location: "Dubai, UAE",
+    name: "Aldaar Tower — Al Reem Island",
+    code: "ALD-T01",
+    location: "Abu Dhabi, UAE",
     pm: "Khalid Al-Mansoori",
     planned: 68,
     actual: 71,
@@ -88,8 +88,8 @@ const PROJECTS: Project[] = [
   },
   {
     id: "p2",
-    name: "Yas Bay Mixed-Use",
-    code: "YBM-03",
+    name: "Aldaar Business Park — Khalifa City",
+    code: "ALD-BP03",
     location: "Abu Dhabi, UAE",
     pm: "Sara Al-Hameli",
     planned: 54,
@@ -97,7 +97,7 @@ const PROJECTS: Project[] = [
     lastWeekActual: 48,
     status: "at-risk",
     budget: "$28M",
-    type: "Commercial + residential",
+    type: "Commercial + offices",
     milestones: [
       { name: "Basement slab pour", due: "Feb 28", status: "done" },
       { name: "Level 5 structure", due: "Apr 15", status: "at-risk" },
@@ -109,8 +109,8 @@ const PROJECTS: Project[] = [
   },
   {
     id: "p3",
-    name: "Corniche Residences",
-    code: "COR-07",
+    name: "Aldaar Residences — Saadiyat",
+    code: "ALD-R07",
     location: "Abu Dhabi, UAE",
     pm: "Mohammed Al-Mazrouei",
     planned: 81,
@@ -130,9 +130,9 @@ const PROJECTS: Project[] = [
   },
   {
     id: "p4",
-    name: "Jebel Ali Logistics Hub",
-    code: "JAL-02",
-    location: "Dubai, UAE",
+    name: "Aldaar Logistics Centre — KIZAD",
+    code: "ALD-LC02",
+    location: "Abu Dhabi, UAE",
     pm: "Faisal Al-Ketbi",
     planned: 33,
     actual: 35,
@@ -151,16 +151,16 @@ const PROJECTS: Project[] = [
   },
   {
     id: "p5",
-    name: "DIFC Gate Office Park",
-    code: "DGO-11",
-    location: "Dubai, UAE",
+    name: "Aldaar HQ — Al Maryah Island",
+    code: "ALD-HQ11",
+    location: "Abu Dhabi, UAE",
     pm: "Noura Al-Bloushi",
     planned: 91,
     actual: 87,
     lastWeekActual: 85,
     status: "at-risk",
     budget: "$55M",
-    type: "Office",
+    type: "Office / headquarters",
     milestones: [
       { name: "M&E commissioning", due: "Mar 28", status: "at-risk" },
       { name: "Snagging complete", due: "Apr 18", status: "at-risk" },
@@ -173,12 +173,12 @@ const PROJECTS: Project[] = [
 ];
 
 const DELAYED_ACTIVITIES: DelayedActivity[] = [
-  { project: "COR-07", activity: "Block B internal partitions – Level 3", planned: 100, actual: 62, delayDays: 18, critical: true },
-  { project: "DGO-11", activity: "AHU commissioning – Zone 4 & 5",        planned: 100, actual: 71, delayDays: 12, critical: true },
-  { project: "YBM-03", activity: "Level 4 slab reinforcement",             planned: 85,  actual: 61, delayDays: 8,  critical: true },
-  { project: "COR-07", activity: "Electrical rough-in Block B floors 4–6", planned: 70,  actual: 48, delayDays: 7,  critical: false },
-  { project: "DGO-11", activity: "Snagging walkthrough – Towers A & B",    planned: 60,  actual: 40, delayDays: 6,  critical: false },
-  { project: "YBM-03", activity: "Waterproofing – podium roof",             planned: 100, actual: 78, delayDays: 5,  critical: false },
+  { project: "ALD-R07",  activity: "Block B internal partitions – Level 3", planned: 100, actual: 62, delayDays: 18, critical: true },
+  { project: "ALD-HQ11", activity: "AHU commissioning – Zone 4 & 5",        planned: 100, actual: 71, delayDays: 12, critical: true },
+  { project: "ALD-BP03", activity: "Level 4 slab reinforcement",             planned: 85,  actual: 61, delayDays: 8,  critical: true },
+  { project: "ALD-R07",  activity: "Electrical rough-in Block B floors 4–6", planned: 70,  actual: 48, delayDays: 7,  critical: false },
+  { project: "ALD-HQ11", activity: "Snagging walkthrough – Towers A & B",    planned: 60,  actual: 40, delayDays: 6,  critical: false },
+  { project: "ALD-BP03", activity: "Waterproofing – podium roof",             planned: 100, actual: 78, delayDays: 5,  critical: false },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────

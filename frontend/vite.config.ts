@@ -17,6 +17,15 @@ export default defineConfig({
 
     rollupOptions: {
       output: {
+        // Prevent Vite from injecting <link rel="modulepreload"> for the
+        // Three.js chunk — it's only ever needed on the BIM viewer route,
+        // never on first load, so preloading it would waste bandwidth.
+        modulePreload: {
+          resolveDependencies(_url, deps) {
+            return deps.filter((d) => !d.includes("vendor-three"));
+          },
+        },
+
         // ── Manual vendor chunks ──────────────────────────────────────────
         // Each group lands in its own file that can be cached independently.
         // Users who visit only the dashboard never download vendor-three.
@@ -34,11 +43,6 @@ export default defineConfig({
             return "vendor-three";
           }
 
-          // Sentry: monitoring — loaded idle after first paint, never critical
-          if (id.includes("/@sentry/")) {
-            return "vendor-sentry";
-          }
-
           // Recharts: charting library for dashboard + forecast pages
           if (id.includes("/recharts/") || id.includes("/victory-vendor/")) {
             return "vendor-charts";
@@ -49,11 +53,12 @@ export default defineConfig({
             return "vendor-motion";
           }
 
-          // Core React runtime — almost never changes, maximise cache TTL
+          // Core React runtime — almost never changes, maximise cache TTL.
+          // NOTE: react-router is intentionally left in `vendor` to avoid a
+          // circular chunk cycle (react-router → @remix-run/router → vendor).
           if (
             id.includes("/node_modules/react/") ||
-            id.includes("/node_modules/react-dom/") ||
-            id.includes("/node_modules/react-router")
+            id.includes("/node_modules/react-dom/")
           ) {
             return "vendor-react";
           }

@@ -18,6 +18,7 @@ import {
   Users,
   BarChart3,
   TrendingUp,
+  TrendingDown,
   Building2,
   Settings,
   ChevronLeft,
@@ -88,6 +89,12 @@ const PROJECT_NAV: NavItem[] = [
     label: "Progress",
     icon: TrendingUp,
     path: (id) => id ? `/projects/${id}/progress` : "/projects",
+    requiresProject: true,
+  },
+  {
+    label: "Forecast",
+    icon: TrendingDown,
+    path: (id) => id ? `/projects/${id}/forecast` : "/projects",
     requiresProject: true,
   },
   {

@@ -1,0 +1,88 @@
+/*
+  THEME CONTRACT — MIQYAS
+  ══════════════════════════════════════════════════════════════════════
+  Every theme file MUST define all variables listed below.
+  A theme is a single CSS selector block (`:root`, `[data-theme="NAME"]`)
+  that sets these custom properties. Nothing else belongs in a theme file.
+
+  To add a new theme:
+    1. Copy this file as `themes/my-theme.css`
+    2. Replace every TODO with a concrete hex value
+    3. Add `@import './themes/my-theme.css'` to globals.css
+    4. Register the name in themeContext.tsx
+
+  WCAG AA requirements applied throughout:
+    - Normal text / UI labels  : contrast ≥ 4.5 : 1
+    - Large text (≥ 18 pt)     : contrast ≥ 3.0 : 1
+    - UI components / icons    : contrast ≥ 3.0 : 1
+    - Disabled / inactive UI   : exempt (no requirement)
+
+  ──────────────────────────────────────────────────────────────────────
+  SURFACES  (background layers, lightest → darkest in dark theme)
+  ──────────────────────────────────────────────────────────────────────
+  --color-bg-primary      Page / document background
+  --color-bg-secondary    Sidebar, topbar, sub-panels
+  --color-bg-card         Card / panel surface (lifts off primary)
+  --color-bg-elevated     Popovers, dropdowns, menus
+  --color-bg-hover        Hover / pressed state fill
+
+  ──────────────────────────────────────────────────────────────────────
+  BORDERS
+  ──────────────────────────────────────────────────────────────────────
+  --color-border           Default hairline divider
+  --color-border-hover     Hover / interactive state border
+  --color-border-strong    Emphasized separator
+
+  ──────────────────────────────────────────────────────────────────────
+  TEXT  (all must pass ≥ 4.5 : 1 against their expected background)
+  ──────────────────────────────────────────────────────────────────────
+  --color-text-primary     Headings, labels, body copy
+  --color-text-secondary   Supporting text, captions
+  --color-text-muted       Meta, timestamps, hints
+                           ⚠ Must pass 4.5 : 1 on bg-card (hardest surface)
+  --color-text-disabled    Truly inactive UI only (WCAG exempt, may be low contrast)
+  --color-section-label    Sidebar section group headers ("PROJECTS", "TOOLS")
+                           ⚠ Must pass 4.5 : 1 on bg-secondary
+
+  ──────────────────────────────────────────────────────────────────────
+  ACCENT  (brand / interactive)
+  ──────────────────────────────────────────────────────────────────────
+  --color-accent           Accent color for icons / decorative UI elements
+  --color-accent-hover     Accent lighter/darker for hover states
+
+  --color-accent-solid     FILLED BUTTON background
+                           ⚠ --color-accent-text on this must pass ≥ 4.5 : 1
+  --color-accent-solid-hover  Filled button hover background
+  --color-accent-text      Text / icon color on top of accent-solid fill
+                           ⚠ Must pass ≥ 4.5 : 1 against --color-accent-solid
+
+  --color-accent-link      Inline text link color
+                           ⚠ Must pass ≥ 4.5 : 1 against bg-primary AND bg-card
+  --color-accent-soft      Very low-opacity tint (5–15%) for backgrounds
+  --color-accent-dim       Alias of accent-soft used on selected/active pills
+
+  ──────────────────────────────────────────────────────────────────────
+  FOCUS
+  ──────────────────────────────────────────────────────────────────────
+  --color-accent-ring      box-shadow value for keyboard focus rings
+                           ⚠ The solid ring color component must be ≥ 3 : 1
+                             against both the focused element and bg behind it
+
+  ──────────────────────────────────────────────────────────────────────
+  SCROLLBAR
+  ──────────────────────────────────────────────────────────────────────
+  --color-scrollbar        Scrollbar thumb default
+  --color-scrollbar-hover  Scrollbar thumb hover
+
+  ──────────────────────────────────────────────────────────────────────
+  SHADOWS
+  ──────────────────────────────────────────────────────────────────────
+  --shadow-xs   Micro depth (1px)
+  --shadow-sm   Small depth (2–4px)
+  --shadow-card Card / panel shadow (2–8px)
+  --shadow-md   Medium depth (4–12px)
+  --shadow-lg   Large depth (12–24px)
+  --shadow-cta  Accent-colored shadow for primary buttons
+
+  ══════════════════════════════════════════════════════════════════════
+*/

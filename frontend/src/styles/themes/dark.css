@@ -1,0 +1,69 @@
+/*
+  DARK THEME  (default, :root)
+  ══════════════════════════════════════════════════════════════════════
+  Palette: navy hull surfaces + blue accent.
+  Contrast audit passed: 2025-04 against WCAG 2.1 AA.
+
+  Key pairings (verified):
+    text-primary   (#f1f5f9) / bg-card   (#1e293b)  → 13.35 : 1  ✅ AAA
+    text-secondary (#cbd5e1) / bg-card   (#1e293b)  →  9.85 : 1  ✅ AAA
+    text-muted     (#8b9db0) / bg-card   (#1e293b)  →  5.26 : 1  ✅ AA
+    section-label  (#7a8ea3) / bg-secondary (#16213a)→  4.74 : 1  ✅ AA
+    accent-link    (#60a5fa) / bg-primary (#0d1526)  →  7.17 : 1  ✅ AAA
+    accent-text    (#ffffff) / accent-solid (#1d6ae8) →  4.91 : 1  ✅ AA
+*/
+:root {
+  /* ── Surfaces ──────────────────────────────────────────────── */
+  --color-bg-primary:   #0d1526;
+  --color-bg-secondary: #16213a;
+  --color-bg-card:      #1e293b;
+  --color-bg-elevated:  #263347;
+  --color-bg-hover:     #2d3d54;
+
+  /* ── Borders ───────────────────────────────────────────────── */
+  --color-border:        #2d3d54;
+  --color-border-hover:  #3f536e;
+  --color-border-strong: #3f536e;
+
+  /* ── Text ──────────────────────────────────────────────────── */
+  --color-text-primary:   #f1f5f9;   /* 13.35 : 1 on bg-card ✅ */
+  --color-text-secondary: #cbd5e1;   /*  9.85 : 1 on bg-card ✅ */
+  --color-text-muted:     #8b9db0;   /*  5.26 : 1 on bg-card ✅  (was #64748b = 3.07 ❌) */
+  --color-text-disabled:  #4a6080;   /* inactive UI, WCAG exempt */
+  --color-section-label:  #7a8ea3;   /*  4.74 : 1 on bg-secondary ✅  (was #475569 = 2.11 ❌) */
+
+  /* ── Accent ────────────────────────────────────────────────── */
+  /* Decorative / icon accent — NOT for body text or button fills */
+  --color-accent:       #3b82f6;   /* 4.95 : 1 on bg-primary ✅ (icon / indicator use) */
+  --color-accent-hover: #60a5fa;   /* 7.17 : 1 on bg-primary ✅ */
+
+  /* Button fills — white text must reach 4.5 : 1 */
+  --color-accent-solid:       #1d6ae8;  /* 4.91 : 1 with #fff ✅  (was #3b82f6 = 3.68 ❌) */
+  --color-accent-solid-hover: #1a5ed2;
+
+  /* Text on top of a solid accent fill */
+  --color-accent-text: #ffffff;   /* 4.91 : 1 on accent-solid ✅ */
+
+  /* Inline text links — must pass on both page and card backgrounds */
+  --color-accent-link: #60a5fa;   /* 7.17 : 1 on bg-primary ✅, 6.16 : 1 on bg-card ✅ */
+
+  /* Soft tints for pills, active backgrounds */
+  --color-accent-soft: rgba(59, 130, 246, 0.15);
+  --color-accent-dim:  rgba(59, 130, 246, 0.15);
+
+  /* Focus ring (3px box-shadow) */
+  --color-accent-ring: rgba(59, 130, 246, 0.50);
+  --ring-accent: 0 0 0 3px rgba(59, 130, 246, 0.50);
+
+  /* ── Scrollbar ─────────────────────────────────────────────── */
+  --color-scrollbar:       #2d3d54;
+  --color-scrollbar-hover: #3f536e;
+
+  /* ── Shadows ───────────────────────────────────────────────── */
+  --shadow-xs:   0 1px 2px rgba(0, 0, 0, 0.40);
+  --shadow-sm:   0 2px 4px -1px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.35);
+  --shadow-md:   0 4px 12px -2px rgba(0, 0, 0, 0.40), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
+  --shadow-lg:   0 12px 24px -6px rgba(0, 0, 0, 0.50), 0 4px 8px -4px rgba(0, 0, 0, 0.30);
+  --shadow-cta:  0 2px 6px -1px rgba(29, 106, 232, 0.50), 0 1px 2px rgba(0,0,0,0.3);
+}

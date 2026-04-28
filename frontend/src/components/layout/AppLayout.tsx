@@ -270,7 +270,7 @@ export default function AppLayout() {
 
           {/* Divider + project-specific section */}
           {!collapsed && (
-            <p className="px-3 pt-4 pb-1.5 text-[9px] font-semibold uppercase tracking-widest text-slate-600">
+            <p className="px-3 pt-4 pb-1.5 text-[9px] font-semibold uppercase tracking-widest section-label">
               Project
             </p>
           )}

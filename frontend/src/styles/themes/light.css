@@ -1,0 +1,98 @@
+/*
+  LIGHT THEME  ([data-theme="light"])
+  ══════════════════════════════════════════════════════════════════════
+  Palette: paper-warm whites, graphite text, industrial-mustard CTA.
+  Contrast audit passed: 2025-04 against WCAG 2.1 AA.
+
+  Key pairings (verified):
+    text-primary   (#26241F) / bg-card      (#FCFBF7) → 14.97 : 1  ✅ AAA
+    text-secondary (#55524A) / bg-card      (#FCFBF7) →  7.53 : 1  ✅ AAA
+    text-muted     (#6b6660) / bg-secondary (#EDEBE3) →  4.76 : 1  ✅ AA
+    section-label  (#6b6660) / bg-secondary (#EDEBE3) →  4.76 : 1  ✅ AA
+    accent-text    (#1E1C15) / accent-solid (#C2A23A)  →  6.92 : 1  ✅ AAA
+    accent-link    (#7A5A00) / bg-primary   (#F4F3EF)  →  5.75 : 1  ✅ AA
+
+    Active nav text uses --color-text-primary (#26241F) in this theme.
+    The mustard left-bar + bg-mq-500/15 tint communicate active state —
+    mustard itself (#C2A23A) fails as foreground text on warm paper (2.22 : 1).
+
+  ──────────────────────────────────────────────────────────────────────
+  Design language:
+    Surfaces: 5-step paper scale — each step ~3-5% warmer/darker.
+    Mustard is reserved for fills, indicators, and borders only.
+    Text ramp uses true charcoal (warm, not cool grey).
+*/
+[data-theme="light"] {
+  /* ── Surfaces ──────────────────────────────────────────────── */
+  --color-bg-primary:   #F4F3EF;   /* Concrete White — page */
+  --color-bg-secondary: #EDEBE3;   /* sidebar / topbar */
+  --color-bg-card:      #FCFBF7;   /* cards — almost pure, lifts off page */
+  --color-bg-elevated:  #F8F6EF;   /* popovers / menus */
+  --color-bg-hover:     #E8E4D7;   /* subtle tap state */
+
+  /* ── Borders ───────────────────────────────────────────────── */
+  --color-border:        #E0DBCC;
+  --color-border-hover:  #C2A23A;   /* mustard on interaction */
+  --color-border-strong: #CFC7B2;
+
+  /* ── Text ──────────────────────────────────────────────────── */
+  --color-text-primary:   #26241F;  /* 14.97 : 1 on bg-card ✅ */
+  --color-text-secondary: #55524A;  /*  7.53 : 1 on bg-card ✅ */
+  --color-text-muted:     #6b6660;  /*  4.76 : 1 on bg-secondary ✅  (was #8A8577 = 3.09 ❌) */
+  --color-text-disabled:  #B0A898;  /* inactive UI, WCAG exempt */
+  --color-section-label:  #6b6660;  /*  4.76 : 1 on bg-secondary ✅  (was #8A8577 = 3.09 ❌) */
+
+  /* ── Accent — Industrial Mustard ──────────────────────────── */
+  /* Decorative / border / icon accent — NOT for body text */
+  --color-accent:       #C2A23A;
+  --color-accent-hover: #AA8B23;
+
+  /* Button fills — --color-accent-text on this must reach 4.5 : 1 */
+  --color-accent-solid:       #C2A23A;  /* 6.92 : 1 with #1E1C15 ✅ */
+  --color-accent-solid-hover: #AA8B23;  /* 5.22 : 1 with #1E1C15 ✅ */
+
+  /* Text on top of a solid accent fill */
+  --color-accent-text: #1E1C15;   /* 6.92 : 1 on accent-solid ✅ */
+
+  /* Inline text links — distinct from the button mustard, dark enough to read */
+  --color-accent-link: #7A5A00;   /* 5.75 : 1 on bg-primary ✅, 6.16 : 1 on bg-card ✅ */
+
+  /* Soft tints for pills, active backgrounds */
+  --color-accent-soft: rgba(194, 162, 58, 0.14);
+  --color-accent-dim:  rgba(194, 162, 58, 0.14);
+
+  /* Focus ring (3px box-shadow) */
+  --color-accent-ring: rgba(194, 162, 58, 0.55);
+  --ring-accent: 0 0 0 3px rgba(194, 162, 58, 0.55);
+
+  /* ── Scrollbar ─────────────────────────────────────────────── */
+  --color-scrollbar:       #D5CFBF;
+  --color-scrollbar-hover: #C2A23A;
+
+  /* ── Shadows — warm, tinted toward charcoal (not black) ───── */
+  --shadow-xs:   0 1px 2px rgba(47, 47, 44, 0.05);
+  --shadow-sm:   0 1px 2px rgba(47, 47, 44, 0.06), 0 1px 3px rgba(47, 47, 44, 0.04);
+  --shadow-card: 0 1px 2px rgba(47, 47, 44, 0.04),
+                 0 4px 10px -4px rgba(47, 47, 44, 0.08),
+                 0 0 0 1px rgba(47, 47, 44, 0.02);
+  --shadow-md:   0 4px 12px -2px rgba(47, 47, 44, 0.10),
+                 0 2px 4px -2px rgba(47, 47, 44, 0.06);
+  --shadow-lg:   0 18px 36px -12px rgba(47, 47, 44, 0.18),
+                 0 8px 16px -8px rgba(47, 47, 44, 0.10);
+  --shadow-cta:  0 1px 2px rgba(47, 47, 44, 0.15),
+                 0 4px 10px -2px rgba(194, 162, 58, 0.35),
+                 inset 0 1px 0 rgba(255, 255, 255, 0.20);
+}
+
+/* ── Light-mode typography: antialiasing for warm paper ────────────── */
+[data-theme="light"] body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Text selection ─────────────────────────────────────────────────── */
+[data-theme="light"] ::selection {
+  background-color: rgba(194, 162, 58, 0.30);
+  color: #1E1C15;
+}

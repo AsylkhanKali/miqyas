@@ -1,54 +1,88 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import DashboardPage from "@/pages/DashboardPage";
-import ProjectsPage from "@/pages/ProjectsPage";
-import NewProjectPage from "@/pages/NewProjectPage";
-import ProjectDetailPage from "@/pages/ProjectDetailPage";
-import BIMViewerPage from "@/pages/BIMViewerPage";
-import ScheduleDetailPage from "@/pages/ScheduleDetailPage";
-import ReportsPage from "@/pages/ReportsPage";
-import IntegrationsPage from "@/pages/IntegrationsPage";
-import ReprojectionViewPage from "@/pages/ReprojectionViewPage";
-import PlanTrackerPage from "@/pages/PlanTrackerPage";
-import TradesPage from "@/pages/TradesPage";
-import ExecutiveOverviewPage from "@/pages/ExecutiveOverviewPage";
-import BIMModelPickerPage from "@/pages/BIMModelPickerPage";
-import ProgressOverviewPage from "@/pages/ProgressOverviewPage";
-import CaptureDetailPage from "@/pages/CaptureDetailPage";
-import DelayForecastPage from "@/pages/DelayForecastPage";
-import SettingsPage from "@/pages/SettingsPage";
+
+// ── Skeleton fallback shown while a route chunk is loading ──────────────────
+function RouteLoader() {
+  return (
+    <div className="flex-1 p-6 space-y-4 animate-pulse">
+      <div className="h-7 w-48 rounded-lg skeleton-pulse" />
+      <div className="grid grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-24 rounded-xl skeleton-pulse" />
+        ))}
+      </div>
+      <div className="h-64 rounded-xl skeleton-pulse" />
+    </div>
+  );
+}
+
+function Lazy({ page }: { page: React.LazyExoticComponent<React.ComponentType> }) {
+  const Page = page;
+  return (
+    <Suspense fallback={<RouteLoader />}>
+      <Page />
+    </Suspense>
+  );
+}
+
+// ── Eagerly loaded (tiny, always needed) ───────────────────────────────────
 import NotFoundPage from "@/pages/NotFoundPage";
+
+// ── Lazily loaded — each becomes its own JS chunk ──────────────────────────
+// Dashboard & top-level
+const DashboardPage        = lazy(() => import("@/pages/DashboardPage"));
+const ExecutiveOverviewPage= lazy(() => import("@/pages/ExecutiveOverviewPage"));
+const ProjectsPage         = lazy(() => import("@/pages/ProjectsPage"));
+const NewProjectPage       = lazy(() => import("@/pages/NewProjectPage"));
+const SettingsPage         = lazy(() => import("@/pages/SettingsPage"));
+const ReportsPage          = lazy(() => import("@/pages/ReportsPage"));
+
+// Per-project pages
+const ProjectDetailPage    = lazy(() => import("@/pages/ProjectDetailPage"));
+const PlanTrackerPage      = lazy(() => import("@/pages/PlanTrackerPage"));
+const TradesPage           = lazy(() => import("@/pages/TradesPage"));
+const ScheduleDetailPage   = lazy(() => import("@/pages/ScheduleDetailPage"));
+const BIMModelPickerPage   = lazy(() => import("@/pages/BIMModelPickerPage"));
+const ProgressOverviewPage = lazy(() => import("@/pages/ProgressOverviewPage"));
+const CaptureDetailPage    = lazy(() => import("@/pages/CaptureDetailPage"));
+const DelayForecastPage    = lazy(() => import("@/pages/DelayForecastPage"));
+const IntegrationsPage     = lazy(() => import("@/pages/IntegrationsPage"));
+
+// Heavy 3D pages — Three.js only loads when these routes are visited
+const BIMViewerPage        = lazy(() => import("@/pages/BIMViewerPage"));
+const ReprojectionViewPage = lazy(() => import("@/pages/ReprojectionViewPage"));
 
 export const router = createBrowserRouter([
   {
     element: <AppLayout />,
     errorElement: <ErrorBoundary><div /></ErrorBoundary>,
     children: [
-      { path: "/",                                               element: <DashboardPage /> },
-      { path: "/executive",                                      element: <ExecutiveOverviewPage /> },
-      { path: "/projects",                                       element: <ProjectsPage /> },
-      { path: "/projects/new",                                   element: <NewProjectPage /> },
-      { path: "/projects/:projectId",                            element: <ProjectDetailPage /> },
-      { path: "/projects/:projectId/plan-tracker",               element: <PlanTrackerPage /> },
-      { path: "/projects/:projectId/trades",                     element: <TradesPage /> },
-      { path: "/projects/:projectId/schedules/:scheduleId",      element: <ScheduleDetailPage /> },
-      { path: "/projects/:projectId/bim",                         element: <BIMModelPickerPage /> },
-      { path: "/projects/:projectId/progress",                   element: <ProgressOverviewPage /> },
-      { path: "/projects/:projectId/captures/:captureId",        element: <CaptureDetailPage /> },
-      { path: "/projects/:projectId/forecast",                   element: <DelayForecastPage /> },
-      { path: "/projects/:projectId/integrations",               element: <IntegrationsPage /> },
-      { path: "/settings",                                        element: <SettingsPage /> },
-      { path: "/reports",                                        element: <ReportsPage /> },
-      { path: "/schedule",                                       element: <ProjectsPage /> },
+      { path: "/",                                               element: <Lazy page={DashboardPage} /> },
+      { path: "/executive",                                      element: <Lazy page={ExecutiveOverviewPage} /> },
+      { path: "/projects",                                       element: <Lazy page={ProjectsPage} /> },
+      { path: "/projects/new",                                   element: <Lazy page={NewProjectPage} /> },
+      { path: "/projects/:projectId",                            element: <Lazy page={ProjectDetailPage} /> },
+      { path: "/projects/:projectId/plan-tracker",               element: <Lazy page={PlanTrackerPage} /> },
+      { path: "/projects/:projectId/trades",                     element: <Lazy page={TradesPage} /> },
+      { path: "/projects/:projectId/schedules/:scheduleId",      element: <Lazy page={ScheduleDetailPage} /> },
+      { path: "/projects/:projectId/bim",                        element: <Lazy page={BIMModelPickerPage} /> },
+      { path: "/projects/:projectId/progress",                   element: <Lazy page={ProgressOverviewPage} /> },
+      { path: "/projects/:projectId/captures/:captureId",        element: <Lazy page={CaptureDetailPage} /> },
+      { path: "/projects/:projectId/forecast",                   element: <Lazy page={DelayForecastPage} /> },
+      { path: "/projects/:projectId/integrations",               element: <Lazy page={IntegrationsPage} /> },
+      { path: "/settings",                                       element: <Lazy page={SettingsPage} /> },
+      { path: "/reports",                                        element: <Lazy page={ReportsPage} /> },
+      { path: "/schedule",                                       element: <Lazy page={ProjectsPage} /> },
       { path: "*",                                               element: <NotFoundPage /> },
     ],
   },
-  // Fullscreen pages (no sidebar)
-  { path: "/viewer/:projectId/:modelId", element: <BIMViewerPage /> },
-  { path: "/viewer",                     element: <BIMViewerPage /> },
+  // Fullscreen pages (no sidebar) — also lazy: Three.js never loads on dashboard
+  { path: "/viewer/:projectId/:modelId", element: <Lazy page={BIMViewerPage} /> },
+  { path: "/viewer",                     element: <Lazy page={BIMViewerPage} /> },
   {
     path: "/projects/:projectId/captures/:captureId/reprojection",
-    element: <ReprojectionViewPage />,
+    element: <Lazy page={ReprojectionViewPage} />,
   },
 ]);

@@ -262,27 +262,30 @@ function PaceDrawer({
   const r = RISK[activity.risk];
   const pct = Math.round((activity.done / activity.total) * 100);
 
-  // Build "Activity Over Time" data: cumulative actual + planned + forecast
-  const overtimeData = useMemo(() => {
+  // Build "Activity Over Time" data: cumulative actual + planned + forecast.
+  // The row type uses optional fields so both history rows and forecast rows
+  // fit in the same array without a TypeScript overload error.
+  type OvertimeRow = { week: string; actual?: number; planned: number; forecast?: number };
+  const overtimeData = useMemo((): OvertimeRow[] => {
     let cumActual = 0;
     let cumPlanned = 0;
-    return activity.weeklyData.map((w, i) => {
+    const base  = activity.weeklyData.reduce((s, w) => s + w.actual, 0);
+    const baseP = activity.weeklyData.reduce((s, w) => s + w.planned, 0);
+
+    const history: OvertimeRow[] = activity.weeklyData.map((w) => {
       cumActual  += w.actual;
       cumPlanned += w.planned;
       return { week: w.week, actual: cumActual, planned: cumPlanned };
-    }).concat(
-      // 4 forecast weeks at custom pace
-      Array.from({ length: 4 }, (_, i) => {
-        const base = activity.weeklyData.reduce((s, w) => s + w.actual, 0);
-        const baseP = activity.weeklyData.reduce((s, w) => s + w.planned, 0);
-        return {
-          week: `W${14 + activity.weeklyData.length + i}`,
-          actual: undefined as number | undefined,
-          planned: baseP + (i + 1) * activity.plannedPace,
-          forecast: base + (i + 1) * customPace,
-        };
-      })
-    );
+    });
+
+    // 4 forecast weeks at custom pace — actual is absent (rendered as gap)
+    const forecast: OvertimeRow[] = Array.from({ length: 4 }, (_, i) => ({
+      week: `W${14 + activity.weeklyData.length + i}`,
+      planned: baseP + (i + 1) * activity.plannedPace,
+      forecast: base + (i + 1) * customPace,
+    }));
+
+    return [...history, ...forecast];
   }, [activity, customPace]);
 
   // Estimated delay weeks at custom pace

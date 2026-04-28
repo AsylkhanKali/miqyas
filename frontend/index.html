@@ -4,15 +4,63 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MIQYAS — Construction Progress Tracking</title>
+
+    <!--
+      Font strategy
+      ─────────────
+      Critical fonts (DM Sans + Instrument Sans) are loaded with the
+      standard async swap pattern:
+        1. preconnect hints fire immediately (no DNS penalty on the fetch)
+        2. <link media="print"> loads the CSS off the critical path
+        3. onload flips it to media="all" so it applies once ready
+        4. <noscript> is the synchronous fallback for no-JS environments
+
+      JetBrains Mono is monospace / code-only — loaded separately and
+      even more deferred (appended via JS after first paint).
+
+      Weights trimmed vs. original:
+        DM Sans     : 400, 500, 600 only  (dropped 300 and 700 variants)
+        Instrument Sans: 400, 600 only    (dropped 500 and 700 variants)
+        JetBrains Mono : 400 only          (was 400+500)
+
+      Net effect: 11 font files → 6 font files on first load.
+    -->
+
+    <!-- 1. DNS + TLS pre-warming -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- 2. Critical fonts — async load via print→all trick -->
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Instrument+Sans:wght@400;600&display=swap"
     />
+    <!-- 3. Synchronous fallback for no-JS -->
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Instrument+Sans:wght@400;600&display=swap"
+      />
+    </noscript>
   </head>
   <body class="bg-slate-950 text-white antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!--
+      4. JetBrains Mono — code/mono font, not on the critical path.
+         Injected after the page is interactive so it never blocks rendering.
+    -->
+    <script>
+      window.addEventListener("load", function () {
+        var link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href =
+          "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=optional";
+        document.head.appendChild(link);
+      });
+    </script>
   </body>
 </html>

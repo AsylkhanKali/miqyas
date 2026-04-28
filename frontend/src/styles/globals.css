@@ -1,128 +1,26 @@
+/*
+  Theme files are pure CSS custom-property blocks — no Tailwind, no
+  component classes. Each file defines exactly the tokens listed in
+  themes/_contract.css. Adding a new theme = one file + one @import.
+
+  NOTE: @import must come before all other rules (CSS spec + PostCSS).
+  Tailwind directives follow the imports so the theme tokens are in scope
+  when Tailwind generates its base layer.
+*/
+@import './themes/dark.css';
+@import './themes/light.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ═══════════════════════════════════════════════════════════════════════
-   THEME SYSTEM
-     Dark  (default)  — navy + blue accent (engineering HUD).
-     Light ([data-theme="light"]) — "construction atelier":
-       paper-warm whites, graphite text, industrial-mustard CTA.
-     Anchors (user-locked):
-       #F4F3EF  Concrete White     — page
-       #C2A23A  Industrial Mustard — CTA / highlight
-       #2F2F2C  Structural Charcoal — text
-   ═════════════════════════════════════════════════════════════════════ */
-
+/* ─────────────────────────────────────────────────────────────────────
+   BASE
+   ───────────────────────────────────────────────────────────────────── */
 @layer base {
-  :root {
-    /* Surfaces */
-    --color-bg-primary:   #0d1526;
-    --color-bg-secondary: #16213a;
-    --color-bg-card:      #1e293b;
-    --color-bg-elevated:  #263347;
-    --color-bg-hover:     #2d3d54;
-
-    /* Borders */
-    --color-border:       #2d3d54;
-    --color-border-hover: #3f536e;
-    --color-border-strong: #3f536e;
-
-    /* Text */
-    --color-text-primary:   #f1f5f9;
-    --color-text-secondary: #cbd5e1;
-    --color-text-muted:     #64748b;
-
-    /* Accent (blue — brand) */
-    --color-accent:       #3b82f6;
-    --color-accent-hover: #60a5fa;
-    --color-accent-soft:  rgba(59, 130, 246, 0.15);
-    --color-accent-dim:   rgba(59, 130, 246, 0.15);
-    --color-accent-text:  #ffffff;
-    --color-accent-ring:  rgba(59, 130, 246, 0.35);
-
-    /* Scrollbar */
-    --color-scrollbar:       #2d3d54;
-    --color-scrollbar-hover: #3f536e;
-
-    /* Shadows — layered for depth */
-    --shadow-xs:   0 1px 2px rgba(0, 0, 0, 0.40);
-    --shadow-sm:   0 2px 4px -1px rgba(0, 0, 0, 0.35);
-    --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.35);
-    --shadow-md:   0 4px 12px -2px rgba(0, 0, 0, 0.40), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
-    --shadow-lg:   0 12px 24px -6px rgba(0, 0, 0, 0.50), 0 4px 8px -4px rgba(0, 0, 0, 0.30);
-    --shadow-cta:  0 2px 6px -1px rgba(59, 130, 246, 0.45), 0 1px 2px rgba(0,0,0,0.3);
-
-    /* Focus ring */
-    --ring-accent: 0 0 0 3px rgba(59, 130, 246, 0.35);
-  }
-
-  /* ── Light theme ──────────────────────────────────────────────────
-     Palette philosophy:
-       Surfaces are a 5-step paper scale — each step ~3-5% warmer/darker
-       than the last, so hierarchy reads without being loud.
-       Text uses a true 3-step charcoal ramp for confident contrast.
-       Mustard is reserved: primary CTA, focus ring, active indicator —
-       never used for plain surfaces or body borders.
-       Split-complementary harmony with the dark-mode blue kept intact.    */
-  [data-theme="light"] {
-    /* Surfaces — paper-warm, 5 steps */
-    --color-bg-primary:   #F4F3EF;   /* Concrete White — page */
-    --color-bg-secondary: #EDEBE3;   /* sidebar / topbar */
-    --color-bg-card:      #FCFBF7;   /* cards — almost pure, lifts off page */
-    --color-bg-elevated:  #F8F6EF;   /* popovers / menus */
-    --color-bg-hover:     #E8E4D7;   /* subtle tap state */
-
-    /* Borders — warm stone, not grey */
-    --color-border:        #E0DBCC;   /* hairline separator */
-    --color-border-hover:  #C2A23A;   /* mustard on interaction */
-    --color-border-strong: #CFC7B2;   /* emphasized divider */
-
-    /* Text — graphite ramp */
-    --color-text-primary:   #26241F;  /* near-black, warm */
-    --color-text-secondary: #55524A;  /* body */
-    --color-text-muted:     #8A8577;  /* captions / meta */
-
-    /* Accent — Industrial Mustard */
-    --color-accent:       #C2A23A;
-    --color-accent-hover: #AA8B23;
-    --color-accent-soft:  rgba(194, 162, 58, 0.14);
-    --color-accent-dim:   rgba(194, 162, 58, 0.14);
-    --color-accent-text:  #1E1C15;   /* high-contrast on mustard */
-    --color-accent-ring:  rgba(194, 162, 58, 0.40);
-
-    /* Scrollbar */
-    --color-scrollbar:       #D5CFBF;
-    --color-scrollbar-hover: #C2A23A;
-
-    /* Shadows — soft, warm, tinted toward charcoal (not black) */
-    --shadow-xs:   0 1px 2px rgba(47, 47, 44, 0.05);
-    --shadow-sm:   0 1px 2px rgba(47, 47, 44, 0.06), 0 1px 3px rgba(47, 47, 44, 0.04);
-    --shadow-card: 0 1px 2px rgba(47, 47, 44, 0.04),
-                   0 4px 10px -4px rgba(47, 47, 44, 0.08),
-                   0 0 0 1px rgba(47, 47, 44, 0.02);
-    --shadow-md:   0 4px 12px -2px rgba(47, 47, 44, 0.10),
-                   0 2px 4px -2px rgba(47, 47, 44, 0.06);
-    --shadow-lg:   0 18px 36px -12px rgba(47, 47, 44, 0.18),
-                   0 8px 16px -8px rgba(47, 47, 44, 0.10);
-    --shadow-cta:  0 1px 2px rgba(47, 47, 44, 0.15),
-                   0 4px 10px -2px rgba(194, 162, 58, 0.35),
-                   inset 0 1px 0 rgba(255, 255, 255, 0.20);
-
-    --ring-accent: 0 0 0 3px rgba(194, 162, 58, 0.40);
-  }
-
   html, body, #root {
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
-  }
-
-  /* Light theme typography polish: tighter tracking & antialiasing on
-     warm paper — text reads crisper, avoids the "washed-out" feel of
-     raw sans-serif on cream. */
-  [data-theme="light"] body {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
   }
 
   * {
@@ -138,144 +36,20 @@
   *::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-scrollbar-hover);
   }
-
-  /* Text selection */
-  [data-theme="light"] ::selection {
-    background-color: rgba(194, 162, 58, 0.30);
-    color: #1E1C15;
-  }
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   LIGHT-MODE OVERRIDES FOR HARDCODED TAILWIND CLASSES
-   Pages ship with many `bg-slate-*` / `text-slate-*` / `bg-mq-*` /
-   arbitrary-value classes. Rather than touch every page we remap them
-   here via attribute-selector specificity.
-   ═════════════════════════════════════════════════════════════════════ */
-
-/* ── Arbitrary hex surfaces (page / sidebar / card / elevated / hover) ── */
-[data-theme="light"] .bg-\[\#0d1526\] { background-color: var(--color-bg-primary)   !important; }
-[data-theme="light"] .bg-\[\#16213a\] { background-color: var(--color-bg-secondary) !important; }
-[data-theme="light"] .bg-\[\#1e293b\] { background-color: var(--color-bg-card)      !important; }
-[data-theme="light"] .bg-\[\#263347\] { background-color: var(--color-bg-elevated)  !important; }
-[data-theme="light"] .bg-\[\#2d3d54\] { background-color: var(--color-bg-hover)     !important; }
-[data-theme="light"] .bg-\[\#3f536e\] { background-color: var(--color-border-strong)!important; }
-
-[data-theme="light"] .hover\:bg-\[\#1e293b\]:hover { background-color: var(--color-bg-elevated) !important; }
-[data-theme="light"] .hover\:bg-\[\#263347\]:hover { background-color: var(--color-bg-hover)    !important; }
-
-[data-theme="light"] .border-\[\#2d3d54\]        { border-color: var(--color-border) !important; }
-[data-theme="light"] .border-\[\#3f536e\]        { border-color: var(--color-border-strong) !important; }
-[data-theme="light"] .hover\:border-\[\#2d3d54\]:hover { border-color: var(--color-border)        !important; }
-[data-theme="light"] .hover\:border-\[\#3f536e\]:hover { border-color: var(--color-border-hover)  !important; }
-
-/* ── Slate surfaces ──────────────────────────────────────────────── */
-[data-theme="light"] .bg-slate-950 { background-color: var(--color-bg-primary)   !important; }
-[data-theme="light"] .bg-slate-925 { background-color: var(--color-bg-secondary) !important; }
-[data-theme="light"] .bg-slate-900 { background-color: var(--color-bg-secondary) !important; }
-[data-theme="light"] .bg-slate-850 { background-color: var(--color-bg-card)      !important; }
-[data-theme="light"] .bg-slate-800 { background-color: var(--color-bg-card)      !important; }
-[data-theme="light"] .bg-slate-700 { background-color: var(--color-bg-elevated)  !important; }
-[data-theme="light"] .bg-slate-600 { background-color: var(--color-bg-hover)     !important; }
-
-/* Slate with opacity — common pattern for "dimmer" surfaces */
-[data-theme="light"] .bg-slate-800\/50  { background-color: rgba(252, 251, 247, 0.65) !important; }
-[data-theme="light"] .bg-slate-800\/40  { background-color: rgba(252, 251, 247, 0.55) !important; }
-[data-theme="light"] .bg-slate-800\/30  { background-color: rgba(252, 251, 247, 0.45) !important; }
-[data-theme="light"] .bg-slate-900\/50  { background-color: rgba(237, 235, 227, 0.70) !important; }
-
-[data-theme="light"] .hover\:bg-slate-800\/50:hover { background-color: var(--color-bg-elevated) !important; }
-[data-theme="light"] .hover\:bg-slate-800:hover    { background-color: var(--color-bg-elevated) !important; }
-[data-theme="light"] .hover\:bg-slate-700:hover    { background-color: var(--color-bg-hover)    !important; }
-
-/* Slate borders (+ opacity variants) */
-[data-theme="light"] .border-slate-800     { border-color: var(--color-border) !important; }
-[data-theme="light"] .border-slate-700     { border-color: var(--color-border) !important; }
-[data-theme="light"] .border-slate-600     { border-color: var(--color-border-strong) !important; }
-[data-theme="light"] .border-slate-700\/50 { border-color: rgba(224, 219, 204, 0.70) !important; }
-[data-theme="light"] .hover\:border-slate-600:hover { border-color: var(--color-border-hover) !important; }
-
-/* ── Text ──────────────────────────────────────────────────────── */
-[data-theme="light"] .text-white      { color: var(--color-text-primary)   !important; }
-[data-theme="light"] .text-slate-100  { color: var(--color-text-primary)   !important; }
-[data-theme="light"] .text-slate-200  { color: var(--color-text-primary)   !important; }
-[data-theme="light"] .text-slate-300  { color: var(--color-text-secondary) !important; }
-[data-theme="light"] .text-slate-400  { color: var(--color-text-secondary) !important; }
-[data-theme="light"] .text-slate-500  { color: var(--color-text-muted)     !important; }
-[data-theme="light"] .text-slate-600  { color: var(--color-text-muted)     !important; }
-[data-theme="light"] .text-slate-700  { color: #A6A092                      !important; }
-
-[data-theme="light"] .hover\:text-white:hover     { color: var(--color-text-primary)   !important; }
-[data-theme="light"] .hover\:text-slate-200:hover { color: var(--color-text-primary)   !important; }
-[data-theme="light"] .hover\:text-slate-300:hover { color: var(--color-text-secondary) !important; }
-
-[data-theme="light"] .placeholder-slate-500::placeholder,
-[data-theme="light"] .placeholder-slate-400::placeholder { color: var(--color-text-muted) !important; }
-
-/* ── Status badge text — deeper shades for contrast on cream ────── */
-[data-theme="light"] .badge-ahead   { color: #145A2D !important; background-color: rgba(16, 185, 129, 0.10) !important; border-color: rgba(16, 185, 129, 0.30) !important; }
-[data-theme="light"] .badge-ontrack { color: #1D3F9E !important; background-color: rgba(37, 99, 235, 0.10)  !important; border-color: rgba(37, 99, 235, 0.28)  !important; }
-[data-theme="light"] .badge-behind  { color: #8C1818 !important; background-color: rgba(239, 68, 68, 0.10)  !important; border-color: rgba(239, 68, 68, 0.30)  !important; }
-[data-theme="light"] .badge-warning { color: #7A4706 !important; background-color: rgba(245, 158, 11, 0.12) !important; border-color: rgba(245, 158, 11, 0.32) !important; }
-
-/* ═══════════════════════════════════════════════════════════════════════
-   mq-* BRAND COLOR REMAP (light mode)
-   Dark theme: mq-* is a blue scale (#3b82f6 etc.).
-   Light theme: we shift the whole scale onto the mustard family so
-   brand CTAs / highlights read as "Industrial Mustard" — without
-   having to rename classes throughout the codebase.
-   ═════════════════════════════════════════════════════════════════════ */
-
-/* Solid mq backgrounds */
-[data-theme="light"] .bg-mq-400     { background-color: #D4B44D !important; }
-[data-theme="light"] .bg-mq-500     { background-color: #C2A23A !important; }
-[data-theme="light"] .bg-mq-600     { background-color: #AA8B23 !important; }
-[data-theme="light"] .bg-mq-700     { background-color: #8E7318 !important; }
-
-/* mq backgrounds with opacity — soft tints for nav pills, info panels */
-[data-theme="light"] .bg-mq-500\/15 { background-color: rgba(194, 162, 58, 0.14) !important; }
-[data-theme="light"] .bg-mq-500\/50 { background-color: rgba(194, 162, 58, 0.45) !important; }
-[data-theme="light"] .bg-mq-600\/5  { background-color: rgba(170, 139, 35, 0.06) !important; }
-[data-theme="light"] .bg-mq-600\/10 { background-color: rgba(170, 139, 35, 0.10) !important; }
-[data-theme="light"] .bg-mq-600\/15 { background-color: rgba(170, 139, 35, 0.14) !important; }
-[data-theme="light"] .bg-mq-600\/20 { background-color: rgba(170, 139, 35, 0.18) !important; }
-
-/* mq borders */
-[data-theme="light"] .border-mq-500      { border-color: #C2A23A !important; }
-[data-theme="light"] .border-mq-600      { border-color: #AA8B23 !important; }
-[data-theme="light"] .border-mq-500\/50  { border-color: rgba(194, 162, 58, 0.50) !important; }
-[data-theme="light"] .border-mq-600\/20  { border-color: rgba(170, 139, 35, 0.25) !important; }
-[data-theme="light"] .border-mq-600\/25  { border-color: rgba(170, 139, 35, 0.32) !important; }
-[data-theme="light"] .border-mq-600\/30  { border-color: rgba(170, 139, 35, 0.40) !important; }
-
-/* mq text */
-[data-theme="light"] .text-mq-300   { color: #8E7318 !important; }
-[data-theme="light"] .text-mq-400   { color: #8E7318 !important; }
-
-/* Gradients (from-mq-500 → to-mq-700) — used on hero CTAs / stat headers */
-[data-theme="light"] .from-mq-500   { --tw-gradient-from: #C2A23A !important; --tw-gradient-to: rgba(194,162,58,0) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
-[data-theme="light"] .to-mq-700     { --tw-gradient-to: #8E7318 !important; }
-
-/* Colored shadow utility: shadow-mq-500/30 → warm mustard drop */
-[data-theme="light"] .shadow-mq-500\/30 { --tw-shadow-color: rgba(194, 162, 58, 0.35) !important; --tw-shadow: var(--tw-shadow-colored) !important; }
-[data-theme="light"] .shadow-mq-600\/30 { --tw-shadow-color: rgba(170, 139, 35, 0.30) !important; --tw-shadow: var(--tw-shadow-colored) !important; }
-
-/* Ring utility (focus) */
-[data-theme="light"] .ring-mq-500       { --tw-ring-color: rgba(194, 162, 58, 0.60) !important; }
-[data-theme="light"] .focus\:ring-mq-500:focus { --tw-ring-color: rgba(194, 162, 58, 0.60) !important; }
-
-/* ═══════════════════════════════════════════════════════════════════════
+/* ─────────────────────────────────────────────────────────────────────
    COMPONENT CLASSES
-   ═════════════════════════════════════════════════════════════════════ */
-
+   These use semantic tokens so they automatically adapt to any theme.
+   ───────────────────────────────────────────────────────────────────── */
 @layer components {
+  /* ── Card ──────────────────────────────────────────────────── */
   .card {
     @apply rounded-xl;
     background-color: var(--color-bg-card);
     border: 1px solid var(--color-border);
     box-shadow: var(--shadow-card);
   }
-
   .card-hover {
     @apply card transition-all duration-200;
   }
@@ -286,20 +60,25 @@
     transform: translateY(-1px);
   }
 
-  /* ── Buttons ────────────────────────────────────────────────── */
+  /* ── Buttons ───────────────────────────────────────────────── */
+
+  /*
+    btn-primary uses --color-accent-SOLID (not --color-accent).
+    accent-solid is tuned so --color-accent-text achieves ≥ 4.5 : 1 on it.
+    (dark: #1d6ae8 bg / #fff text = 4.91 ✅  light: #C2A23A bg / #1E1C15 text = 6.92 ✅)
+  */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5
            text-sm font-semibold transition-all duration-150
            active:scale-[0.98]
            disabled:opacity-50 disabled:cursor-not-allowed;
-    background-color: var(--color-accent);
+    background-color: var(--color-accent-solid);
     color: var(--color-accent-text);
     box-shadow: var(--shadow-cta);
     letter-spacing: -0.005em;
   }
   .btn-primary:hover {
-    background-color: var(--color-accent-hover);
-    box-shadow: var(--shadow-md), 0 0 0 1px var(--color-accent-hover) inset;
+    background-color: var(--color-accent-solid-hover);
   }
   .btn-primary:focus-visible {
     outline: none;
@@ -324,7 +103,7 @@
   .btn-secondary:focus-visible {
     outline: none;
     box-shadow: var(--ring-accent);
-    border-color: var(--color-accent);
+    border-color: var(--color-accent-solid);
   }
 
   .btn-ghost {
@@ -337,17 +116,18 @@
     color: var(--color-text-primary);
   }
 
-  /* ── Form elements ──────────────────────────────────────────── */
+  /* ── Form elements ─────────────────────────────────────────── */
   .input {
     @apply w-full rounded-lg px-3.5 py-2.5 text-sm outline-none transition-all duration-150;
     background-color: var(--color-bg-card);
     border: 1px solid var(--color-border);
     color: var(--color-text-primary);
   }
+  /* text-muted now passes 4.5 : 1 on bg-card in both themes */
   .input::placeholder { color: var(--color-text-muted); }
   .input:hover        { border-color: var(--color-border-strong); }
   .input:focus {
-    border-color: var(--color-accent);
+    border-color: var(--color-accent-solid);
     box-shadow: var(--ring-accent);
   }
 
@@ -357,30 +137,41 @@
     letter-spacing: -0.005em;
   }
 
-  /* ── Badges ──────────────────────────────────────────────────── */
+  /* ── Badges ────────────────────────────────────────────────── */
   .badge {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
     letter-spacing: 0.01em;
   }
-  .badge-ahead    { @apply badge bg-emerald-500/15 text-emerald-400 border border-emerald-500/25; }
-  .badge-ontrack  { @apply badge bg-blue-500/15    text-blue-400    border border-blue-500/25; }
-  .badge-behind   { @apply badge bg-red-500/15     text-red-400     border border-red-500/25; }
-  .badge-warning  { @apply badge bg-amber-500/15   text-amber-400   border border-amber-500/25; }
+  /*
+    Dark mode badge text verified:
+      emerald-400 (#34d399) on blended bg → 6.00 : 1 ✅
+      blue-400    (#60a5fa) on blended bg → 4.77 : 1 ✅
+      red-400     (#f87171) on blended bg → 4.63 : 1 ✅
+      amber-400   (#fbbf24) on blended bg → 6.77 : 1 ✅
+    Light mode badge text verified (deep hues against tinted card):
+      #145A2D on blended bg → 7.29 : 1 ✅
+      #1D3F9E on blended bg → 7.78 : 1 ✅
+      #8C1818 on blended bg → 7.85 : 1 ✅
+      #7A4706 on blended bg → 6.76 : 1 ✅
+  */
+  .badge-ahead   { @apply badge bg-emerald-500/15 text-emerald-400 border border-emerald-500/25; }
+  .badge-ontrack { @apply badge bg-blue-500/15    text-blue-400    border border-blue-500/25; }
+  .badge-behind  { @apply badge bg-red-500/15     text-red-400     border border-red-500/25; }
+  .badge-warning { @apply badge bg-amber-500/15   text-amber-400   border border-amber-500/25; }
 
-  /* ── Typography ─────────────────────────────────────────────── */
+  /* ── Typography ────────────────────────────────────────────── */
   .section-title {
     @apply text-lg font-semibold font-display;
     color: var(--color-text-primary);
     letter-spacing: -0.015em;
   }
-
   .page-title {
     @apply text-2xl font-bold font-display tracking-tight;
     color: var(--color-text-primary);
     letter-spacing: -0.025em;
   }
 
-  /* ── Stat card ──────────────────────────────────────────────── */
+  /* ── Stat card ─────────────────────────────────────────────── */
   .stat-card {
     @apply card p-5 flex flex-col gap-1 transition-all duration-200;
   }
@@ -389,65 +180,81 @@
     border-color: var(--color-border-strong);
   }
 
-  /* ── Table ──────────────────────────────────────────────────── */
+  /* ── Table ─────────────────────────────────────────────────── */
   .table-row-hover {
     @apply transition-colors duration-100;
   }
   .table-row-hover:hover {
     background-color: var(--color-bg-elevated);
   }
+
+  /*
+    Section label — sidebar group headers ("PROJECT", "TOOLS", …).
+    Uses --color-section-label which is audited to pass 4.5 : 1 against
+    bg-secondary in both themes.
+    dark: #7a8ea3 / #16213a = 4.74 : 1 ✅
+    light: #6b6660 / #EDEBE3 = 4.76 : 1 ✅
+    (was text-slate-600 = #475569 on dark sidebar = 2.11 : 1 ❌)
+  */
+  .section-label {
+    color: var(--color-section-label);
+  }
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   LIGHT-THEME FINE DETAILS
-   Small, opinionated polish that can't be expressed as a simple remap.
-   ═════════════════════════════════════════════════════════════════════ */
+/* ─────────────────────────────────────────────────────────────────────
+   UTILITY: SKELETON PULSE
+   Single class so both themes animate correctly.
+   ───────────────────────────────────────────────────────────────────── */
+.skeleton-pulse {
+  background-color: rgba(38, 51, 71, 0.80); /* dark default */
+}
+[data-theme="light"] .skeleton-pulse {
+  background-color: #E8E4D7;
+}
 
-/* Heavier-feeling cards — the layered shadow + hairline inset border does
-   most of the lifting. Tailwind `shadow-*` utilities get silently upgraded
-   so existing cards look correct without editing markup. */
+/* ─────────────────────────────────────────────────────────────────────
+   TAILWIND CLASS OVERRIDES FOR THE LIGHT THEME
+   ─────────────────────────────────────────────────────────────────────
+   Pages use hardcoded Tailwind classes (bg-slate-800, text-slate-400 …)
+   for the dark theme. These overrides remap them to semantic token values
+   when [data-theme="light"] is active, without touching every page file.
+
+   HOW IT WORKS:
+     [data-theme="light"] .bg-slate-800 { background-color: var(--color-bg-card) !important }
+
+   WHY !important:
+     Tailwind utility classes have no specificity advantage. The attribute
+     selector [data-theme="light"] only adds (0,1,0) — not enough to win
+     against utilities with (0,0,1) without !important. Scoped via the
+     `[data-theme]` ancestor, so overrides are strictly contained.
+
+   MAINTENANCE NOTE:
+     When a component is migrated to use semantic tokens directly
+     (e.g. `bg-[var(--color-bg-card)]`), its override row here can be
+     deleted. The goal is eventually empty sections below.
+   ─────────────────────────────────────────────────────────────────────
+*/
+
+/* ── Shadow upgrades (warm, tinted toward charcoal, not black) ─────── */
 [data-theme="light"] .shadow-sm { box-shadow: var(--shadow-sm) !important; }
 [data-theme="light"] .shadow,
 [data-theme="light"] .shadow-md { box-shadow: var(--shadow-md) !important; }
 [data-theme="light"] .shadow-lg { box-shadow: var(--shadow-lg) !important; }
 [data-theme="light"] .shadow-xl { box-shadow: var(--shadow-lg) !important; }
 
-/* Nav active-state: subtle mustard wash + left bar (handled via bg-mq-500
-   remap above). The active link text uses text-mq-400 which we point at
-   the darker mustard for strong contrast on cream. */
+/* ── Arbitrary hex → surface tokens ────────────────────────────────── */
+[data-theme="light"] .bg-\[\#0d1526\] { background-color: var(--color-bg-primary)   !important; }
+[data-theme="light"] .bg-\[\#16213a\] { background-color: var(--color-bg-secondary) !important; }
+[data-theme="light"] .bg-\[\#1e293b\] { background-color: var(--color-bg-card)      !important; }
+[data-theme="light"] .bg-\[\#263347\] { background-color: var(--color-bg-elevated)  !important; }
+[data-theme="light"] .bg-\[\#2d3d54\] { background-color: var(--color-bg-hover)     !important; }
+[data-theme="light"] .bg-\[\#3f536e\] { background-color: var(--color-border-strong)!important; }
+[data-theme="light"] .bg-\[\#1a2842\] { background-color: var(--color-bg-elevated)  !important; }
 
-/* Divider lines inside cards (common: divide-slate-800) */
-[data-theme="light"] .divide-slate-800 > :not([hidden]) ~ :not([hidden]) { border-color: var(--color-border) !important; }
-[data-theme="light"] .divide-slate-700 > :not([hidden]) ~ :not([hidden]) { border-color: var(--color-border) !important; }
+[data-theme="light"] .hover\:bg-\[\#1e293b\]:hover { background-color: var(--color-bg-elevated) !important; }
+[data-theme="light"] .hover\:bg-\[\#263347\]:hover { background-color: var(--color-bg-hover)    !important; }
 
-/* Common "bg-white/5" type frosted overlays used on KPI chips */
-[data-theme="light"] .bg-white\/5  { background-color: rgba(47, 47, 44, 0.04) !important; }
-[data-theme="light"] .bg-white\/10 { background-color: rgba(47, 47, 44, 0.06) !important; }
-[data-theme="light"] .bg-black\/20 { background-color: rgba(47, 47, 44, 0.05) !important; }
-[data-theme="light"] .bg-black\/30 { background-color: rgba(47, 47, 44, 0.07) !important; }
-
-/* Links */
-[data-theme="light"] a.text-blue-400,
-[data-theme="light"] a.text-blue-500 { color: var(--color-accent-hover) !important; }
-[data-theme="light"] a.text-blue-400:hover,
-[data-theme="light"] a.text-blue-500:hover { color: var(--color-accent) !important; text-decoration: underline; text-underline-offset: 3px; }
-
-/* ── Skeleton pulse ──────────────────────────────────────────────────────
-   Single semantic class so dark/light both animate nicely. */
-.skeleton-pulse {
-  background-color: #263347cc; /* dark default */
-}
-[data-theme="light"] .skeleton-pulse {
-  background-color: #E8E4D7;   /* warm stone for light mode */
-}
-
-/* Missing arbitrary-hex overrides (plain + opacity variants) */
-[data-theme="light"] .bg-\[\#1a2842\]        { background-color: var(--color-bg-elevated) !important; }
-[data-theme="light"] .bg-\[\#1a2842\]\/40    { background-color: rgba(248,246,239,0.50)   !important; }
-[data-theme="light"] .border-\[\#1a2842\]    { border-color: var(--color-border)          !important; }
-
-/* Opacity variants of dark navy surfaces — Tailwind generates distinct
-   class names for each opacity, so they each need their own override.    */
+/* Opacity variants (Tailwind generates a distinct class per opacity) */
 [data-theme="light"] .bg-\[\#1e293b\]\/40    { background-color: rgba(252,251,247,0.80)   !important; }
 [data-theme="light"] .bg-\[\#1e293b\]\/50    { background-color: rgba(252,251,247,0.75)   !important; }
 [data-theme="light"] .bg-\[\#1e293b\]\/60    { background-color: rgba(252,251,247,0.80)   !important; }
@@ -455,17 +262,183 @@
 [data-theme="light"] .bg-\[\#263347\]\/80    { background-color: rgba(232,228,215,0.90)   !important; }
 [data-theme="light"] .bg-\[\#263347\]\/60    { background-color: rgba(232,228,215,0.75)   !important; }
 [data-theme="light"] .bg-\[\#263347\]\/40    { background-color: rgba(232,228,215,0.60)   !important; }
+[data-theme="light"] .bg-\[\#1a2842\]\/40    { background-color: rgba(248,246,239,0.50)   !important; }
 
-/* Progress bar planned track — `bg-[#3a506b]/80` used in TradeRow */
+/* Tooltip / chart popover backdrops */
+[data-theme="light"] .bg-\[\#0d1117\]        { background-color: var(--color-bg-elevated) !important; }
+[data-theme="light"] .bg-\[\#111827\]        { background-color: var(--color-bg-elevated) !important; }
+
+/* Progress bar planned-track colour */
 [data-theme="light"] .bg-\[\#3a506b\]        { background-color: #CFC7B2                  !important; }
 [data-theme="light"] .bg-\[\#3a506b\]\/80    { background-color: rgba(207,199,178,0.90)   !important; }
 [data-theme="light"] .bg-\[\#3a506b\]\/60    { background-color: rgba(207,199,178,0.70)   !important; }
 
-/* Tooltip / popover backdrop — `bg-[#0d1117]`, `bg-[#111827]` etc. used in some charts */
-[data-theme="light"] .bg-\[\#0d1117\]        { background-color: var(--color-bg-elevated) !important; }
-[data-theme="light"] .bg-\[\#111827\]        { background-color: var(--color-bg-elevated) !important; }
+/* ── Slate surface classes → surface tokens ─────────────────────────── */
+[data-theme="light"] .bg-slate-950 { background-color: var(--color-bg-primary)   !important; }
+[data-theme="light"] .bg-slate-925 { background-color: var(--color-bg-secondary) !important; }
+[data-theme="light"] .bg-slate-900 { background-color: var(--color-bg-secondary) !important; }
+[data-theme="light"] .bg-slate-850 { background-color: var(--color-bg-card)      !important; }
+[data-theme="light"] .bg-slate-800 { background-color: var(--color-bg-card)      !important; }
+[data-theme="light"] .bg-slate-700 { background-color: var(--color-bg-elevated)  !important; }
+[data-theme="light"] .bg-slate-600 { background-color: var(--color-bg-hover)     !important; }
 
-/* Three.js canvas container */
+[data-theme="light"] .bg-slate-800\/50 { background-color: rgba(252,251,247,0.65) !important; }
+[data-theme="light"] .bg-slate-800\/40 { background-color: rgba(252,251,247,0.55) !important; }
+[data-theme="light"] .bg-slate-800\/30 { background-color: rgba(252,251,247,0.45) !important; }
+[data-theme="light"] .bg-slate-900\/50 { background-color: rgba(237,235,227,0.70) !important; }
+
+[data-theme="light"] .hover\:bg-slate-800\/50:hover { background-color: var(--color-bg-elevated) !important; }
+[data-theme="light"] .hover\:bg-slate-800:hover     { background-color: var(--color-bg-elevated) !important; }
+[data-theme="light"] .hover\:bg-slate-700:hover     { background-color: var(--color-bg-hover)    !important; }
+
+/* ── Borders ────────────────────────────────────────────────────────── */
+[data-theme="light"] .border-\[\#2d3d54\]  { border-color: var(--color-border)        !important; }
+[data-theme="light"] .border-\[\#3f536e\]  { border-color: var(--color-border-strong) !important; }
+[data-theme="light"] .border-\[\#1a2842\]  { border-color: var(--color-border)        !important; }
+[data-theme="light"] .border-slate-800     { border-color: var(--color-border)        !important; }
+[data-theme="light"] .border-slate-700     { border-color: var(--color-border)        !important; }
+[data-theme="light"] .border-slate-600     { border-color: var(--color-border-strong) !important; }
+[data-theme="light"] .border-slate-700\/50 { border-color: rgba(224,219,204,0.70)     !important; }
+
+[data-theme="light"] .hover\:border-\[\#2d3d54\]:hover { border-color: var(--color-border)       !important; }
+[data-theme="light"] .hover\:border-\[\#3f536e\]:hover { border-color: var(--color-border-hover) !important; }
+[data-theme="light"] .hover\:border-slate-600:hover    { border-color: var(--color-border-hover) !important; }
+
+/* Dividers */
+[data-theme="light"] .divide-slate-800 > :not([hidden]) ~ :not([hidden]) { border-color: var(--color-border) !important; }
+[data-theme="light"] .divide-slate-700 > :not([hidden]) ~ :not([hidden]) { border-color: var(--color-border) !important; }
+
+/* ── Text → text tokens ─────────────────────────────────────────────── */
+[data-theme="light"] .text-white     { color: var(--color-text-primary)   !important; }
+[data-theme="light"] .text-slate-100 { color: var(--color-text-primary)   !important; }
+[data-theme="light"] .text-slate-200 { color: var(--color-text-primary)   !important; }
+[data-theme="light"] .text-slate-300 { color: var(--color-text-secondary) !important; }
+[data-theme="light"] .text-slate-400 { color: var(--color-text-secondary) !important; }
+[data-theme="light"] .text-slate-500 { color: var(--color-text-muted)     !important; }
+[data-theme="light"] .text-slate-600 { color: var(--color-text-muted)     !important; }
+/*
+  text-slate-700 was remapped to #A6A092 (FAIL 2.35 : 1).
+  New value #6A625A passes 5.39 : 1 on bg-primary ✅
+*/
+[data-theme="light"] .text-slate-700 { color: #6A625A !important; }
+
+[data-theme="light"] .hover\:text-white:hover     { color: var(--color-text-primary)   !important; }
+[data-theme="light"] .hover\:text-slate-200:hover { color: var(--color-text-primary)   !important; }
+[data-theme="light"] .hover\:text-slate-300:hover { color: var(--color-text-secondary) !important; }
+
+[data-theme="light"] .placeholder-slate-500::placeholder,
+[data-theme="light"] .placeholder-slate-400::placeholder { color: var(--color-text-muted) !important; }
+
+/* ── Status badge text — deep hues for contrast on warm paper ───────── */
+[data-theme="light"] .badge-ahead {
+  color: #145A2D !important;                        /* 7.29 : 1 ✅ */
+  background-color: rgba(16, 185, 129, 0.10) !important;
+  border-color: rgba(16, 185, 129, 0.30) !important;
+}
+[data-theme="light"] .badge-ontrack {
+  color: #1D3F9E !important;                        /* 7.78 : 1 ✅ */
+  background-color: rgba(37, 99, 235, 0.10)  !important;
+  border-color: rgba(37, 99, 235, 0.28)  !important;
+}
+[data-theme="light"] .badge-behind {
+  color: #8C1818 !important;                        /* 7.85 : 1 ✅ */
+  background-color: rgba(239, 68, 68, 0.10)  !important;
+  border-color: rgba(239, 68, 68, 0.30)  !important;
+}
+[data-theme="light"] .badge-warning {
+  color: #7A4706 !important;                        /* 6.76 : 1 ✅ */
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.32) !important;
+}
+
+/* Frosted overlays used on KPI chips */
+[data-theme="light"] .bg-white\/5  { background-color: rgba(47,47,44,0.04) !important; }
+[data-theme="light"] .bg-white\/10 { background-color: rgba(47,47,44,0.06) !important; }
+[data-theme="light"] .bg-black\/20 { background-color: rgba(47,47,44,0.05) !important; }
+[data-theme="light"] .bg-black\/30 { background-color: rgba(47,47,44,0.07) !important; }
+
+/* ── mq-* brand scale → mustard family ─────────────────────────────────
+   Dark mode: mq-* = blue (#3b82f6 family)
+   Light mode: mq-* = mustard (#C2A23A family) for fills, decorations, borders.
+
+   CONTRAST NOTES:
+   • bg-mq-* classes are FILLS — the text on top uses btn-primary's
+     --color-accent-text (#1E1C15) which passes 6.92 : 1 ✅
+   • text-mq-* is intentionally removed for nav-item labels (see below).
+     text-mq-400 and text-mq-300 are remapped to --color-text-primary
+     so active nav text (#26241F on sidebar) = 12.99 : 1 ✅
+     (mustard as nav label text = 2.06 : 1 ❌ — not used)
+   ────────────────────────────────────────────────────────────────────── */
+
+/* Solid fills */
+[data-theme="light"] .bg-mq-400     { background-color: #D4B44D !important; }
+[data-theme="light"] .bg-mq-500     { background-color: #C2A23A !important; }
+[data-theme="light"] .bg-mq-600     { background-color: #AA8B23 !important; }
+[data-theme="light"] .bg-mq-700     { background-color: #8E7318 !important; }
+
+/* Tinted backgrounds (pills, active washes) */
+[data-theme="light"] .bg-mq-500\/15 { background-color: rgba(194,162,58,0.14) !important; }
+[data-theme="light"] .bg-mq-500\/50 { background-color: rgba(194,162,58,0.45) !important; }
+[data-theme="light"] .bg-mq-600\/5  { background-color: rgba(170,139,35,0.06) !important; }
+[data-theme="light"] .bg-mq-600\/10 { background-color: rgba(170,139,35,0.10) !important; }
+[data-theme="light"] .bg-mq-600\/15 { background-color: rgba(170,139,35,0.14) !important; }
+[data-theme="light"] .bg-mq-600\/20 { background-color: rgba(170,139,35,0.18) !important; }
+
+/* Borders */
+[data-theme="light"] .border-mq-500      { border-color: #C2A23A !important; }
+[data-theme="light"] .border-mq-600      { border-color: #AA8B23 !important; }
+[data-theme="light"] .border-mq-500\/50  { border-color: rgba(194,162,58,0.50) !important; }
+[data-theme="light"] .border-mq-600\/20  { border-color: rgba(170,139,35,0.25) !important; }
+[data-theme="light"] .border-mq-600\/25  { border-color: rgba(170,139,35,0.32) !important; }
+[data-theme="light"] .border-mq-600\/30  { border-color: rgba(170,139,35,0.40) !important; }
+
+/*
+  text-mq-400 / text-mq-300 for nav item LABELS:
+  Remapped to text-primary (#26241F) so active nav labels pass 12.99 : 1 ✅.
+  Mustard (#C2A23A / #D4B44D) as foreground text on sidebar = 2.06 : 1 ❌.
+  Visual active indication is carried by the left bar (bg-mq-500) and
+  background wash (bg-mq-500/15), not by the text colour.
+*/
+[data-theme="light"] .text-mq-300 { color: var(--color-text-primary) !important; }
+[data-theme="light"] .text-mq-400 { color: var(--color-text-primary) !important; }
+
+/* Gradients */
+[data-theme="light"] .from-mq-500 {
+  --tw-gradient-from: #C2A23A !important;
+  --tw-gradient-to: rgba(194,162,58,0) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+[data-theme="light"] .to-mq-700 { --tw-gradient-to: #8E7318 !important; }
+
+/* Colored shadow */
+[data-theme="light"] .shadow-mq-500\/30 {
+  --tw-shadow-color: rgba(194,162,58,0.35) !important;
+  --tw-shadow: var(--tw-shadow-colored) !important;
+}
+[data-theme="light"] .shadow-mq-600\/30 {
+  --tw-shadow-color: rgba(170,139,35,0.30) !important;
+  --tw-shadow: var(--tw-shadow-colored) !important;
+}
+
+/* Focus rings */
+[data-theme="light"] .ring-mq-500                     { --tw-ring-color: rgba(194,162,58,0.60) !important; }
+[data-theme="light"] .focus\:ring-mq-500:focus         { --tw-ring-color: rgba(194,162,58,0.60) !important; }
+
+/* ── Links ──────────────────────────────────────────────────────────── */
+/*
+  --color-accent-link = #7A5A00 → 5.75 : 1 on bg-primary ✅
+  (was --color-accent-hover = #AA8B23 = 2.94 : 1 ❌)
+*/
+[data-theme="light"] a.text-blue-400,
+[data-theme="light"] a.text-blue-500 { color: var(--color-accent-link) !important; }
+[data-theme="light"] a.text-blue-400:hover,
+[data-theme="light"] a.text-blue-500:hover {
+  color: var(--color-accent-link) !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── Three.js canvas ────────────────────────────────────────────────── */
 .ifc-viewer-container canvas {
   outline: none;
   border-radius: 0.75rem;

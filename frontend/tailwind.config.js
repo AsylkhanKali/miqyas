@@ -4,48 +4,50 @@ export default {
   theme: {
     extend: {
       colors: {
-        // MIQYAS brand — vibrant construction-grade palette
+        // MIQYAS brand — construction orange (site-vocabulary accent)
+        // Dark mode uses orange; light mode uses mustard via CSS vars.
         mq: {
-          50:  "#eff6ff",
-          100: "#dbeafe",
-          200: "#bfdbfe",
-          300: "#93c5fd",
-          400: "#60a5fa",
-          500: "#3b82f6",
-          600: "#2563eb",
-          700: "#1d4ed8",
-          800: "#1e40af",
-          900: "#1e3a8a",
-          950: "#172554",
+          50:  "#fff7ed",
+          100: "#ffedd5",
+          200: "#fed7aa",
+          300: "#fdba74",
+          400: "#fb923c",
+          500: "#f97316",   // construction orange — primary brand
+          600: "#ea580c",
+          700: "#c2410c",
+          800: "#9a3412",
+          900: "#7c2d12",
+          950: "#431407",
         },
-        // Surface scale — charcoal with blue undertone (lighter than before)
+        // Surface scale — warm steel (grounded in construction materials)
         surface: {
-          50:  "#f8fafc",
-          100: "#f1f5f9",
-          200: "#e2e8f0",
-          300: "#cbd5e1",
-          400: "#94a3b8",
-          500: "#64748b",
-          600: "#475569",
-          700: "#334155",
-          800: "#1e293b",
-          900: "#0f172a",
-          950: "#070e1d",
+          50:  "#faf8f5",
+          100: "#f3f0ea",
+          200: "#e8e2d8",
+          300: "#d4cbbf",
+          400: "#b8a998",
+          500: "#8f7f70",
+          600: "#6b5d50",
+          700: "#4a3f35",
+          800: "#332d26",
+          900: "#1f1a15",
+          950: "#0e0b08",
         },
-        // Override dark-end slate shades to be brighter / more readable
+        // Site-specific slate — warm charcoal, not cold blue-gray
         slate: {
-          700: "#3a506b",   // borders, muted icons (was #334155, now slightly lighter)
-          800: "#263347",   // card surfaces (was #1e293b)
-          850: "#1f2d40",   // between 800/900 (new)
-          900: "#1a2842",   // deeper panels (was #0f172a)
-          925: "#16213a",   // sidebar / topbar
-          950: "#0d1526",   // page background
+          700: "#4a3f35",   // borders, muted icons
+          800: "#332d26",   // card surfaces
+          850: "#2a241d",   // between 800/900
+          900: "#1f1a15",   // deep panels
+          925: "#1a1410",   // sidebar / topbar
+          950: "#141008",   // page background
         },
+        // Semantic site colors — construction vocabulary
         signal: {
-          ahead:   "#10b981",
-          ontrack: "#3b82f6",
-          behind:  "#ef4444",
-          warning: "#f59e0b",
+          ahead:   "#4a9d6f",   // safe green — on schedule
+          ontrack: "#f97316",   // orange — active, in progress
+          behind:  "#d84141",   // critical red — act now
+          warning: "#e8a932",   // safety amber — float running out
         },
       },
       fontFamily: {

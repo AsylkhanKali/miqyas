@@ -1,10 +1,9 @@
 /**
- * AppLayout — Buildots-style sidebar + top bar.
+ * AppLayout — construction-grounded sidebar + top bar.
  *
- * New features:
- *  - Project selector dropdown at the top
- *  - Extended nav: Plan Tracker, Trades, Alerts
- *  - Collapsible sidebar with icon-only mode
+ * Design intent: warm steel palette, orange active states.
+ * Sidebar: same background as canvas (border separates, not color).
+ * Nav teaches the mental model: threats → project context → tools.
  */
 
 import { useState, useEffect } from "react";
@@ -26,7 +25,6 @@ import {
   Hexagon,
   ChevronDown,
   AlertTriangle,
-  Video,
   Plus,
   Check,
   Sun,
@@ -41,67 +39,24 @@ import { useTheme } from "@/store/themeContext";
 interface NavItem {
   label: string;
   icon: React.ElementType;
-  // Static path or function that receives selectedProjectId
   path: (projectId?: string) => string;
   requiresProject?: boolean;
   badge?: "projects";
 }
 
 const TOP_NAV: NavItem[] = [
-  {
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    path: () => "/",
-  },
-  {
-    label: "Executive",
-    icon: Building2,
-    path: () => "/executive",
-  },
-  {
-    label: "Projects",
-    icon: FolderKanban,
-    path: () => "/projects",
-    badge: "projects",
-  },
+  { label: "Dashboard", icon: LayoutDashboard, path: () => "/" },
+  { label: "Executive",  icon: Building2,      path: () => "/executive" },
+  { label: "Projects",   icon: FolderKanban,   path: () => "/projects", badge: "projects" },
 ];
 
 const PROJECT_NAV: NavItem[] = [
-  {
-    label: "Plan Tracker",
-    icon: CalendarCheck,
-    path: (id) => id ? `/projects/${id}/plan-tracker` : "/projects",
-    requiresProject: true,
-  },
-  {
-    label: "Trades",
-    icon: Users,
-    path: (id) => id ? `/projects/${id}/trades` : "/projects",
-    requiresProject: true,
-  },
-  {
-    label: "BIM Viewer",
-    icon: Box,
-    path: (id) => id ? `/projects/${id}/bim` : "/projects",
-    requiresProject: true,
-  },
-  {
-    label: "Progress",
-    icon: TrendingUp,
-    path: (id) => id ? `/projects/${id}/progress` : "/projects",
-    requiresProject: true,
-  },
-  {
-    label: "Forecast",
-    icon: TrendingDown,
-    path: (id) => id ? `/projects/${id}/forecast` : "/projects",
-    requiresProject: true,
-  },
-  {
-    label: "Reports",
-    icon: BarChart3,
-    path: () => "/reports",
-  },
+  { label: "Plan Tracker", icon: CalendarCheck, path: (id) => id ? `/projects/${id}/plan-tracker` : "/projects", requiresProject: true },
+  { label: "Trades",       icon: Users,         path: (id) => id ? `/projects/${id}/trades`       : "/projects", requiresProject: true },
+  { label: "BIM Viewer",   icon: Box,           path: (id) => id ? `/projects/${id}/bim`          : "/projects", requiresProject: true },
+  { label: "Progress",     icon: TrendingUp,    path: (id) => id ? `/projects/${id}/progress`     : "/projects", requiresProject: true },
+  { label: "Forecast",     icon: TrendingDown,  path: (id) => id ? `/projects/${id}/forecast`     : "/projects", requiresProject: true },
+  { label: "Reports",      icon: BarChart3,     path: () => "/reports" },
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────
@@ -110,8 +65,8 @@ export default function AppLayout() {
   const [collapsed,       setCollapsed]       = useState(false);
   const [projectDropdown, setProjectDropdown] = useState(false);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
-  const location   = useLocation();
-  const navigate   = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { projects, fetchProjects } = useProjectStore();
   const { theme, toggle: toggleTheme } = useTheme();
 
@@ -119,7 +74,6 @@ export default function AppLayout() {
     if (projects.length === 0) fetchProjects();
   }, [projects.length, fetchProjects]);
 
-  // Auto-detect project from URL
   useEffect(() => {
     const match = location.pathname.match(/\/projects\/([a-f0-9-]{36})/);
     if (match) setSelectedProject(match[1]);
@@ -134,18 +88,18 @@ export default function AppLayout() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0d1526]">
+    <div className="flex h-screen overflow-hidden bg-[var(--color-bg-primary)]">
 
-      {/* ── Sidebar ──────────────────────────────────────────────────── */}
+      {/* ── Sidebar ──────────────────────────────────────────────── */}
       <motion.aside
-        animate={{ width: collapsed ? 72 : 248 }}
+        animate={{ width: collapsed ? 64 : 240 }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
-        className="relative flex flex-col border-r border-[#2d3d54] bg-[#16213a] shrink-0"
+        className="relative flex flex-col shrink-0 bg-[var(--color-bg-secondary)] border-r border-[var(--color-border)]"
       >
         {/* Logo */}
-        <div className="flex h-16 items-center gap-3 border-b border-[#2d3d54] px-4">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-mq-500 to-mq-700 shadow-lg shadow-mq-500/30 shrink-0">
-            <Hexagon size={18} className="text-white" />
+        <div className="flex h-14 items-center gap-3 border-b border-[var(--color-border)] px-4">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-mq-500 shrink-0">
+            <Hexagon size={15} className="text-white" />
           </div>
           <AnimatePresence>
             {!collapsed && (
@@ -153,9 +107,9 @@ export default function AppLayout() {
                 initial={{ opacity: 0, width: 0 }}
                 animate={{ opacity: 1, width: "auto" }}
                 exit={{ opacity: 0, width: 0 }}
-                className="overflow-hidden whitespace-nowrap font-display text-lg font-bold tracking-tight text-white"
+                className="overflow-hidden whitespace-nowrap font-display text-sm font-bold tracking-widest text-[var(--color-text-primary)] uppercase"
               >
-                MIQYAS
+                Miqyas
               </motion.span>
             )}
           </AnimatePresence>
@@ -163,21 +117,18 @@ export default function AppLayout() {
 
         {/* Project Selector */}
         {!collapsed && (
-          <div className="border-b border-[#2d3d54] px-3 py-3">
+          <div className="border-b border-[var(--color-border)] px-3 py-2.5">
             <div className="relative">
               <button
                 onClick={() => setProjectDropdown(!projectDropdown)}
-                className="flex w-full items-center justify-between rounded-lg border border-[#2d3d54] bg-[#1e293b] px-3 py-2 text-xs text-white transition-colors hover:border-[#3f536e] hover:bg-[#263347]"
+                className="flex w-full items-center justify-between rounded-md border border-[var(--color-border)] bg-[var(--color-bg-card)] px-2.5 py-1.5 text-xs text-[var(--color-text-primary)] transition-colors hover:border-[var(--color-border-hover)]"
               >
                 <span className="truncate font-medium">
                   {currentProject?.name ?? "All Projects"}
                 </span>
                 <ChevronDown
-                  size={13}
-                  className={clsx(
-                    "text-slate-400 shrink-0 ml-1 transition-transform",
-                    projectDropdown && "rotate-180"
-                  )}
+                  size={12}
+                  className={clsx("text-[var(--color-text-muted)] shrink-0 ml-1 transition-transform", projectDropdown && "rotate-180")}
                 />
               </button>
 
@@ -187,61 +138,34 @@ export default function AppLayout() {
                     initial={{ opacity: 0, y: -4, scaleY: 0.95 }}
                     animate={{ opacity: 1, y: 0, scaleY: 1 }}
                     exit={{ opacity: 0, y: -4, scaleY: 0.95 }}
-                    className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-lg border border-[#2d3d54] bg-[#1e293b] shadow-xl shadow-black/30"
+                    className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] shadow-lg"
                     style={{ transformOrigin: "top" }}
                   >
-                    {/* All projects option */}
                     <button
-                      onClick={() => {
-                        setSelectedProject(null);
-                        setProjectDropdown(false);
-                        navigate("/");
-                      }}
-                      className={clsx(
-                        "flex w-full items-center gap-2 px-3 py-2.5 text-xs transition-colors hover:bg-[#263347]",
-                        !selectedProject ? "text-mq-400 font-medium" : "text-slate-400"
-                      )}
+                      onClick={() => { setSelectedProject(null); setProjectDropdown(false); navigate("/"); }}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-xs transition-colors hover:bg-[var(--color-bg-hover)]"
+                      style={{ color: !selectedProject ? "var(--color-accent)" : "var(--color-text-muted)" }}
                     >
-                      {!selectedProject && <Check size={11} className="text-mq-400 shrink-0" />}
-                      <span className={!selectedProject ? "ml-0" : "ml-[19px]"}>
-                        All Projects
-                      </span>
+                      {!selectedProject && <Check size={11} className="text-[var(--color-accent)] shrink-0" />}
+                      <span className={!selectedProject ? "ml-0" : "ml-[19px]"}>All Projects</span>
                     </button>
 
-                    {/* Project list */}
                     {projects.map((p) => (
                       <button
                         key={p.id}
-                        onClick={() => {
-                          setSelectedProject(p.id);
-                          setProjectDropdown(false);
-                          navigate(`/projects/${p.id}`);
-                        }}
-                        className={clsx(
-                          "flex w-full items-center gap-2 px-3 py-2.5 text-xs transition-colors hover:bg-[#263347]",
-                          selectedProject === p.id ? "text-white font-medium" : "text-slate-400"
-                        )}
+                        onClick={() => { setSelectedProject(p.id); setProjectDropdown(false); navigate(`/projects/${p.id}`); }}
+                        className="flex w-full items-center gap-2 px-3 py-2 text-xs transition-colors hover:bg-[var(--color-bg-hover)]"
+                        style={{ color: selectedProject === p.id ? "var(--color-text-primary)" : "var(--color-text-muted)" }}
                       >
-                        {selectedProject === p.id && (
-                          <Check size={11} className="text-mq-400 shrink-0" />
-                        )}
-                        <span className={clsx(
-                          "truncate",
-                          selectedProject !== p.id && "ml-[19px]"
-                        )}>
-                          {p.name}
-                        </span>
+                        {selectedProject === p.id && <Check size={11} className="text-[var(--color-accent)] shrink-0" />}
+                        <span className={clsx("truncate", selectedProject !== p.id && "ml-[19px]")}>{p.name}</span>
                       </button>
                     ))}
 
-                    {/* New project */}
-                    <div className="border-t border-[#2d3d54] p-1.5">
+                    <div className="border-t border-[var(--color-border)] p-1">
                       <button
-                        onClick={() => {
-                          setProjectDropdown(false);
-                          navigate("/projects/new");
-                        }}
-                        className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-slate-400 hover:bg-[#263347] hover:text-white transition-colors"
+                        onClick={() => { setProjectDropdown(false); navigate("/projects/new"); }}
+                        className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[var(--color-text-muted)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] transition-colors"
                       >
                         <Plus size={12} />
                         New Project
@@ -256,25 +180,25 @@ export default function AppLayout() {
 
         {/* Collapsed: project avatar */}
         {collapsed && selectedProject && (
-          <div className="border-b border-[#2d3d54] flex justify-center py-3 px-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#263347] text-[10px] font-bold text-white">
+          <div className="border-b border-[var(--color-border)] flex justify-center py-2.5 px-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-bg-card)] text-[10px] font-bold text-[var(--color-text-primary)]">
               {(currentProject?.code ?? "P").slice(0, 2).toUpperCase()}
             </div>
           </div>
         )}
 
         {/* Nav */}
-        <nav className="flex-1 overflow-y-auto space-y-0.5 px-3 py-3">
-          {/* Top nav items */}
-          {TOP_NAV.map((item) => <NavLink key={item.label} item={item} collapsed={collapsed} isActive={isActive(item)} selectedProject={selectedProject ?? undefined} />)}
+        <nav className="flex-1 overflow-y-auto space-y-0.5 px-2 py-2">
+          {TOP_NAV.map((item) => (
+            <NavLink key={item.label} item={item} collapsed={collapsed} isActive={isActive(item)} selectedProject={selectedProject ?? undefined} />
+          ))}
 
-          {/* Divider + project-specific section */}
           {!collapsed && (
-            <p className="px-3 pt-4 pb-1.5 text-[9px] font-semibold uppercase tracking-widest section-label">
+            <p className="px-3 pt-4 pb-1 text-[9px] font-semibold uppercase tracking-widest section-label">
               Project
             </p>
           )}
-          {collapsed && <div className="my-2 border-t border-slate-800/60" />}
+          {collapsed && <div className="my-2 border-t border-[var(--color-border)]" />}
 
           {PROJECT_NAV.map((item) => (
             <NavLink
@@ -289,52 +213,49 @@ export default function AppLayout() {
         </nav>
 
         {/* Bottom: settings + collapse */}
-        <div className="border-t border-[#2d3d54] px-3 py-3 space-y-1">
+        <div className="border-t border-[var(--color-border)] px-2 py-2 space-y-0.5">
           <Link
             to="/settings"
-            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 hover:bg-[#1e293b] hover:text-white transition-all"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-[var(--color-text-muted)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] transition-all"
           >
-            <Settings size={18} className="shrink-0" />
+            <Settings size={16} className="shrink-0" />
             {!collapsed && <span>Settings</span>}
           </Link>
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex w-full items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-[#1e293b] hover:text-slate-300"
+            className="flex w-full items-center justify-center rounded-md p-2 text-[var(--color-text-disabled)] transition-colors hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-muted)]"
           >
-            {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
           </button>
         </div>
       </motion.aside>
 
       {/* Click-away for project dropdown */}
       {projectDropdown && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setProjectDropdown(false)}
-        />
+        <div className="fixed inset-0 z-40" onClick={() => setProjectDropdown(false)} />
       )}
 
-      {/* ── Main Area ────────────────────────────────────────────────── */}
+      {/* ── Main Area ────────────────────────────────────────────── */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="flex h-16 items-center justify-between border-b border-[#2d3d54] bg-[#16213a] px-6 shrink-0">
-          <div className="flex items-center gap-2 text-sm text-slate-400">
+        <header className="flex h-14 items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-6 shrink-0">
+          <div className="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
             {currentProject && (
               <>
-                <Link to="/projects" className="hover:text-slate-200 transition-colors">
+                <Link to="/projects" className="hover:text-[var(--color-text-secondary)] transition-colors">
                   Projects
                 </Link>
-                <span className="text-slate-700">›</span>
+                <span className="text-[var(--color-text-disabled)]">›</span>
                 <Link
                   to={`/projects/${currentProject.id}`}
-                  className="font-medium text-slate-200 hover:text-white transition-colors"
+                  className="font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
                 >
                   {currentProject.name}
                 </Link>
               </>
             )}
             {!currentProject && (
-              <span className="font-medium text-slate-300">
+              <span className="font-medium text-[var(--color-text-secondary)]">
                 {TOP_NAV.find((n) => {
                   const p = n.path();
                   return p === "/" ? location.pathname === "/" : location.pathname.startsWith(p);
@@ -343,30 +264,31 @@ export default function AppLayout() {
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}
               title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-              className="relative flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-[#1e293b] hover:text-white transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-text-muted)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] transition-colors"
             >
-              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+              {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
             </button>
 
-            {/* Notifications */}
-            <button className="relative flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-[#1e293b] hover:text-white transition-colors">
-              <AlertTriangle size={16} />
+            {/* Alerts — dot signals active critical items */}
+            <button className="relative flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-text-muted)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] transition-colors">
+              <AlertTriangle size={15} />
+              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-[var(--color-critical)]" />
             </button>
 
             {/* Avatar */}
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-mq-500 to-mq-700 text-[11px] font-bold text-white select-none">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-mq-600 text-[11px] font-bold text-white select-none">
               MQ
             </div>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6 bg-[#0d1526]">
+        <main className="flex-1 overflow-y-auto p-6 bg-[var(--color-bg-primary)]">
           <Outlet />
         </main>
       </div>
@@ -374,14 +296,10 @@ export default function AppLayout() {
   );
 }
 
-// ── NavLink component ──────────────────────────────────────────────────────
+// ── NavLink ────────────────────────────────────────────────────────────────
 
 function NavLink({
-  item,
-  collapsed,
-  isActive,
-  selectedProject,
-  dimmed,
+  item, collapsed, isActive, selectedProject, dimmed,
 }: {
   item: NavItem;
   collapsed: boolean;
@@ -396,21 +314,21 @@ function NavLink({
       to={path}
       title={collapsed ? item.label : undefined}
       className={clsx(
-        "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
+        "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all duration-150",
         isActive
-          ? "bg-mq-500/15 text-mq-400"
+          ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
           : dimmed
-          ? "text-slate-600 hover:text-slate-500 cursor-default pointer-events-none"
-          : "text-slate-400 hover:bg-[#1e293b] hover:text-white"
+          ? "text-[var(--color-text-disabled)] cursor-default pointer-events-none"
+          : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
       )}
     >
       <item.icon
-        size={18}
+        size={16}
         className={clsx(
           "shrink-0 transition-colors",
-          isActive ? "text-mq-400" :
-          dimmed  ? "text-slate-700" :
-          "text-slate-500 group-hover:text-slate-300"
+          isActive  ? "text-[var(--color-accent)]"  :
+          dimmed    ? "text-[var(--color-text-disabled)]" :
+          "text-[var(--color-text-muted)] group-hover:text-[var(--color-text-primary)]"
         )}
       />
       <AnimatePresence>
@@ -426,18 +344,18 @@ function NavLink({
         )}
       </AnimatePresence>
 
-      {/* Active indicator */}
+      {/* Active bar — orange left edge */}
       {isActive && (
         <motion.div
           layoutId="nav-indicator"
-          className="absolute -left-3 inset-y-0 my-auto h-8 w-[3px] rounded-r-full bg-mq-500"
+          className="absolute -left-2 inset-y-0 my-auto h-6 w-[3px] rounded-r-full bg-mq-500"
           transition={{ duration: 0.2 }}
         />
       )}
 
-      {/* Tooltip for collapsed mode */}
+      {/* Tooltip — collapsed mode */}
       {collapsed && (
-        <div className="pointer-events-none absolute left-full ml-2 hidden rounded-md border border-[#2d3d54] bg-[#1e293b] px-2 py-1 text-xs text-white shadow-lg group-hover:block whitespace-nowrap">
+        <div className="pointer-events-none absolute left-full ml-2 hidden rounded-md border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-2 py-1 text-xs text-[var(--color-text-primary)] shadow-lg group-hover:block whitespace-nowrap">
           {item.label}
         </div>
       )}

@@ -1,74 +1,69 @@
 /*
   DARK THEME  (default, :root)
   ══════════════════════════════════════════════════════════════════════
-  Palette: warm steel — grounded in construction materials.
-  Accent:  construction orange (#f97316) — site vocabulary, not tech blue.
+  Palette: navy hull surfaces + blue accent.
+  Contrast audit passed: 2025-04 against WCAG 2.1 AA.
 
-  Design intent: site supervisor, 6am, spotting delays and cascades.
-  Feeling: authoritative, grounded, decisive. Not cold. Not clinical.
-
-  Key pairings (verified WCAG AA):
-    text-primary   (#f5f3f0) / bg-card   (#332d26) → 14.1 : 1  ✅ AAA
-    text-secondary (#c4bdb5) / bg-card   (#332d26) →  8.3 : 1  ✅ AAA
-    text-muted     (#8f7f70) / bg-card   (#332d26) →  4.6 : 1  ✅ AA
-    section-label  (#8f7f70) / bg-secondary (#1a1410) → 5.1 : 1 ✅ AA
-    accent-link    (#fb923c) / bg-primary (#141008) →  5.8 : 1  ✅ AA
-    accent-text    (#ffffff) / accent-solid (#ea580c) → 4.6 : 1 ✅ AA
+  Key pairings (verified):
+    text-primary   (#f1f5f9) / bg-card   (#1e293b)  → 13.35 : 1  ✅ AAA
+    text-secondary (#cbd5e1) / bg-card   (#1e293b)  →  9.85 : 1  ✅ AAA
+    text-muted     (#8b9db0) / bg-card   (#1e293b)  →  5.26 : 1  ✅ AA
+    section-label  (#7a8ea3) / bg-secondary (#16213a)→  4.74 : 1  ✅ AA
+    accent-link    (#60a5fa) / bg-primary (#0d1526)  →  7.17 : 1  ✅ AAA
+    accent-text    (#ffffff) / accent-solid (#1d6ae8) →  4.91 : 1  ✅ AA
 */
 :root {
-  /* ── Surfaces — warm steel elevation ──────────────────────── */
-  --color-bg-primary:   #141008;   /* weathered steel — page bg */
-  --color-bg-secondary: #1a1410;   /* sidebar, topbar */
-  --color-bg-card:      #332d26;   /* cards — concrete surface */
-  --color-bg-elevated:  #3d3529;   /* popovers, dropdowns */
-  --color-bg-hover:     #4a3f35;   /* hover / pressed state */
+  /* ── Surfaces ──────────────────────────────────────────────── */
+  --color-bg-primary:   #0d1526;
+  --color-bg-secondary: #16213a;
+  --color-bg-card:      #1e293b;
+  --color-bg-elevated:  #263347;
+  --color-bg-hover:     #2d3d54;
 
-  /* ── Borders — structural, not decorative ─────────────────── */
-  --color-border:        rgba(255, 255, 255, 0.08);
-  --color-border-hover:  rgba(255, 255, 255, 0.16);
-  --color-border-strong: rgba(255, 255, 255, 0.22);
+  /* ── Borders ───────────────────────────────────────────────── */
+  --color-border:        #2d3d54;
+  --color-border-hover:  #3f536e;
+  --color-border-strong: #3f536e;
 
-  /* ── Text — warm white hierarchy ──────────────────────────── */
-  --color-text-primary:   #f5f3f0;   /* 14.1 : 1 on bg-card ✅ */
-  --color-text-secondary: #c4bdb5;   /*  8.3 : 1 on bg-card ✅ */
-  --color-text-muted:     #8f7f70;   /*  4.6 : 1 on bg-card ✅ */
-  --color-text-disabled:  #4a3f35;   /* inactive UI, WCAG exempt */
-  --color-section-label:  #8f7f70;   /*  5.1 : 1 on bg-secondary ✅ */
+  /* ── Text ──────────────────────────────────────────────────── */
+  --color-text-primary:   #f1f5f9;   /* 13.35 : 1 on bg-card ✅ */
+  --color-text-secondary: #cbd5e1;   /*  9.85 : 1 on bg-card ✅ */
+  --color-text-muted:     #8b9db0;   /*  5.26 : 1 on bg-card ✅  (was #64748b = 3.07 ❌) */
+  --color-text-disabled:  #4a6080;   /* inactive UI, WCAG exempt */
+  --color-section-label:  #7a8ea3;   /*  4.74 : 1 on bg-secondary ✅  (was #475569 = 2.11 ❌) */
 
-  /* ── Accent — construction orange ─────────────────────────── */
-  --color-accent:       #f97316;
-  --color-accent-hover: #fb923c;
+  /* ── Accent ────────────────────────────────────────────────── */
+  /* Decorative / icon accent — NOT for body text or button fills */
+  --color-accent:       #3b82f6;   /* 4.95 : 1 on bg-primary ✅ (icon / indicator use) */
+  --color-accent-hover: #60a5fa;   /* 7.17 : 1 on bg-primary ✅ */
 
-  /* Filled button — white text must clear 4.5 : 1 */
-  --color-accent-solid:       #ea580c;   /* 4.6 : 1 with #fff ✅ */
-  --color-accent-solid-hover: #c2410c;
+  /* Button fills — white text must reach 4.5 : 1 */
+  --color-accent-solid:       #1d6ae8;  /* 4.91 : 1 with #fff ✅  (was #3b82f6 = 3.68 ❌) */
+  --color-accent-solid-hover: #1a5ed2;
 
-  --color-accent-text: #ffffff;
-  --color-accent-link: #fb923c;   /* 5.8 : 1 on bg-primary ✅ */
+  /* Text on top of a solid accent fill */
+  --color-accent-text: #ffffff;   /* 4.91 : 1 on accent-solid ✅ */
 
-  --color-accent-soft: rgba(249, 115, 22, 0.08);
-  --color-accent-dim:  rgba(249, 115, 22, 0.08);
+  /* Inline text links — must pass on both page and card backgrounds */
+  --color-accent-link: #60a5fa;   /* 7.17 : 1 on bg-primary ✅, 6.16 : 1 on bg-card ✅ */
 
-  --color-accent-ring: rgba(249, 115, 22, 0.50);
-  --ring-accent: 0 0 0 3px rgba(249, 115, 22, 0.50);
+  /* Soft tints for pills, active backgrounds */
+  --color-accent-soft: rgba(59, 130, 246, 0.15);
+  --color-accent-dim:  rgba(59, 130, 246, 0.15);
 
-  /* ── Semantic — construction vocabulary ───────────────────── */
-  --color-critical:     #d84141;   /* critical path — act now */
-  --color-critical-bg:  rgba(216, 65, 65, 0.12);
-  --color-warning:      #e8a932;   /* float running out */
-  --color-warning-bg:   rgba(232, 169, 50, 0.12);
-  --color-safe:         #4a9d6f;   /* on schedule, buffer intact */
-  --color-safe-bg:      rgba(74, 157, 111, 0.12);
+  /* Focus ring (3px box-shadow) */
+  --color-accent-ring: rgba(59, 130, 246, 0.50);
+  --ring-accent: 0 0 0 3px rgba(59, 130, 246, 0.50);
 
   /* ── Scrollbar ─────────────────────────────────────────────── */
-  --color-scrollbar:       #4a3f35;
-  --color-scrollbar-hover: #f97316;
+  --color-scrollbar:       #2d3d54;
+  --color-scrollbar-hover: #3f536e;
 
-  /* ── Shadows — borders do the heavy lifting here ──────────── */
-  --shadow-xs:   0 1px 2px rgba(0, 0, 0, 0.50);
-  --shadow-sm:   0 2px 4px -1px rgba(0, 0, 0, 0.45);
-  --shadow-card: 0 2px 6px -2px rgba(0, 0, 0, 0.40);
-  --shadow-md:   0 4px 12px -2px rgba(0, 0, 0, 0.50), 0 2px 4px -2px rgba(0, 0, 0, 0.30);
-  --shadow-lg:   0 12px 24px -6px rgba(0, 0, 0, 0.60), 0 4px 8px -4px rgba(0, 0, 0, 0.35);
-  --shadow-cta:  0 2px 6px -1px rgba(249, 115, 22, 0.45), 0 1px 2px rgba(0, 0, 0, 0.30);
+  /* ── Shadows ───────────────────────────────────────────────── */
+  --shadow-xs:   0 1px 2px rgba(0, 0, 0, 0.40);
+  --shadow-sm:   0 2px 4px -1px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.35);
+  --shadow-md:   0 4px 12px -2px rgba(0, 0, 0, 0.40), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
+  --shadow-lg:   0 12px 24px -6px rgba(0, 0, 0, 0.50), 0 4px 8px -4px rgba(0, 0, 0, 0.30);
+  --shadow-cta:  0 2px 6px -1px rgba(29, 106, 232, 0.50), 0 1px 2px rgba(0,0,0,0.3);
 }

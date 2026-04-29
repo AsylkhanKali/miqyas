@@ -1,12 +1,8 @@
 /**
- * ActionsPanel — the signature MIQYAS component.
+ * ActionsPanel — "what to do today" call-to-action widget.
  *
- * Delay callouts strip names the affected work with days of slip.
- * Each action row echoes its critical-path impact inline —
- * making the connection between "what's delayed" and "what to do" explicit.
- *
- * Design intent: site supervisor scans threats in <3 seconds.
- * Red = act now. Amber = float running out. Orange = scheduled.
+ * Shows prioritised action items and urgency delay callouts.
+ * Fake data until backend analytics surfaces actionable insights.
  */
 
 import { Link } from "react-router-dom";
@@ -21,8 +17,6 @@ export interface ActionItem {
   project: string;
   cta: string;
   href: string;
-  /** Days behind on critical path — shown as a CP tag on the row */
-  cpDays?: number;
 }
 
 export interface DelayCallout {
@@ -33,22 +27,19 @@ export interface DelayCallout {
 
 const PRIORITY = {
   critical: {
-    dot:     "bg-[var(--color-critical)]",
-    color:   "var(--color-critical)",
-    bg:      "var(--color-critical-bg)",
-    icon:    AlertTriangle,
+    dot:       "bg-red-500",
+    badge:     "bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20",
+    icon:      AlertTriangle,
   },
   warning: {
-    dot:     "bg-[var(--color-warning)]",
-    color:   "var(--color-warning)",
-    bg:      "var(--color-warning-bg)",
-    icon:    RefreshCw,
+    dot:       "bg-amber-500",
+    badge:     "bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/20",
+    icon:      RefreshCw,
   },
   info: {
-    dot:     "bg-[var(--color-accent)]",
-    color:   "var(--color-accent)",
-    bg:      "var(--color-accent-soft)",
-    icon:    Eye,
+    dot:       "bg-mq-500",
+    badge:     "bg-mq-500/10 border-mq-500/20 text-mq-400 hover:bg-mq-500/20",
+    icon:      Eye,
   },
 };
 
@@ -65,21 +56,19 @@ export const FAKE_ACTIONS: ActionItem[] = [
     id: "a1",
     priority: "critical",
     title: "Reinspect slab Level 4",
-    sub: "Rebar 61% vs 85% planned — behind critical path",
+    sub: "Rebar 61% vs 85% planned — 8 days behind critical path",
     project: "Aldaar Square · Abu Dhabi",
     cta: "View in BIM",
     href: "/projects",
-    cpDays: 8,
   },
   {
     id: "a2",
     priority: "critical",
     title: "Review Wall Works Tower A",
-    sub: "Block B partitions 62% complete",
+    sub: "Block B partitions 62% complete, 18 days delayed",
     project: "Bloom Living Phase 2 · Abu Dhabi",
     cta: "Open report",
     href: "/projects",
-    cpDays: 18,
   },
   {
     id: "a3",
@@ -89,7 +78,6 @@ export const FAKE_ACTIONS: ActionItem[] = [
     project: "Aldaar HQ · Abu Dhabi",
     cta: "View details",
     href: "/projects",
-    cpDays: 12,
   },
   {
     id: "a4",
@@ -125,67 +113,37 @@ export default function ActionsPanel({
   const criticalCount = items.filter((i) => i.priority === "critical").length;
 
   return (
-    <div
-      className={clsx("rounded-xl overflow-hidden", className)}
-      style={{
-        backgroundColor: "var(--color-bg-card)",
-        border: "1px solid var(--color-border)",
-      }}
-    >
+    <div className={clsx("rounded-xl border border-[#2d3d54] bg-[#16213a] overflow-hidden", className)}>
+
       {/* Header */}
-      <div
-        className="flex items-center justify-between px-5 py-3"
-        style={{ borderBottom: "1px solid var(--color-border)" }}
-      >
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#2d3d54]">
         <div className="flex items-center gap-2">
-          <Zap size={13} style={{ color: "var(--color-warning)" }} />
-          <span className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
-            Actions Required
-          </span>
+          <Zap size={14} className="text-amber-400" />
+          <span className="text-sm font-semibold text-white">Actions Required</span>
           {criticalCount > 0 && (
-            <span
-              className="rounded-full border px-2 py-0.5 text-[10px] font-bold"
-              style={{
-                backgroundColor: "var(--color-critical-bg)",
-                borderColor:     "var(--color-critical)",
-                color:           "var(--color-critical)",
-              }}
-            >
+            <span className="rounded-full bg-red-500/15 border border-red-500/20 px-2 py-0.5 text-[10px] font-bold text-red-400">
               {criticalCount} critical
             </span>
           )}
         </div>
-        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-          {items.length} items today
-        </span>
+        <span className="text-[10px] text-slate-500">{items.length} items today</span>
       </div>
 
-      {/* Delay callout strip — the signature element */}
+      {/* Urgency delay callouts */}
       {delays.length > 0 && (
-        <div
-          className="flex items-center gap-2 overflow-x-auto px-5 py-2 scrollbar-none"
-          style={{
-            borderBottom: "1px solid var(--color-border)",
-            /* right-edge fade to signal overflow */
-            maskImage: "linear-gradient(to right, black 85%, transparent 100%)",
-            WebkitMaskImage: "linear-gradient(to right, black 85%, transparent 100%)",
-          }}
-        >
-          <span
-            className="shrink-0 flex items-center gap-1 text-xs font-medium"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            <Clock size={10} /> Delays:
+        <div className="flex items-center gap-2 overflow-x-auto px-5 py-2.5 border-b border-[#1e2d42] scrollbar-none">
+          <span className="shrink-0 flex items-center gap-1 text-[10px] text-slate-600 font-medium">
+            <Clock size={9} /> Delays:
           </span>
           {delays.map((d, i) => (
             <span
               key={i}
-              className="shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap"
-              style={{
-                backgroundColor: d.critical ? "var(--color-critical-bg)" : "var(--color-warning-bg)",
-                borderColor:     d.critical ? "var(--color-critical)"    : "var(--color-warning)",
-                color:           d.critical ? "var(--color-critical)"    : "var(--color-warning)",
-              }}
+              className={clsx(
+                "shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-medium whitespace-nowrap",
+                d.critical
+                  ? "bg-red-500/10 border-red-500/20 text-red-400"
+                  : "bg-amber-500/10 border-amber-500/20 text-amber-400"
+              )}
             >
               {d.label} <span className="font-bold">{d.days}d</span>
             </span>
@@ -193,76 +151,35 @@ export default function ActionsPanel({
         </div>
       )}
 
-      {/* Action rows */}
-      <div>
-        {items.map((item, idx) => {
+      {/* Action items */}
+      <div className="divide-y divide-[#1a2535]">
+        {items.map((item) => {
           const p    = PRIORITY[item.priority];
           const Icon = p.icon;
 
           return (
             <div
               key={item.id}
-              className="flex items-center gap-3 px-5 py-3 transition-colors"
-              style={{
-                borderTop: idx > 0 ? "1px solid var(--color-border)" : undefined,
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.backgroundColor = "var(--color-bg-hover)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent";
-              }}
+              className="flex items-center gap-3 px-5 py-3.5 hover:bg-[#1a2740] transition-colors"
             >
               {/* Priority dot */}
               <span className={clsx("mt-1 h-2 w-2 shrink-0 self-start rounded-full", p.dot)} />
 
               {/* Content */}
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p
-                    className="text-sm font-medium leading-snug"
-                    style={{ color: "var(--color-text-primary)" }}
-                  >
-                    {item.title}
-                  </p>
-                  {/* CP tag — threads delay strip to action row */}
-                  {item.cpDays != null && (
-                    <span
-                      className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold font-mono tracking-tight border"
-                      style={{
-                        backgroundColor: "var(--color-critical-bg)",
-                        borderColor:     "var(--color-critical)",
-                        color:           "var(--color-critical)",
-                      }}
-                    >
-                      CP · {item.cpDays}d
-                    </span>
-                  )}
-                </div>
-                <p
-                  className="mt-0.5 text-xs leading-snug"
-                  style={{ color: "var(--color-text-secondary)" }}
-                >
-                  {item.sub}
-                </p>
-                <p
-                  className="mt-0.5 text-[10px] font-mono"
-                  style={{ color: "var(--color-text-muted)" }}
-                >
-                  {item.project}
-                </p>
+                <p className="text-sm font-medium text-white leading-snug">{item.title}</p>
+                <p className="mt-0.5 text-[11px] leading-snug text-slate-400">{item.sub}</p>
+                <p className="mt-0.5 text-[10px] font-mono text-slate-600">{item.project}</p>
               </div>
 
-              {/* CTA */}
+              {/* CTA button */}
               <Link
                 to={item.href}
                 onClick={(e) => e.stopPropagation()}
-                className="shrink-0 flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-xs font-medium whitespace-nowrap transition-opacity hover:opacity-80"
-                style={{
-                  backgroundColor: p.bg,
-                  borderColor:     p.color,
-                  color:           p.color,
-                }}
+                className={clsx(
+                  "shrink-0 flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium whitespace-nowrap transition-colors",
+                  p.badge
+                )}
               >
                 <Icon size={10} />
                 {item.cta}

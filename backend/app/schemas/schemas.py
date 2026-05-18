@@ -319,3 +319,62 @@ class InvestorDashboard(BaseModel):
 
     # Timestamp
     generated_at: datetime
+
+
+# ── Webhooks ─────────────────────────────────────────────────────────────
+
+WEBHOOK_EVENTS = {
+    "progress.updated",    # progress items recalculated for a project
+    "report.ready",        # PDF report generation complete
+    "capture.analyzed",    # full CV pipeline finished for a capture
+    "deviation.critical",  # element flagged as critically behind schedule
+}
+
+
+class WebhookCreate(BaseModel):
+    url: str = Field(..., description="HTTPS endpoint to POST events to")
+    events: list[str] = Field(..., description=f"Events to subscribe to: {sorted(WEBHOOK_EVENTS)}")
+    project_id: UUID | None = Field(None, description="Scope to a specific project, or null for all projects")
+
+
+class WebhookResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    url: str
+    events: list[str]
+    project_id: UUID | None
+    is_active: bool
+    last_triggered_at: datetime | None
+    created_at: datetime
+
+
+class WebhookCreatedResponse(WebhookResponse):
+    """Returned only on creation — includes the signing secret (shown once)."""
+    secret: str
+
+
+# ── API Keys ─────────────────────────────────────────────────────────────
+
+class ApiKeyCreate(BaseModel):
+    name: str = Field(..., max_length=255, description="Human-readable label, e.g. 'SAP EAM Production'")
+    scopes: list[str] = Field(default=["read"], description="Permissions: read, write, webhooks")
+    expires_at: datetime | None = Field(None, description="Optional expiry. Null = never expires")
+
+
+class ApiKeyResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    name: str
+    key_prefix: str
+    scopes: list[str]
+    is_active: bool
+    last_used_at: datetime | None
+    expires_at: datetime | None
+    created_at: datetime
+
+
+class ApiKeyCreatedResponse(ApiKeyResponse):
+    """Returned only on creation — includes the full key (shown once)."""
+    key: str

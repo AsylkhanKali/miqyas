@@ -7,6 +7,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.v1.acc import router as acc_router
+from app.api.v1.api_keys import router as api_keys_router
+from app.api.v1.webhooks import router as webhooks_router
 from app.api.v1.bim import router as bim_router
 from app.api.v1.captures import router as captures_router
 from app.api.v1.cv_pipeline import router as cv_router
@@ -390,3 +393,6 @@ api_router.include_router(cv_router)
 api_router.include_router(pipeline_router)
 api_router.include_router(reports_router)
 api_router.include_router(procore_router)
+api_router.include_router(acc_router)
+api_router.include_router(api_keys_router)
+api_router.include_router(webhooks_router)

@@ -361,6 +361,57 @@ export interface WeeklyPlanActivity {
   level?: string;
 }
 
+// ── Autodesk Construction Cloud ──────────────────────────────────────────
+
+export interface AccConfig {
+  project_id: string;
+  acc_hub_id: string | null;
+  acc_project_id: string | null;
+  is_active: boolean;
+  field_mapping: Record<string, string>;
+}
+
+export interface AccPushLog {
+  id: string;
+  acc_issue_id: string | null;
+  success: boolean;
+  status: number | null;
+  created_at: string;
+}
+
+// ── API Keys ──────────────────────────────────────────────────────────────
+
+export interface ApiKey {
+  id: string;
+  name: string;
+  key_prefix: string;
+  scopes: string[];
+  is_active: boolean;
+  last_used_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+}
+
+export interface ApiKeyCreated extends ApiKey {
+  key: string;
+}
+
+// ── Webhooks ──────────────────────────────────────────────────────────────
+
+export interface Webhook {
+  id: string;
+  url: string;
+  events: string[];
+  project_id: string | null;
+  is_active: boolean;
+  last_triggered_at: string | null;
+  created_at: string;
+}
+
+export interface WebhookCreated extends Webhook {
+  secret: string;
+}
+
 // ── Wizard ──────────────────────────────────────────────────────────────
 
 export interface WizardState {

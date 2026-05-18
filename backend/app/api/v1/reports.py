@@ -102,6 +102,14 @@ async def generate_report(
         await db.rollback()
         raise HTTPException(status_code=500, detail=f"Report generation failed: {e}")
 
+    from app.services.webhook_service import dispatch as webhook_dispatch
+    await webhook_dispatch(db, "report.ready", {
+        "report_id": str(report.id),
+        "project_id": str(report.project_id),
+        "report_type": report.report_type,
+        "title": report.title,
+    }, project_id=report.project_id)
+
     return ReportResponse(
         id=str(report.id),
         project_id=str(report.project_id),

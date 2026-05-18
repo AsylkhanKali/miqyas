@@ -128,9 +128,52 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title=settings.project_name,
-    description="AI-Powered Construction Progress Tracking Platform",
-    version="0.1.0",
+    title="MIQYAS API",
+    description="""
+## AI-Powered Construction Progress Tracking
+
+MIQYAS monitors construction sites by comparing 360° video footage against BIM models and P6 schedules, automatically detecting deviations and pushing alerts to project management systems.
+
+### Core Workflows
+
+1. **Upload** — IFC model + P6 schedule + 360° video
+2. **Analyze** — CV pipeline segments frames, compares against BIM expected masks, computes IoU per element
+3. **Report** — deviation breakdown, executive summary PDF, element-level progress items
+4. **Integrate** — push RFIs/Issues to Procore (OAuth2); webhook events for EAM/CMMS systems
+
+### Authentication
+
+Currently session-based (internal). API key authentication for third-party integrations coming in v2.
+
+### Integrations
+
+| System | Status |
+|--------|--------|
+| Procore | ✅ OAuth2 + bulk RFI/Issue push |
+| SAP EAM | 🔜 Planned |
+| Oracle Primavera Unifier | 🔜 Planned |
+| Webhooks (generic) | 🔜 Planned |
+
+### Support
+
+Contact: [Miqyasdev@gmail.com](mailto:Miqyasdev@gmail.com)
+""",
+    version="1.0.0",
+    contact={"name": "MIQYAS Team", "email": "Miqyasdev@gmail.com"},
+    openapi_tags=[
+        {"name": "projects", "description": "Project CRUD and dashboard stats"},
+        {"name": "bim", "description": "BIM model upload, element listing, IFC file access"},
+        {"name": "schedules", "description": "P6 XER/XML schedule upload, activities, WBS"},
+        {"name": "captures", "description": "360° video upload, frame extraction, COLMAP alignment"},
+        {"name": "cv-pipeline", "description": "Segmentation, IoU comparison, progress items"},
+        {"name": "pipeline", "description": "Full end-to-end analysis pipeline (Celery)"},
+        {"name": "reports", "description": "PDF report generation and download"},
+        {"name": "procore", "description": "Procore OAuth2, RFI/Issue push, field mapping"},
+        {"name": "acc", "description": "Autodesk Construction Cloud OAuth2, Issue push, hub/project discovery"},
+        {"name": "api-keys", "description": "Create and revoke API keys for third-party integrations"},
+        {"name": "webhooks", "description": "Register endpoints to receive real-time event notifications (HMAC-signed)"},
+        {"name": "system", "description": "Health check, capabilities, metrics"},
+    ],
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",

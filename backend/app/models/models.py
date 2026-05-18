@@ -144,6 +144,8 @@ class Project(Base):
     captures = relationship("VideoCapture", back_populates="project", cascade="all, delete-orphan")
     reports = relationship("Report", back_populates="project", cascade="all, delete-orphan")
     procore_config = relationship("ProcoreConfig", back_populates="project", uselist=False)
+    acc_config = relationship("AccConfig", back_populates="project", uselist=False)
+    webhooks = relationship("Webhook", back_populates="project", cascade="all, delete-orphan")
 
 
 # ── 2. BIM / IFC ────────────────────────────────────────────────────────
@@ -548,3 +550,79 @@ class ProcorePushLog(Base):
     updated_at = Column("updated_at", DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     config = relationship("ProcoreConfig", back_populates="push_logs")
+
+
+# ── 11. Webhooks ───────────────────────────────────────────────────────
+
+class Webhook(Base):
+    """Registered webhook endpoints for third-party integrations."""
+    __tablename__ = "webhooks"
+
+    id = pk()
+    url = Column(String(2048), nullable=False)
+    secret = Column(String(64), nullable=False)     # HMAC-SHA256 signing secret
+    events = Column(JSONB, default=list)            # ["progress.updated", "report.ready", ...]
+    project_id = Column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=True)
+    is_active = Column(Boolean, default=True, nullable=False)
+    last_triggered_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column("created_at", DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column("updated_at", DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    project = relationship("Project", back_populates="webhooks")
+
+
+# ── 12. Autodesk Construction Cloud (ACC) ──────────────────────────────
+
+class AccConfig(Base):
+    """OAuth2 tokens and mapping config for a project's ACC integration."""
+    __tablename__ = "acc_configs"
+
+    id = pk()
+    project_id = Column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, unique=True)
+    acc_hub_id = Column(String(200), nullable=True)          # Autodesk hub (account) ID
+    acc_project_id = Column(String(200), nullable=True)      # ACC project ID
+    access_token = Column(Text, nullable=True)
+    refresh_token = Column(Text, nullable=True)
+    token_expires_at = Column(DateTime(timezone=True), nullable=True)
+    field_mapping = Column(JSONB, default=dict)
+    is_active = Column(Boolean, default=False)
+    created_at = Column("created_at", DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column("updated_at", DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    project = relationship("Project", back_populates="acc_config")
+    push_logs = relationship("AccPushLog", back_populates="config", cascade="all, delete-orphan")
+
+
+class AccPushLog(Base):
+    """Audit log for items pushed to Autodesk Construction Cloud."""
+    __tablename__ = "acc_push_logs"
+
+    id = pk()
+    config_id = Column(UUID(as_uuid=True), ForeignKey("acc_configs.id", ondelete="CASCADE"), nullable=False, index=True)
+    acc_issue_id = Column(String(200), nullable=True)
+    payload = Column(JSONB, default=dict)
+    response_status = Column(Integer, nullable=True)
+    response_body = Column(JSONB, default=dict)
+    success = Column(Boolean, default=False)
+    created_at = Column("created_at", DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column("updated_at", DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    config = relationship("AccConfig", back_populates="push_logs")
+
+
+# ── 13. API Keys ────────────────────────────────────────────────────────
+
+class ApiKey(Base):
+    """API keys for third-party integrations (EAM, CMMS, webhooks)."""
+    __tablename__ = "api_keys"
+
+    id = pk()
+    name = Column(String(255), nullable=False)
+    key_prefix = Column(String(8), nullable=False)          # e.g. "mq_live_a"
+    key_hash = Column(String(64), nullable=False, unique=True)  # SHA-256 of full key
+    scopes = Column(JSONB, default=list)                    # ["read", "write", "webhooks"]
+    is_active = Column(Boolean, default=True, nullable=False)
+    last_used_at = Column(DateTime(timezone=True), nullable=True)
+    expires_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column("created_at", DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column("updated_at", DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)

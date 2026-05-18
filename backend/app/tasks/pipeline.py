@@ -166,6 +166,43 @@ def run_full_analysis_task(
                 await session.commit()
                 status.complete_step({"progress_items": item_count})
 
+                # ── Webhooks ─────────────────────────────────────────
+                from sqlalchemy import select as sa_select
+                from app.models import VideoCapture, ProgressItem
+                from app.services.webhook_service import dispatch as webhook_dispatch
+
+                capture = await session.get(VideoCapture, UUID(capture_id))
+                project_id = capture.project_id if capture else None
+
+                await webhook_dispatch(session, "capture.analyzed", {
+                    "capture_id": capture_id,
+                    "project_id": str(project_id),
+                    "frames": frame_count,
+                    "progress_items": item_count,
+                }, project_id=project_id)
+
+                await webhook_dispatch(session, "progress.updated", {
+                    "capture_id": capture_id,
+                    "project_id": str(project_id),
+                    "item_count": item_count,
+                }, project_id=project_id)
+
+                # Fire deviation.critical if any behind items exist
+                behind_result = await session.execute(
+                    sa_select(ProgressItem).where(
+                        ProgressItem.capture_id == UUID(capture_id),
+                        ProgressItem.deviation_type == "behind",
+                    ).limit(10)
+                )
+                behind_items = behind_result.scalars().all()
+                if behind_items:
+                    await webhook_dispatch(session, "deviation.critical", {
+                        "capture_id": capture_id,
+                        "project_id": str(project_id),
+                        "critical_count": len(behind_items),
+                        "element_ids": [str(i.bim_element_id) for i in behind_items],
+                    }, project_id=project_id)
+
                 logger.info(
                     f"Full analysis pipeline complete: "
                     f"{frame_count} frames → {seg_count} segmented → "

@@ -1,5 +1,9 @@
 import axios from "axios";
 import type {
+  AccConfig,
+  AccPushLog,
+  ApiKey,
+  ApiKeyCreated,
   Activity,
   BIMElement,
   BIMModel,
@@ -22,6 +26,8 @@ import type {
   Schedule,
   TaskStatus,
   VideoCapture,
+  Webhook,
+  WebhookCreated,
 } from "@/types";
 
 const api = axios.create({
@@ -265,6 +271,67 @@ export const procoreApi = {
     api.get<{ task_id: string; state: string; result?: object; error?: string }>(
       `/projects/${projectId}/procore/tasks/${taskId}`,
     ),
+};
+
+// ── Autodesk Construction Cloud ───────────────────────────────────────
+
+export const accApi = {
+  getAuthUrl: (projectId: string) =>
+    api.get<{ url: string }>(`/projects/${projectId}/acc/auth-url`),
+
+  getConfig: (projectId: string) =>
+    api.get<AccConfig>(`/projects/${projectId}/acc/config`),
+
+  updateConfig: (projectId: string, data: Partial<AccConfig>) =>
+    api.patch(`/projects/${projectId}/acc/config`, data),
+
+  disconnect: (projectId: string) =>
+    api.delete(`/projects/${projectId}/acc/disconnect`),
+
+  listHubs: (projectId: string) =>
+    api.get<{ id: string; name: string }[]>(`/projects/${projectId}/acc/hubs`),
+
+  listProjects: (projectId: string, hubId: string) =>
+    api.get<{ id: string; name: string }[]>(`/projects/${projectId}/acc/projects-list`, {
+      params: { hub_id: hubId },
+    }),
+
+  push: (projectId: string, itemIds: string[]) =>
+    api.post<{ task_id: string; queued: number }>(`/projects/${projectId}/acc/push`, {
+      progress_item_ids: itemIds,
+    }),
+
+  getPushLogs: (projectId: string) =>
+    api.get<AccPushLog[]>(`/projects/${projectId}/acc/push-logs`),
+};
+
+// ── API Keys ──────────────────────────────────────────────────────────
+
+export const apiKeysApi = {
+  list: () =>
+    api.get<ApiKey[]>("/api-keys"),
+
+  create: (data: { name: string; scopes: string[] }) =>
+    api.post<ApiKeyCreated>("/api-keys", data),
+
+  revoke: (id: string) =>
+    api.delete(`/api-keys/${id}`),
+};
+
+// ── Webhooks ──────────────────────────────────────────────────────────
+
+export const webhooksApi = {
+  list: () =>
+    api.get<Webhook[]>("/webhooks"),
+
+  create: (data: { url: string; events: string[]; project_id?: string }) =>
+    api.post<WebhookCreated>("/webhooks", data),
+
+  delete: (id: string) =>
+    api.delete(`/webhooks/${id}`),
+
+  test: (id: string) =>
+    api.post(`/webhooks/${id}/test`),
 };
 
 // ── System ────────────────────────────────────────────────────────────

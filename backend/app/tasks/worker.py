@@ -40,6 +40,7 @@ celery_app.conf.update(
         "app.tasks.video_tasks.*": {"queue": "video"},
         "app.tasks.cv_tasks.*": {"queue": "gpu"},
         "app.tasks.procore_tasks.*": {"queue": "default"},
+        "app.tasks.webhook_tasks.*": {"queue": "default"},
     },
 
     # Per-task tighter limits for lightweight tasks so they don't block the
@@ -62,3 +63,5 @@ import app.tasks.video_tasks     # noqa: F401
 import app.tasks.cv_tasks        # noqa: F401
 import app.tasks.pipeline        # noqa: F401
 import app.tasks.procore_tasks   # noqa: F401
+import app.tasks.webhook_tasks   # noqa: F401
+import app.tasks.acc_tasks        # noqa: F401

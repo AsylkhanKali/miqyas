@@ -68,6 +68,11 @@ class Settings(BaseSettings):
     procore_client_secret: str = ""
     procore_redirect_uri: str = ""
 
+    # Autodesk Construction Cloud (ACC)
+    acc_client_id: str = ""
+    acc_client_secret: str = ""
+    acc_redirect_uri: str = ""
+
     # Sentry
     sentry_dsn: str = ""
     sentry_environment: str = "development"

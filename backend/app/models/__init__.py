@@ -1,7 +1,11 @@
 """Re-export all ORM models for convenient imports."""
 
 from app.models.models import (
+    AccConfig,
+    AccPushLog,
+    ApiKey,
     Activity,
+    Webhook,
     ActivityRelationship,
     ActivityStatus,
     AlignmentMethod,
@@ -30,6 +34,10 @@ from app.models.models import (
 )
 
 __all__ = [
+    "AccConfig",
+    "AccPushLog",
+    "ApiKey",
+    "Webhook",
     "Activity",
     "ActivityRelationship",
     "ActivityStatus",

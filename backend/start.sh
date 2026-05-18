@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+# Run DB migrations before starting (idempotent, safe on redeploy)
+echo "Running database migrations..."
+alembic upgrade head
+echo "Migrations complete."
+
 # Start Celery worker in background.
 #
 # Memory constraints on Railway (shared container with FastAPI):

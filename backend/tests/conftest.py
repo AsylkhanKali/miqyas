@@ -46,11 +46,17 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 @pytest_asyncio.fixture
-async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
-    """Async test client with overridden DB dependency."""
+async def client() -> AsyncGenerator[AsyncClient, None]:
+    """Async test client that mirrors production session lifecycle (commit per request)."""
 
     async def override_get_db():
-        yield db_session
+        async with test_session_factory() as session:
+            try:
+                yield session
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise
 
     app.dependency_overrides[get_db] = override_get_db
     transport = ASGITransport(app=app)

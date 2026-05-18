@@ -4,10 +4,9 @@ import hashlib
 import hmac
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import httpx
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.config import get_settings
@@ -48,7 +47,7 @@ async def _deliver(task, webhook_id: str, event: str, payload: dict) -> dict:
 
             body = json.dumps({
                 "event": event,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
                 "data": payload,
             }).encode()
 
@@ -66,7 +65,7 @@ async def _deliver(task, webhook_id: str, event: str, payload: dict) -> dict:
                 )
                 resp.raise_for_status()
 
-            hook.last_triggered_at = datetime.now(timezone.utc)
+            hook.last_triggered_at = datetime.now(UTC)
             await db.commit()
 
             logger.info(f"Webhook delivered: {event} → {hook.url} [{resp.status_code}]")

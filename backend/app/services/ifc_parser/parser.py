@@ -23,7 +23,6 @@ import ifcopenshell
 import ifcopenshell.geom
 import ifcopenshell.util.element
 import ifcopenshell.util.placement
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import BIMElement, BIMModel, ElementCategory
@@ -443,7 +442,7 @@ class IFCParserService:
                     if k == "id":
                         continue
                     # Convert non-serializable values to strings
-                    if isinstance(v, (str, int, float, bool, type(None))):
+                    if isinstance(v, (str, int, float, bool, type(None))):  # noqa: UP038
                         cleaned[k] = v
                     else:
                         cleaned[k] = str(v)
@@ -471,14 +470,14 @@ class IFCParserService:
                     for k, v in pset_values.items():
                         if k == "id":
                             continue
-                        if isinstance(v, (int, float)) and not isinstance(v, bool):
+                        if isinstance(v, (int, float)) and not isinstance(v, bool):  # noqa: UP038
                             quantities[k] = v
                 else:
                     # Harvest numeric quantity-looking fields from other psets
                     for k, v in pset_values.items():
                         if k == "id" or k in quantities:
                             continue
-                        if isinstance(v, (int, float)) and not isinstance(v, bool):
+                        if isinstance(v, (int, float)) and not isinstance(v, bool):  # noqa: UP038
                             if any(tok in k for tok in quantity_tokens):
                                 quantities[k] = v
         except Exception as e:

@@ -16,7 +16,6 @@ Tables cover the entire MVP:
 
 import enum
 import uuid
-from datetime import date, datetime
 
 from sqlalchemy import (
     Boolean,
@@ -28,7 +27,6 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
-    JSON,
     String,
     Text,
     UniqueConstraint,
@@ -38,7 +36,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.core.database import Base
-
 
 # ── Helper ──────────────────────────────────────────────────────────────
 

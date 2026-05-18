@@ -1,7 +1,7 @@
 """API Key authentication dependency."""
 
 import hashlib
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import HTTPException, Security
 from fastapi.security import APIKeyHeader
@@ -32,10 +32,10 @@ async def require_api_key(
     if not api_key or not api_key.is_active:
         raise HTTPException(status_code=401, detail="Invalid or revoked API key")
 
-    if api_key.expires_at and api_key.expires_at < datetime.now(timezone.utc):
+    if api_key.expires_at and api_key.expires_at < datetime.now(UTC):
         raise HTTPException(status_code=401, detail="API key expired")
 
-    api_key.last_used_at = datetime.now(timezone.utc)
+    api_key.last_used_at = datetime.now(UTC)
     await db.commit()
 
     return api_key

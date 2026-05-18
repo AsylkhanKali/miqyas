@@ -11,7 +11,7 @@ The resulting transformation matrix maps from camera coordinates to BIM coordina
 """
 
 import logging
-from typing import Any
+from typing import Any  # noqa: F401
 from uuid import UUID
 
 import numpy as np
@@ -20,8 +20,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import (
     AlignmentMethod,
     CameraAlignment,
-    CameraPose,
-    Frame,
+    CameraPose,  # noqa: F401
+    Frame,  # noqa: F401
     VideoCapture,
     VideoStatus,
 )

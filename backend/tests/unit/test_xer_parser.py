@@ -7,7 +7,6 @@ import pytest
 
 from app.services.p6_parser.parser import XERFileParser
 
-
 SAMPLE_XER = """%T\tPROJECT
 %F\tproj_id\tproj_short_name\tplan_start_date\tplan_end_date\tlast_recalc_date
 %R\t1001\tTEST_PROJECT\t2026-01-01 00:00\t2026-12-31 00:00\t2026-03-15 00:00

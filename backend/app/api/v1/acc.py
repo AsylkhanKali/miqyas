@@ -47,7 +47,7 @@ async def get_auth_url(project_id: UUID, db: AsyncSession = Depends(get_db)):
 @router.get("/callback")
 async def oauth_callback(project_id: UUID, code: str, db: AsyncSession = Depends(get_db)):
     client = AccClient(db)
-    config = await client.exchange_code(code, project_id)
+    await client.exchange_code(code, project_id)
     await db.commit()
     return {"message": "ACC connected", "project_id": str(project_id)}
 
@@ -157,7 +157,7 @@ async def get_push_logs(project_id: UUID, limit: int = 50, db: AsyncSession = De
     )
     logs = logs_result.scalars().all()
     return [
-        {"id": str(l.id), "acc_issue_id": l.acc_issue_id, "success": l.success,
-         "status": l.response_status, "created_at": l.created_at.isoformat()}
-        for l in logs
+        {"id": str(log.id), "acc_issue_id": log.acc_issue_id, "success": log.success,
+         "status": log.response_status, "created_at": log.created_at.isoformat()}
+        for log in logs
     ]

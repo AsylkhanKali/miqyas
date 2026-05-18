@@ -9,7 +9,7 @@ API reference: https://aps.autodesk.com/en/docs/construction/v1/reference/http/i
 
 import logging
 import uuid as _uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -76,7 +76,7 @@ class AccClient:
             resp.raise_for_status()
             token_data = resp.json()
 
-        expires_at = datetime.now(timezone.utc) + timedelta(seconds=token_data["expires_in"])
+        expires_at = datetime.now(UTC) + timedelta(seconds=token_data["expires_in"])
 
         result = await self.db.execute(select(AccConfig).where(AccConfig.project_id == project_id))
         config = result.scalar_one_or_none()
@@ -117,12 +117,12 @@ class AccClient:
 
         config.access_token = token_data["access_token"]
         config.refresh_token = token_data.get("refresh_token", config.refresh_token)
-        config.token_expires_at = datetime.now(timezone.utc) + timedelta(seconds=token_data["expires_in"])
+        config.token_expires_at = datetime.now(UTC) + timedelta(seconds=token_data["expires_in"])
         await self.db.flush()
         return config
 
     async def _get_valid_token(self, config: AccConfig) -> str:
-        if config.token_expires_at and config.token_expires_at - TOKEN_EXPIRY_BUFFER < datetime.now(timezone.utc):
+        if config.token_expires_at and config.token_expires_at - TOKEN_EXPIRY_BUFFER < datetime.now(UTC):
             config = await self._refresh_token(config)
         return config.access_token
 

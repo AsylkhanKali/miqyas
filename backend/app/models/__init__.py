@@ -3,12 +3,11 @@
 from app.models.models import (
     AccConfig,
     AccPushLog,
-    ApiKey,
     Activity,
-    Webhook,
     ActivityRelationship,
     ActivityStatus,
     AlignmentMethod,
+    ApiKey,
     BIMElement,
     BIMModel,
     CameraAlignment,
@@ -31,6 +30,7 @@ from app.models.models import (
     VideoCapture,
     VideoStatus,
     WBSNode,
+    Webhook,
 )
 
 __all__ = [

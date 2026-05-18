@@ -168,7 +168,8 @@ def run_full_analysis_task(
 
                 # ── Webhooks ─────────────────────────────────────────
                 from sqlalchemy import select as sa_select
-                from app.models import VideoCapture, ProgressItem
+
+                from app.models import ProgressItem, VideoCapture
                 from app.services.webhook_service import dispatch as webhook_dispatch
 
                 capture = await session.get(VideoCapture, UUID(capture_id))

@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.models import Webhook
-from app.schemas import WebhookCreate, WebhookCreatedResponse, WebhookResponse, WEBHOOK_EVENTS
+from app.schemas import WEBHOOK_EVENTS, WebhookCreate, WebhookCreatedResponse, WebhookResponse
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 

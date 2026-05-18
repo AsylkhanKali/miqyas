@@ -2,12 +2,9 @@
 
 import hashlib
 import hmac
-import json
 import logging
-from datetime import datetime, timezone
 from uuid import UUID
 
-import httpx
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,11 +24,11 @@ async def dispatch(
     project_id: UUID | None = None,
 ) -> None:
     """Find matching webhooks and enqueue delivery via Celery."""
-    query = select(Webhook).where(Webhook.is_active == True)
+    query = select(Webhook).where(Webhook.is_active == True)  # noqa: E712
     if project_id:
         from sqlalchemy import or_
         query = query.where(
-            or_(Webhook.project_id == project_id, Webhook.project_id == None)
+            or_(Webhook.project_id == project_id, Webhook.project_id == None)  # noqa: E711
         )
 
     result = await db.execute(query)

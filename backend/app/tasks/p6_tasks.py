@@ -5,6 +5,7 @@ import logging
 from uuid import UUID
 
 from celery.exceptions import SoftTimeLimitExceeded
+
 from app.core.config import get_settings
 from app.tasks.worker import celery_app
 
@@ -48,6 +49,7 @@ def parse_schedule_task(self, schedule_id: str):
         logger.error(f"Schedule parse timed out for {schedule_id}")
         try:
             from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
             from app.models import Schedule
 
             async def _mark_failed():

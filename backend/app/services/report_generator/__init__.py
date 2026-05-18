@@ -16,18 +16,18 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select  # noqa: F401
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import (
+    Activity,  # noqa: F401
     BIMElement,
     DeviationType,
-    Project,
     ProgressItem,
+    Project,
     Report,
     ReportStatus,
-    Schedule,
-    Activity,
+    Schedule,  # noqa: F401
     VideoCapture,
 )
 
@@ -216,12 +216,12 @@ class ReportGenerator:
         from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
         from reportlab.lib.units import mm
         from reportlab.platypus import (
-            SimpleDocTemplate,
+            PageBreak,  # noqa: F401
             Paragraph,
+            SimpleDocTemplate,
             Spacer,
             Table,
             TableStyle,
-            PageBreak,
         )
 
         buffer = BytesIO()

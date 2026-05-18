@@ -31,6 +31,7 @@ async def _mark_bim_status(bim_model_id: str, status: str, error: str | None = N
     unhandled exception), so we open a fresh connection to commit the update.
     """
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
     from app.models.bim import BIMModel
 
     engine = create_async_engine(settings.database_url)
@@ -61,6 +62,7 @@ def _make_progress_writer(bim_model_id: str):
     affecting the main async session.
     """
     import time
+
     from app.models import BIMModel as _BIMModel
 
     def write_progress(pct: int, stage: str) -> None:

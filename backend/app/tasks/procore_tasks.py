@@ -37,8 +37,9 @@ def bulk_push_task(
             "results": [{"progress_item_id": str, "success": bool, "procore_entity_id": str|None, "error": str|None}]
         }
     """
-    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
     from sqlalchemy import select
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
     from app.models.models import ProcoreConfig
     from app.services.procore import ProcoreClient
 

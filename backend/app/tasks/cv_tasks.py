@@ -99,7 +99,9 @@ def compare_progress_task(
         Only called when use_mock=True is explicitly passed.
         """
         import random
+
         from sqlalchemy import delete, select
+
         from app.models import BIMElement, DeviationType, ProgressItem, VideoCapture, VideoStatus
 
         rng = random.Random(bim_model_id)

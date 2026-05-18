@@ -19,7 +19,6 @@ Key tables:
 import logging
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession

@@ -7,16 +7,16 @@ from uuid import UUID
 
 logger = logging.getLogger(__name__)
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
-from fastapi.responses import FileResponse, RedirectResponse
-from sqlalchemy import delete, func, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status  # noqa: E402
+from fastapi.responses import FileResponse, RedirectResponse  # noqa: E402
+from sqlalchemy import delete, func, select  # noqa: E402
+from sqlalchemy.ext.asyncio import AsyncSession  # noqa: E402
 
-from app.core.config import get_settings
-from app.core.database import get_db
-from app.models import BIMElement, BIMModel, Project
-from app.schemas import BIMElementListResponse, BIMElementResponse, BIMModelResponse
-from app.services.storage import get_storage
+from app.core.config import get_settings  # noqa: E402
+from app.core.database import get_db  # noqa: E402
+from app.models import BIMElement, BIMModel, Project  # noqa: E402
+from app.schemas import BIMElementListResponse, BIMElementResponse, BIMModelResponse  # noqa: E402
+from app.services.storage import get_storage  # noqa: E402
 
 router = APIRouter(prefix="/projects/{project_id}/bim", tags=["bim"])
 settings = get_settings()

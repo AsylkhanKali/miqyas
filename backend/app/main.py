@@ -56,8 +56,7 @@ async def _reset_stale_bim_models() -> None:
     We also try to re-queue a fresh parse task for each model so they get
     processed automatically once the worker is healthy.
     """
-    import asyncio
-    from sqlalchemy import select, update
+    from sqlalchemy import select
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
     from app.models import BIMModel  # imported here to avoid circular import at module level
@@ -192,7 +191,7 @@ app.add_middleware(
 app.include_router(api_router, prefix=settings.api_v1_prefix)
 
 # ── Prometheus Metrics ────────────────────────────────────────────────
-from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_fastapi_instrumentator import Instrumentator  # noqa: E402
 
 Instrumentator(
     should_group_status_codes=True,

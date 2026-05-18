@@ -165,7 +165,7 @@ class S3Storage(StorageService):
         if dest is None:
             suffix = Path(key).suffix or ".ifc"
             fd, tmp = tempfile.mkstemp(suffix=suffix)
-            import os; os.close(fd)
+            import os; os.close(fd)  # noqa: I001, E702
             dest = Path(tmp)
         dest.parent.mkdir(parents=True, exist_ok=True)
         self.client.download_file(self.bucket, key, str(dest))

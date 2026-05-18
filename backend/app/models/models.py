@@ -14,7 +14,6 @@ Tables cover the entire MVP:
   - Procore integration
 """
 
-import enum
 import uuid
 from enum import StrEnum
 

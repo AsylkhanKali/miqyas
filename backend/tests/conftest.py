@@ -1,6 +1,7 @@
 """Shared test fixtures for the MIQYAS backend test suite."""
 
 import asyncio
+import os
 from collections.abc import AsyncGenerator
 
 import pytest
@@ -11,8 +12,11 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from app.core.database import Base, get_db
 from app.main import app
 
-# Use a separate test database (in-memory SQLite for speed, or test PG)
-TEST_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+# Models use JSONB (PostgreSQL-only). Use DATABASE_URL from env or fall back to local PG.
+TEST_DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql+asyncpg://miqyas:miqyas_dev@localhost:5432/miqyas_test",
+)
 
 engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 test_session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)

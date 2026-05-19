@@ -17,6 +17,7 @@ from app.api.v1.procore import router as procore_router
 from app.api.v1.projects import router as projects_router
 from app.api.v1.reports import router as reports_router
 from app.api.v1.schedules import router as schedules_router
+from app.api.v1.site_diary import router as site_diary_router
 from app.api.v1.webhooks import router as webhooks_router
 from app.core.config import get_settings
 from app.core.database import get_db
@@ -390,3 +391,4 @@ api_router.include_router(procore_router)
 api_router.include_router(acc_router)
 api_router.include_router(api_keys_router)
 api_router.include_router(webhooks_router)
+api_router.include_router(site_diary_router)

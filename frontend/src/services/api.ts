@@ -365,4 +365,17 @@ export const systemApi = {
     }),
 };
 
+// ── Site Diary ──────────────────────────────────────────────────────────
+// Welcome Center validation dataset — 37 hand-classified 360° panoramas.
+
+export const siteDiaryApi = {
+  /** Full analysis JSON for the Welcome Center dataset */
+  getWelcomeCenter: () =>
+    api.get("/site-diary/welcome-center"),
+
+  /** URL to load a single panorama photo */
+  photoUrl: (filename: string): string =>
+    `${api.defaults.baseURL}/site-diary/welcome-center/photos/${encodeURIComponent(filename)}`,
+};
+
 export default api;

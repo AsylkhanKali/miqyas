@@ -19,6 +19,7 @@ import {
   BarChart3,
   TrendingUp,
   TrendingDown,
+  Footprints,
   Building2,
   Settings,
   ChevronLeft,
@@ -63,6 +64,11 @@ const TOP_NAV: NavItem[] = [
     icon: FolderKanban,
     path: () => "/projects",
     badge: "projects",
+  },
+  {
+    label: "Al Falah Z2 Walk",
+    icon: Footprints,
+    path: () => "/site-diary/al-falah",
   },
 ];
 

@@ -1,0 +1,1674 @@
+{
+  "project": {
+    "name": "Al Falah School",
+    "location": "Abu Dhabi, UAE",
+    "type": "School Interior Fit-out",
+    "zone": "Zone 2 (Ground Floor)",
+    "capture_date": "2025-07-12",
+    "total_rooms": 31,
+    "total_photos_available": 108,
+    "note": "Spatial site-walk of Zone 2 ground floor. One representative 360° panorama analyzed per room (31 rooms selected from 108 photos). Trade completion is MIQYAS AI vision-assessed from a single view per room and is indicative, not a formal QS measurement."
+  },
+  "trades": [
+    "ceiling",
+    "flooring",
+    "walls",
+    "mep_systems",
+    "glazing_facade",
+    "furnishings"
+  ],
+  "trade_labels": {
+    "ceiling": "Ceiling",
+    "flooring": "Flooring",
+    "walls": "Walls",
+    "mep_systems": "MEP Systems",
+    "glazing_facade": "Glazing & Façade",
+    "furnishings": "Furnishings & Fit-out"
+  },
+  "rooms": [
+    {
+      "room_id": "Z2A__administrativeoffice",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Administrative Office",
+      "photo": "photos/Z2A__administrativeoffice.jpg",
+      "photo_count_in_room": 7,
+      "source_file": "GF_Z2A_AdministrativeOffice_4.jpg",
+      "phase": "mep_first_fix",
+      "overall_completion_pct": 20,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Exposed structural steel frame and soffit, no finishes; metal deck visible, rough concrete soffit"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw concrete screed, no finishing; protective sheeting and construction materials present"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 15,
+          "notes": "Concrete blockwork with partial plaster base coat visible on interior walls; exterior walls exposed to site"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 30,
+          "notes": "Red conduit/pipework visible throughout; exposed cable management; first fix stage ongoing"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 0,
+          "notes": "No glazing installed; structural openings only, windows and doors not yet fitted"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "MEP first fix installation (conduit running)",
+        "Construction site operations ongoing"
+      ],
+      "defects": [
+        "Exposed structural elements",
+        "No weather protection on openings",
+        "Raw floor surface"
+      ],
+      "key_observation": "Building structure complete but interior systems at earliest MEP stage with no finishes applied."
+    },
+    {
+      "room_id": "Z2A__archiveroom",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Archive Room",
+      "photo": "photos/Z2A__archiveroom.jpg",
+      "photo_count_in_room": 4,
+      "source_file": "GF_Z2A_ArchiveRoom_4.jpg",
+      "phase": "mep_second_fix",
+      "overall_completion_pct": 35,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 10,
+          "notes": "Exposed concrete soffit with structural elements; metal framing for future grid visible; no acoustic or tile finish"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw concrete floor; no screed or finished surface; light dust accumulation"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "Plasterboard applied and partially finished with skim coat; smooth white surface visible; some marks and dust from ongoing work"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Red electrical conduit and cable coils visible on walls; receptacles roughed in but not yet covered; some wiring bundles present"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "Electrical second fix (conduit and wiring installation)",
+        "Plasterboard finishing"
+      ],
+      "defects": [
+        "Unfinished concrete ceiling",
+        "Raw floor surface",
+        "Exposed electrical systems"
+      ],
+      "key_observation": "Walls substantially finished but ceiling and floor remain raw; electrical systems exposed and in active installation."
+    },
+    {
+      "room_id": "Z2A__communitymeeting",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Community Meeting",
+      "photo": "photos/Z2A__communitymeeting.jpg",
+      "photo_count_in_room": 6,
+      "source_file": "GF_Z2A_CommunityMeeting_4.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 40,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 15,
+          "notes": "Exposed structural steel frame with metal deck; HVAC ducts visible in black; no acoustic or tile finish; rough concrete soffit"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw concrete screed; protective plastic sheeting present; no finished floor material"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "Plasterboard with finished skim coat applied; smooth white interior finish; some construction marks and dust residue"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "HVAC ductwork installed and visible; electrical systems partially installed; sprinkler infrastructure visible; ongoing MEP second fix"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 25,
+          "notes": "Multiple aluminum-framed windows with clear vision panels installed but frames not fully glazed; some units have protective film; doors frames visible"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "HVAC ductwork installation",
+        "Window frame installation (partial)",
+        "Electrical systems ongoing"
+      ],
+      "defects": [
+        "Unfinished ceiling",
+        "Raw floor",
+        "Partial glazing only",
+        "Exposed MEP systems"
+      ],
+      "key_observation": "Large open space with walls finished and partial glazing installed, but ceiling and floor remain raw with active MEP second fix work."
+    },
+    {
+      "room_id": "Z2A__communitymeeting2",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Community Meeting 2",
+      "photo": "photos/Z2A__communitymeeting2.jpg",
+      "photo_count_in_room": 6,
+      "source_file": "GF_Z2A_CommunityMeeting2_1.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 50,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 20,
+          "notes": "Metal stud framing and gypsum board visible; some areas show finished skim, others exposed; no acoustic or suspended ceiling installed"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 10,
+          "notes": "Raw concrete floor with protective plastic sheet covering; no finished flooring material; edges show screed level"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 75,
+          "notes": "Plasterboard with skim coat finish applied and painted; smooth white surface; colored construction tape marks visible on some areas"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 45,
+          "notes": "Electrical outlets roughed in and visible in walls; some switch boxes prepared; ceiling shows minimal visible systems due to framing"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 85,
+          "notes": "Frameless glass sliding door system installed and operational; clear tempered glass panels set in aluminum frames; hardware installed"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "Glazing/glass door installation complete",
+        "Electrical outlet installation ongoing",
+        "Wall finishing ongoing"
+      ],
+      "defects": [
+        "Unfinished ceiling",
+        "Raw floor with protective sheeting",
+        "Some wall marks from construction"
+      ],
+      "key_observation": "Walls and glazing substantially complete; ceiling framing in place but not finished; floor still raw with temporary protection."
+    },
+    {
+      "room_id": "Z2A__communitymeeting3",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Community Meeting 3",
+      "photo": "photos/Z2A__communitymeeting3.jpg",
+      "photo_count_in_room": 7,
+      "source_file": "GF_Z2A_CommunityMeeting3_7.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 45,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 15,
+          "notes": "Metal stud frame with gypsum board partially installed; some areas show exposed soffit; no finished ceiling system"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 8,
+          "notes": "Raw concrete floor; protective plastic sheeting present; no flooring material applied"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "Plasterboard applied with skim coat and paint finish; smooth white surface visible on left wall; framing studs visible in background spaces"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Electrical receptacles and switch boxes installed and protruding from wall finish; exposed wiring visible in adjacent spaces; rough stage ongoing"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 80,
+          "notes": "Aluminum-framed glass doors with clear tempered glass installed; frames set and hardware fitted; doors appear functional"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "Glass door frames and hardware installation complete",
+        "Electrical rough-in work ongoing",
+        "Wall finishing proceeding"
+      ],
+      "defects": [
+        "Exposed electrical outlets in walls",
+        "Unfinished ceiling",
+        "Raw floor surface"
+      ],
+      "key_observation": "Glazing and walls largely complete but ceiling unfinished and floor raw; electrical systems exposed and awaiting second fix."
+    },
+    {
+      "room_id": "Z2A__corridor",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Corridor",
+      "photo": "photos/Z2A__corridor.jpg",
+      "photo_count_in_room": 3,
+      "source_file": "GF_Z2A_Corridor_3.jpg",
+      "phase": "mep_second_fix",
+      "overall_completion_pct": 35,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 10,
+          "notes": "Exposed concrete soffit with minimal finish; metal framing elements visible; no suspended or acoustic ceiling installed"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw concrete floor; no screed or finishing; some dust and construction debris present"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "Plasterboard applied with smooth skim coat finish; white painted surface visible; typical corridor finishes at this stage"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 35,
+          "notes": "Metal ladder/stair frame present for access; some conduit routing visible above; electrical systems in rough stage; minimal visible fixtures"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "Plasterboard finishing ongoing",
+        "Access ladder/stair installation",
+        "Electrical rough work proceeding"
+      ],
+      "defects": [
+        "Unfinished ceiling",
+        "Raw floor surface",
+        "Exposed structural elements"
+      ],
+      "key_observation": "Narrow corridor with walls finished but ceiling and floor remain raw; used for site access with temporary ladder installation."
+    },
+    {
+      "room_id": "Z2A__electricalbox",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Electrical Box",
+      "photo": "photos/Z2A__electricalbox.jpg",
+      "photo_count_in_room": 2,
+      "source_file": "GF_Z2A_ElectricalBox_2.jpg",
+      "phase": "mep_second_fix",
+      "overall_completion_pct": 40,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 15,
+          "notes": "Exposed metal frame with gypsum board partially installed; open areas showing structural deck; no finished ceiling"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw concrete floor; some debris and construction materials; no finished surface"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 65,
+          "notes": "Plasterboard with skim coat applied; white finished surface visible; typical utility room finish"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "Electrical distribution systems prominently visible: cable trays, bundled colored cables (red, yellow, black), metal conduit, cable covers, switchgear and panel enclosures installed; active installation ongoing"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "Electrical cable and conduit installation (heavy activity)",
+        "Cable tray and support systems installation",
+        "Main distribution board/switchgear setup ongoing"
+      ],
+      "defects": [
+        "Exposed electrical systems (normal for utility room at this stage)",
+        "Unfinished ceiling",
+        "Raw floor",
+        "Cables loosely bundled in some areas"
+      ],
+      "key_observation": "Utility/electrical room with substantial MEP installation active; walls largely finished but ceiling and floor raw with heavy electrical systems visible."
+    },
+    {
+      "room_id": "Z2A__entrance",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Entrance",
+      "photo": "photos/Z2A__entrance.jpg",
+      "photo_count_in_room": 2,
+      "source_file": "GF_Z2A_Entrance_1.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 45,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 20,
+          "notes": "Exposed structural frame with metal deck; HVAC ducts (blue and black) routed above; electrical cable trays visible; no suspended or acoustic finish applied"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 10,
+          "notes": "Raw concrete floor; protective plastic sheeting in place; no finished flooring material; edges show screed preparation"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 65,
+          "notes": "Plasterboard applied with skim coat finish; white painted surface; large areas visible; some minor marks and dust from ongoing work"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "HVAC ductwork installed and routed overhead; electrical cable trays and routing visible; some cable covers in place; sprinkler lines visible; comprehensive MEP distribution set"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 75,
+          "notes": "Large glass facade/curtain wall system frames installed with aluminum mullions; clear tempered glass panels set; some protective film still visible; frames structurally complete but minor trim items may remain"
+        },
+        "furnishings": {
+          "visible": true,
+          "completion_pct": 15,
+          "notes": "Doors and hardware frames installed; glass entrance doors operational; some door protection visible; no other furnishings or FF&E present"
+        }
+      },
+      "activities_in_progress": [
+        "Glazing/curtain wall installation largely complete",
+        "HVAC and electrical distribution ongoing",
+        "Protective film removal from glass in progress"
+      ],
+      "defects": [
+        "Unfinished ceiling with exposed systems",
+        "Raw floor surface with temporary protection",
+        "Some protective film still on glazing"
+      ],
+      "key_observation": "Main entrance foyer with substantial glazing facade installed and walls finished; ceiling and floor remain raw with active MEP second fix work."
+    },
+    {
+      "room_id": "Z2A__examcontrol",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Exam Control",
+      "photo": "photos/Z2A__examcontrol.jpg",
+      "photo_count_in_room": 3,
+      "source_file": "GF_Z2A_ExamControl_1.jpg",
+      "phase": "mep_second_fix",
+      "overall_completion_pct": 25,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Exposed structural soffit, no ceiling grid or tiles installed; temporary work lighting visible"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw sand/screed layer, no finished flooring or skirting; construction dust cover visible"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Gypsum board installed and taped, primer/base coat applied; some construction marking visible"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 30,
+          "notes": "Orange electrical conduit routed along walls and into door opening; basic first-fix infrastructure in place"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 10,
+          "notes": "Door opening frame visible with temporary protection; no glazing or hardware installed"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "MEP conduit and wiring installation",
+        "Wall finishing preparation"
+      ],
+      "defects": [
+        "No finished flooring yet",
+        "Exposed structural elements"
+      ],
+      "key_observation": "Early-stage exam control room in MEP second fix phase with walls prepped but floors and ceiling still raw."
+    },
+    {
+      "room_id": "Z2A__glassnotfixed",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Glass Not Fixed",
+      "photo": "photos/Z2A__glassnotfixed.jpg",
+      "photo_count_in_room": 1,
+      "source_file": "GF_Z2A_GlassNotFixed.jpg",
+      "phase": "mep_second_fix",
+      "overall_completion_pct": 40,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 10,
+          "notes": "Exposed concrete soffit and structural frame; no ceiling grid, tiles, or finish; temporary lighting installed"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw concrete screed with dust and debris; no protective covering or finished flooring"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "Gypsum board finished with plaster and paint (white); some minor marks and annotations from construction"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Orange protective conduit and ducting on floor; electrical infrastructure actively being installed; worker present performing MEP work"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 0,
+          "notes": "DEFECT: Large opening on right side with aluminum frame installed but NO GLASS PANES - critical glazing failure; opening is unprotected and represents major snag"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "MEP infrastructure installation (electrician on-site)",
+        "Conduit and cable routing"
+      ],
+      "defects": [
+        "CRITICAL: Glazing not fixed - large opening with aluminum frame but no glass installed",
+        "Floor unfinished and exposed"
+      ],
+      "key_observation": "Walls and basic structure progressing, but critical glazing defect (unglazed opening) and floors remain unfinished in this MEP-active space."
+    },
+    {
+      "room_id": "Z2A__idf",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "IDF",
+      "photo": "photos/Z2A__idf.jpg",
+      "photo_count_in_room": 3,
+      "source_file": "GF_Z2A_IDF_3.jpg",
+      "phase": "mep_second_fix",
+      "overall_completion_pct": 30,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Exposed concrete soffit structure; no ceiling grid, tiles, or coverings; bare structural elements visible"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw concrete floor; no screed finish or protection; bare construction surface"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 20,
+          "notes": "Concrete blockwork visible; partial plaster/finish in progress; minimal paint application"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "Extensive electrical and data infrastructure installed: organized orange and black cables on wire tray/conduit, cable management system in place, multiple circuit runs visible; electrician working on cable organization"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "Electrical and data cabling installation and organization",
+        "Cable tray and conduit routing"
+      ],
+      "defects": [],
+      "key_observation": "IDF room with advanced MEP infrastructure (data/electrical cabling) but raw walls, floor, and no ceiling - specialized telecom room in active second-fix stage."
+    },
+    {
+      "room_id": "Z2A__principaloffice",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Principal Office",
+      "photo": "photos/Z2A__principaloffice.jpg",
+      "photo_count_in_room": 4,
+      "source_file": "GF_Z2A_PrincipalOffice_1.jpg",
+      "phase": "mep_second_fix",
+      "overall_completion_pct": 35,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 10,
+          "notes": "Exposed steel frame/soffit structure with acoustic backing; no suspended ceiling grid or tiles; temporary rigging visible"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw concrete screed; no finished flooring, skirting, or protection; dust and debris on floor"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "Gypsum board installed, taped, and finished with plaster and paint (white); room identification signage mounted; construction annotations visible"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 30,
+          "notes": "Electrical outlet box visible on wall; ceiling conduit and wiring infrastructure visible; basic MEP rough-in in progress"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "MEP systems rough-in",
+        "Electrical outlet and fixture installation prep"
+      ],
+      "defects": [
+        "Exposed structural soffit",
+        "Unfinished floor"
+      ],
+      "key_observation": "Principal's office with walls finished and labeled but exposed soffit structure, raw floors, and ongoing MEP installation; mid-stage fit-out."
+    },
+    {
+      "room_id": "Z2A__receptionhall",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Reception Hall",
+      "photo": "photos/Z2A__receptionhall.jpg",
+      "photo_count_in_room": 11,
+      "source_file": "GF_Z2A_ReceptionHall_11.jpg",
+      "phase": "mep_second_fix",
+      "overall_completion_pct": 45,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 20,
+          "notes": "Metal stud frame/soffit structure with partial drywall; exposed ribs and structural framing; temporary lighting installed; no finished ceiling tiles"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw concrete screed with significant dust, debris, and construction residue; no finished flooring or protection"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "Gypsum board installed and finished with plaster and paint (white/light); clean finish on visible surfaces"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Cable tray, electrical conduit, and wiring infrastructure visible overhead; lighting fixtures installed; distribution systems in place; active electrical infrastructure second-fix ongoing"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Glass door and window openings with aluminum frames installed; glazing partially in place; frames secured but not fully fitted or sealed"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "MEP second-fix (electrical and lighting distribution)",
+        "Ceiling frame and drywall installation"
+      ],
+      "defects": [
+        "Exposed ceiling structure",
+        "Unfinished floor with construction debris"
+      ],
+      "key_observation": "Large reception hall with walls substantially finished, glazing frames in place, but ceiling remains skeletal and floor unfinished; MEP systems active."
+    },
+    {
+      "room_id": "Z2A__secretary",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Secretary",
+      "photo": "photos/Z2A__secretary.jpg",
+      "photo_count_in_room": 5,
+      "source_file": "GF_Z2A_Secretary_5.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 50,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Metal grid frame structure partially installed; some acoustic ceiling tiles visible in grid; partial finish of suspended ceiling system"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw concrete screed; no finished flooring or skirting; bare construction surface"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 80,
+          "notes": "Gypsum board installed and fully finished with plaster and paint (white); clean surfaces ready for final fit-out"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "Electrical outlets visible on walls; ceiling conduit and wiring infrastructure installed; lighting systems partially in place"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Glass panel/window visible on left side with frame; partially installed or fitted; interior glazing visible through opening"
+        },
+        "furnishings": {
+          "visible": true,
+          "completion_pct": 10,
+          "notes": "Emergency/Exit signage mounted on wall (bilingual English/Arabic); no furniture or permanent fixtures installed"
+        }
+      },
+      "activities_in_progress": [
+        "Ceiling tile installation",
+        "MEP final connections"
+      ],
+      "defects": [
+        "Floor unfinished"
+      ],
+      "key_observation": "Secretary's office with finished walls, partial ceiling grid and tiles, and MEP infrastructure in place; floors remain raw; entering finishes phase."
+    },
+    {
+      "room_id": "Z2A__storage",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "Storage",
+      "photo": "photos/Z2A__storage.jpg",
+      "photo_count_in_room": 4,
+      "source_file": "GF_Z2A_Storage_1.jpg",
+      "phase": "mep_second_fix",
+      "overall_completion_pct": 40,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Exposed metal frame structure; no ceiling grid, tiles, or finish; bare structural elements"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw concrete screed; no finished flooring; construction coils and materials on floor"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "Gypsum board installed and finished with plaster and paint (white); clean wall surfaces"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Electrical conduit routed along walls; yellow electrical power cable coil visible on floor; outlet boxes and basic wiring infrastructure in place"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 10,
+          "notes": "Dark door frame visible in opening; no glass or door leaf installed; frame only"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "Electrical conduit and cable routing",
+        "MEP rough-in completion"
+      ],
+      "defects": [
+        "Door not installed",
+        "Floor unfinished"
+      ],
+      "key_observation": "Storage room with walls finished but ceiling exposed and floors raw; electrical infrastructure being routed; door opening unfilled."
+    },
+    {
+      "room_id": "Z2A__wc",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "WC",
+      "photo": "photos/Z2A__wc.jpg",
+      "photo_count_in_room": 7,
+      "source_file": "GF_Z2A_WC_1.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 40,
+      "trades": {
+        "ceiling": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "Raw concrete floor; no finished flooring or tile; bare construction surface"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Gypsum board base with tile cladding starting to install; visible dark tile at opening threshold; partial wall finish in progress"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Electrical conduit visible; outlet box mounted on wall; basic utilities rough-in complete; plumbing infrastructure expected but not clearly visible in this angle"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 30,
+          "notes": "Interior glass visible in opening with frame; glazing partially installed; not fully sealed or finished"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "No sanitary fixtures (toilet, sink, urinals) visible or installed; typical for restroom finishes phase"
+        }
+      },
+      "activities_in_progress": [
+        "Wall tile cladding installation",
+        "MEP rough-in completion"
+      ],
+      "defects": [
+        "Sanitary fixtures not yet installed",
+        "Floor unfinished"
+      ],
+      "key_observation": "Restroom in finishes phase with wall tiling beginning and MEP systems rough-in complete; floors and sanitary ware remain to be installed."
+    },
+    {
+      "room_id": "Z2A__wc2",
+      "zone": "Z2A",
+      "zone_label": "Zone 2A",
+      "room_label": "WC 2",
+      "photo": "photos/Z2A__wc2.jpg",
+      "photo_count_in_room": 7,
+      "source_file": "GF_Z2A_WC2_5.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 5,
+      "trades": {
+        "ceiling": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible - photo is severely underexposed/dark, structure not visible"
+        },
+        "flooring": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible - too dark to assess"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 10,
+          "notes": "Very dark image, walls appear to be blockwork/plaster foundation stage only, minimal finishing visible"
+        },
+        "mep_systems": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this lighting condition"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [],
+      "defects": [
+        "severe underexposure/lighting issue obscures assessment"
+      ],
+      "key_observation": "Restroom is at early structure stage; dark lighting prevents detailed assessment but indicates minimal finishing work completed."
+    },
+    {
+      "room_id": "Z2B__doctorroom",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "Doctor Room",
+      "photo": "photos/Z2B__doctorroom.jpg",
+      "photo_count_in_room": 2,
+      "source_file": "GF_Z2B_DoctorRoom_1.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 45,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 20,
+          "notes": "Structural elements visible through doorway, no ceiling finish installed, raw soffit/concrete exposed"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "Floor screed complete, dust protection applied (blue tape visible), ready for final flooring"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "White plaster/drywall installed on main walls, rough brick/blockwork frame at doorway unfinished, minor paint marks"
+        },
+        "mep_systems": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not clearly visible from doorway view"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible - room is empty shell"
+        }
+      },
+      "activities_in_progress": [],
+      "defects": [
+        "unfinished brick frame at doorway",
+        "ceiling not started"
+      ],
+      "key_observation": "Doctor room is mid-finishes with walls and floor screed done but ceiling structure exposed and door frame rough finish."
+    },
+    {
+      "room_id": "Z2B__firsthallway",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "First Hallway",
+      "photo": "photos/Z2B__firsthallway.jpg",
+      "photo_count_in_room": 1,
+      "source_file": "GF_Z2B_FirstHallway_1.jpg",
+      "phase": "mep_second_fix",
+      "overall_completion_pct": 50,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 35,
+          "notes": "Metal framing and cable trays exposed, electrical conduit and coloured wires (red/white/blue) visible, no ceiling finish installed, structural framing complete"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Floor screed applied, light dust/construction debris visible, no final flooring or skirting installed"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Plaster/drywall installed on most walls, white finish applied, some construction marks visible, cable routing marks visible"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "Electrical conduit installed, cable trays visible, first-fix wiring in progress, no fixtures/outlets visible yet"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible - empty construction space"
+        }
+      },
+      "activities_in_progress": [
+        "electrical first-fix wiring",
+        "cable routing"
+      ],
+      "defects": [
+        "exposed electrical infrastructure",
+        "construction debris on floor"
+      ],
+      "key_observation": "First hallway is in active MEP first-fix phase with ceiling framing, wiring, and cable trays exposed; walls and floor base complete."
+    },
+    {
+      "room_id": "Z2B__hrbusinesscoordinator",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "HR Business Coordinator",
+      "photo": "photos/Z2B__hrbusinesscoordinator.jpg",
+      "photo_count_in_room": 2,
+      "source_file": "GF_Z2B_HRBusinessCoordinator_2.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 65,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 75,
+          "notes": "White plaster/drywall ceiling installed with recessed LED light fixture mounted, ceiling appears mostly finished"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Concrete floor with light dust covering, no final flooring installed, no skirting"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 80,
+          "notes": "White painted walls complete on all visible surfaces, minor masking tape and construction marks visible, smooth finish"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "Ceiling light fixture installed and wired, outlet boxes visible on walls, no other HVAC or major systems visible"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Window with black frame visible but glass appears hazed/dusty from construction, not fully cleaned"
+        },
+        "furnishings": {
+          "visible": true,
+          "completion_pct": 10,
+          "notes": "No furnishings installed; materials and construction debris present (cables, paint containers, tools), worker present with PPE"
+        }
+      },
+      "activities_in_progress": [
+        "material storage and staging",
+        "ongoing finishing work"
+      ],
+      "defects": [
+        "dust on windows",
+        "construction materials stored in room",
+        "outlet boxes not finished"
+      ],
+      "key_observation": "HR Business Coordinator room is largely finished with painted walls and ceiling light installed, but flooring and final fixtures pending."
+    },
+    {
+      "room_id": "Z2B__isolationroom",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "Isolation Room",
+      "photo": "photos/Z2B__isolationroom.jpg",
+      "photo_count_in_room": 2,
+      "source_file": "GF_Z2B_IsolationRoom_2.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 55,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "White plaster/drywall ceiling installed, smooth finish, no visible fixtures or diffusers, appears complete except for lighting"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Dark floor surface (concrete or partial screed), dust/debris visible in corner, no final flooring material or skirting installed"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 75,
+          "notes": "White painted walls complete on all surfaces, smooth finish, no visible outlet boxes or switch plates"
+        },
+        "mep_systems": {
+          "visible": false,
+          "completion_pct": 20,
+          "notes": "No visible MEP outlets, lights, or fixtures - likely rough-in done but not visible in this view"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible - room is empty"
+        }
+      },
+      "activities_in_progress": [],
+      "defects": [
+        "floor finish not started",
+        "no visible MEP fixtures/outlets",
+        "debris in corner"
+      ],
+      "key_observation": "Isolation room has ceiling and walls finished with white paint, but flooring incomplete and MEP fixtures not yet installed."
+    },
+    {
+      "room_id": "Z2B__multipurposehall",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "Multipurpose Hall",
+      "photo": "photos/Z2B__multipurposehall.jpg",
+      "photo_count_in_room": 2,
+      "source_file": "GF_Z2B_MultipurposeHall_2.jpg",
+      "phase": "mep_second_fix",
+      "overall_completion_pct": 55,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Metal stud framing grid complete, LED ceiling panel lights installed in grid pattern, white/silver painted grid finish, red electrical conduit visible"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 35,
+          "notes": "Floor screed applied, light dust covering, no final flooring material installed, protection sheeting visible"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "White plaster/drywall applied to most walls, smooth finish, some construction marks visible, walls appear largely complete"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 65,
+          "notes": "Ceiling grid lights installed and powered, red electrical conduit routed throughout ceiling, metal cable trays visible, full lighting system in grid"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "Large windows with glass installed on multiple walls, visible daylight, windows appear clear and installed but not fully finished (trim/sealant pending)"
+        },
+        "furnishings": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "No furnishings installed; large quantities of materials staged (drywall sheets stacked, cardboard boxes, construction materials), worker present in hard hat and PPE"
+        }
+      },
+      "activities_in_progress": [
+        "material staging",
+        "final ceiling inspection"
+      ],
+      "defects": [
+        "exposed electrical conduit",
+        "materials blocking floor",
+        "construction dust/debris"
+      ],
+      "key_observation": "Multipurpose hall is in advanced MEP stage with sophisticated ceiling grid and lighting system complete; walls mostly finished but floor and final fixtures pending."
+    },
+    {
+      "room_id": "Z2B__nurseoffice",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "Nurse Office",
+      "photo": "photos/Z2B__nurseoffice.jpg",
+      "photo_count_in_room": 2,
+      "source_file": "GF_Z2B_NurseOffice_2.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 60,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "White drywall/plaster ceiling installed with gap/hole visible near center (fixture opening or damage), LED strip light visible along edge, mostly complete but with defect"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 45,
+          "notes": "Floor screed laid, light dust/construction debris visible, no final flooring material or skirting installed"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 80,
+          "notes": "White painted walls complete on all visible surfaces, smooth finish, outlet box visible on left wall, minimal construction marks"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "LED ceiling strip light installed, outlet box visible, no other major systems visible, electrical second-fix appears underway"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Glazed door/window visible with glass installed, frame appears complete but not fully sealed/finished"
+        },
+        "furnishings": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "No furnishings installed; cardboard sheet with red X marks stored in room, construction stage"
+        }
+      },
+      "activities_in_progress": [],
+      "defects": [
+        "ceiling hole/gap in center",
+        "unfinished floor",
+        "door not fully trimmed"
+      ],
+      "key_observation": "Nurse office is largely finished with walls and partial ceiling done, but has a notable ceiling defect (hole) and flooring still pending."
+    },
+    {
+      "room_id": "Z2B__reception",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "Reception",
+      "photo": "photos/Z2B__reception.jpg",
+      "photo_count_in_room": 2,
+      "source_file": "GF_Z2B_Reception_2.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 60,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "White plaster/drywall ceiling installed with recessed light fixture opening/trim visible (black trim ring), fixture not yet installed, smooth finish otherwise"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 45,
+          "notes": "Floor screed applied, light dust and construction debris visible, no final flooring material or skirting installed"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 80,
+          "notes": "White painted walls complete on most surfaces, smooth finish, outlet boxes and switch openings visible, well finished"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Ceiling fixture opening prepared with trim ring visible, outlet/switch boxes visible on walls but covers/plates not installed, second-fix in progress"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": true,
+          "completion_pct": 5,
+          "notes": "No furnishings installed; construction materials and staging visible, worker activity space only"
+        }
+      },
+      "activities_in_progress": [
+        "material staging",
+        "MEP second-fix outlet installation"
+      ],
+      "defects": [
+        "ceiling light fixture not installed",
+        "unfinished floor",
+        "outlet boxes not covered"
+      ],
+      "key_observation": "Reception area has walls and ceiling largely finished, but flooring incomplete and MEP fixtures (lights, outlets) not yet installed."
+    },
+    {
+      "room_id": "Z2B__receptionstore",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "Reception Store",
+      "photo": "photos/Z2B__receptionstore.jpg",
+      "photo_count_in_room": 2,
+      "source_file": "GF_Z2B_ReceptionStore_2.jpg",
+      "phase": "structure",
+      "overall_completion_pct": 15,
+      "trades": {
+        "ceiling": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 20,
+          "notes": "Dark screed or raw concrete, no finish applied"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 10,
+          "notes": "Dark/unfinished blockwork or base walls, no plaster or paint"
+        },
+        "mep_systems": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [],
+      "defects": [
+        "Photo quality too poor to assess defects"
+      ],
+      "key_observation": "Reception Store is in very early construction phase with minimal detail visible due to poor lighting conditions."
+    },
+    {
+      "room_id": "Z2B__teacherworkshop",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "Teacher Workshop",
+      "photo": "photos/Z2B__teacherworkshop.jpg",
+      "photo_count_in_room": 3,
+      "source_file": "GF_Z2B_TeacherWorkshop_2.jpg",
+      "phase": "mep_first_fix",
+      "overall_completion_pct": 42,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 20,
+          "notes": "Exposed metal stud grid framework, no tiles or acoustic panels installed, visible structural framing"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 30,
+          "notes": "Light colored concrete screed, some protection sheets, no tile or final finish"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "White drywall/plaster finish applied, electrical outlet boxes visible, appears relatively complete"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Exposed HVAC ducts, metal studs and framework visible in ceiling, electrical conduit/cable trays visible, first fix in progress"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "White framed windows/glass doors visible in background, appear installed but may need final trim/glazing bars"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "Ceiling grid framing assembly",
+        "MEP first fix installation"
+      ],
+      "defects": [
+        "Ceiling grid not yet complete",
+        "Flooring protection sheets indicate ongoing work"
+      ],
+      "key_observation": "Teacher Workshop is in mep_first_fix phase with walls largely finished but ceiling framework and utilities still exposed."
+    },
+    {
+      "room_id": "Z2B__teacherworkshop2",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "Teacher Workshop 2",
+      "photo": "photos/Z2B__teacherworkshop2.jpg",
+      "photo_count_in_room": 2,
+      "source_file": "GF_Z2B_TeacherWorkshop2_1.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 65,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "Light fixtures installed (recessed), appears to have gypsum finish or softfit, mostly complete"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Light colored concrete screed, no tile or skirting, requires final flooring application"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 80,
+          "notes": "White plaster/drywall finish painted, appears complete and clean"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "Light fixtures installed in ceiling, minimal other MEP visible, appears second fix stage"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [],
+      "defects": [],
+      "key_observation": "Teacher Workshop 2 corridor is in finishes phase with ceiling and walls mostly complete; flooring awaits final application."
+    },
+    {
+      "room_id": "Z2B__teacherworkshop2_abolution",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "Teacher Workshop 2 Ablution",
+      "photo": "photos/Z2B__teacherworkshop2_abolution.jpg",
+      "photo_count_in_room": 1,
+      "source_file": "GF_Z2B_TeacherWorkshop2_Abolution.jpg",
+      "phase": "fit_out",
+      "overall_completion_pct": 70,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Exposed soffit with HVAC ductwork wrapped in foil insulation, partial gypsum/drywall in areas, ceiling work in progress"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 80,
+          "notes": "Tiled flooring appears largely complete, light colored tiles, no visible gaps or damage"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 80,
+          "notes": "Light colored ceramic tiles applied to walls, mostly complete, some upper areas may need finishing"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "HVAC ducts clearly visible with insulation wrap, plumbing connections visible for toilet stalls and washbasins"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "Toilet stall doors/partitions visible, washbasin fixtures installed, some fixtures may need final connections"
+        }
+      },
+      "activities_in_progress": [
+        "Ceiling drywall and HVAC completion"
+      ],
+      "defects": [
+        "Ceiling work not fully complete",
+        "Some tile grout may need finishing"
+      ],
+      "key_observation": "Teacher Workshop 2 Ablution wet area is in fit_out phase with tiled walls and floor largely complete, plumbing fixtures installed, but ceiling work ongoing."
+    },
+    {
+      "room_id": "Z2B__teacherworkshop_abolution",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "Teacher Workshop Ablution",
+      "photo": "photos/Z2B__teacherworkshop_abolution.jpg",
+      "photo_count_in_room": 1,
+      "source_file": "GF_Z2B_TeacherWorkshop_Abolution.jpg",
+      "phase": "fit_out",
+      "overall_completion_pct": 55,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Exposed soffit with drywall being worked on, gypsum finish partially applied, active construction visible"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 75,
+          "notes": "Tiled flooring visible, appears mostly complete with consistent tile pattern"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "Light colored ceramic tiles applied, some areas near scaffold may need touch-ups, overall mostly complete"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "HVAC ducts visible with foil wrapping, plumbing connections visible, active MEP work in progress"
+        },
+        "glazing_facade": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        },
+        "furnishings": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Toilet stall partitions/doors visible (dark colored), washbasin area visible, fixtures being installed/finished"
+        }
+      },
+      "activities_in_progress": [
+        "Active ceiling drywall installation on scaffold",
+        "Fixture installation and testing",
+        "Final MEP connections"
+      ],
+      "defects": [
+        "Ceiling not yet fully finished",
+        "Scaffold in use indicates active work zone"
+      ],
+      "key_observation": "Teacher Workshop Ablution wet area is actively under construction with tiled walls/floor largely done but ceiling drywall and fixtures still being installed."
+    },
+    {
+      "room_id": "Z2B__vpoffice",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "VP Office",
+      "photo": "photos/Z2B__vpoffice.jpg",
+      "photo_count_in_room": 2,
+      "source_file": "GF_Z2B_VPOffice_2.jpg",
+      "phase": "finishes",
+      "overall_completion_pct": 48,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 20,
+          "notes": "Exposed metal stud framework, no tiles or gypsum finish, visible cable tray and MEP systems in frame"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 40,
+          "notes": "Light colored concrete screed with protection sheets, no tile or final finish applied"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "White drywall/plaster finish applied, equipment boxes mounted on walls, appears mostly complete"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Cable tray visible in ceiling frame, electrical conduit and boxes mounted on walls, first fix complete, second fix in progress"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 60,
+          "notes": "Window installed with frame, may need final trim and caulking"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [
+        "Flooring preparation work",
+        "MEP second fix and boxing"
+      ],
+      "defects": [
+        "Ceiling grid not finished",
+        "Floor protection indicates ongoing work"
+      ],
+      "key_observation": "VP Office is in finishes phase with walls largely complete but ceiling framework still exposed and flooring not yet finished."
+    },
+    {
+      "room_id": "Z2B__vpoffice2",
+      "zone": "Z2B",
+      "zone_label": "Zone 2B",
+      "room_label": "VP Office 2",
+      "photo": "photos/Z2B__vpoffice2.jpg",
+      "photo_count_in_room": 2,
+      "source_file": "GF_Z2B_VPOffice2_1.jpg",
+      "phase": "fit_out",
+      "overall_completion_pct": 72,
+      "trades": {
+        "ceiling": {
+          "visible": true,
+          "completion_pct": 85,
+          "notes": "Smooth gypsum/drywall finish applied, painted white, appears complete, no visible defects"
+        },
+        "flooring": {
+          "visible": true,
+          "completion_pct": 50,
+          "notes": "Concrete screed with protection materials, no tile or final skirting, requires final flooring application"
+        },
+        "walls": {
+          "visible": true,
+          "completion_pct": 85,
+          "notes": "White drywall/plaster finish painted, clean appearance, appears complete, ready for furnishing"
+        },
+        "mep_systems": {
+          "visible": true,
+          "completion_pct": 70,
+          "notes": "MEP systems appear mostly complete and concealed, no major visible works, second fix complete"
+        },
+        "glazing_facade": {
+          "visible": true,
+          "completion_pct": 80,
+          "notes": "Window installed with frame and trim, appears complete"
+        },
+        "furnishings": {
+          "visible": false,
+          "completion_pct": 0,
+          "notes": "Not visible in this view"
+        }
+      },
+      "activities_in_progress": [],
+      "defects": [],
+      "key_observation": "VP Office 2 is in fit_out phase with ceiling, walls, and windows complete; only flooring finish remains before furnishing."
+    }
+  ],
+  "summary": {
+    "overall_completion_pct": 44,
+    "by_trade": {
+      "ceiling": {
+        "label": "Ceiling",
+        "avg_pct": 31,
+        "rooms_visible": 28
+      },
+      "flooring": {
+        "label": "Flooring",
+        "avg_pct": 25,
+        "rooms_visible": 30
+      },
+      "walls": {
+        "label": "Walls",
+        "avg_pct": 60,
+        "rooms_visible": 31
+      },
+      "mep_systems": {
+        "label": "MEP Systems",
+        "avg_pct": 51,
+        "rooms_visible": 27
+      },
+      "glazing_facade": {
+        "label": "Glazing & Façade",
+        "avg_pct": 45,
+        "rooms_visible": 17
+      },
+      "furnishings": {
+        "label": "Furnishings & Fit-out",
+        "avg_pct": 20,
+        "rooms_visible": 8
+      }
+    },
+    "phase_counts": {
+      "mep_first_fix": 2,
+      "mep_second_fix": 11,
+      "finishes": 14,
+      "structure": 1,
+      "fit_out": 3
+    },
+    "defect_total": 68
+  },
+  "generated_at": "2026-07-16T07:38:07.759040+00:00"
+}

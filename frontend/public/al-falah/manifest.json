@@ -1,0 +1,281 @@
+[
+  {
+    "room_id": "Z2A__administrativeoffice",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Administrative Office",
+    "source_file": "GF_Z2A_AdministrativeOffice_4.jpg",
+    "photo": "photos/Z2A__administrativeoffice.jpg",
+    "photo_count_in_room": 7
+  },
+  {
+    "room_id": "Z2A__archiveroom",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Archive Room",
+    "source_file": "GF_Z2A_ArchiveRoom_4.jpg",
+    "photo": "photos/Z2A__archiveroom.jpg",
+    "photo_count_in_room": 4
+  },
+  {
+    "room_id": "Z2A__communitymeeting",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Community Meeting",
+    "source_file": "GF_Z2A_CommunityMeeting_4.jpg",
+    "photo": "photos/Z2A__communitymeeting.jpg",
+    "photo_count_in_room": 6
+  },
+  {
+    "room_id": "Z2A__communitymeeting2",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Community Meeting 2",
+    "source_file": "GF_Z2A_CommunityMeeting2_1.jpg",
+    "photo": "photos/Z2A__communitymeeting2.jpg",
+    "photo_count_in_room": 6
+  },
+  {
+    "room_id": "Z2A__communitymeeting3",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Community Meeting 3",
+    "source_file": "GF_Z2A_CommunityMeeting3_7.jpg",
+    "photo": "photos/Z2A__communitymeeting3.jpg",
+    "photo_count_in_room": 7
+  },
+  {
+    "room_id": "Z2A__corridor",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Corridor",
+    "source_file": "GF_Z2A_Corridor_3.jpg",
+    "photo": "photos/Z2A__corridor.jpg",
+    "photo_count_in_room": 3
+  },
+  {
+    "room_id": "Z2A__electricalbox",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Electrical Box",
+    "source_file": "GF_Z2A_ElectricalBox_2.jpg",
+    "photo": "photos/Z2A__electricalbox.jpg",
+    "photo_count_in_room": 2
+  },
+  {
+    "room_id": "Z2A__entrance",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Entrance",
+    "source_file": "GF_Z2A_Entrance_1.jpg",
+    "photo": "photos/Z2A__entrance.jpg",
+    "photo_count_in_room": 2
+  },
+  {
+    "room_id": "Z2A__examcontrol",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Exam Control",
+    "source_file": "GF_Z2A_ExamControl_1.jpg",
+    "photo": "photos/Z2A__examcontrol.jpg",
+    "photo_count_in_room": 3
+  },
+  {
+    "room_id": "Z2A__glassnotfixed",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Glass Not Fixed",
+    "source_file": "GF_Z2A_GlassNotFixed.jpg",
+    "photo": "photos/Z2A__glassnotfixed.jpg",
+    "photo_count_in_room": 1
+  },
+  {
+    "room_id": "Z2A__idf",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "IDF",
+    "source_file": "GF_Z2A_IDF_3.jpg",
+    "photo": "photos/Z2A__idf.jpg",
+    "photo_count_in_room": 3
+  },
+  {
+    "room_id": "Z2A__principaloffice",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Principal Office",
+    "source_file": "GF_Z2A_PrincipalOffice_1.jpg",
+    "photo": "photos/Z2A__principaloffice.jpg",
+    "photo_count_in_room": 4
+  },
+  {
+    "room_id": "Z2A__receptionhall",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Reception Hall",
+    "source_file": "GF_Z2A_ReceptionHall_11.jpg",
+    "photo": "photos/Z2A__receptionhall.jpg",
+    "photo_count_in_room": 11
+  },
+  {
+    "room_id": "Z2A__secretary",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Secretary",
+    "source_file": "GF_Z2A_Secretary_5.jpg",
+    "photo": "photos/Z2A__secretary.jpg",
+    "photo_count_in_room": 5
+  },
+  {
+    "room_id": "Z2A__storage",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "Storage",
+    "source_file": "GF_Z2A_Storage_1.jpg",
+    "photo": "photos/Z2A__storage.jpg",
+    "photo_count_in_room": 4
+  },
+  {
+    "room_id": "Z2A__wc",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "WC",
+    "source_file": "GF_Z2A_WC_1.jpg",
+    "photo": "photos/Z2A__wc.jpg",
+    "photo_count_in_room": 7
+  },
+  {
+    "room_id": "Z2A__wc2",
+    "zone": "Z2A",
+    "zone_label": "Zone 2A",
+    "room_label": "WC 2",
+    "source_file": "GF_Z2A_WC2_5.jpg",
+    "photo": "photos/Z2A__wc2.jpg",
+    "photo_count_in_room": 7
+  },
+  {
+    "room_id": "Z2B__doctorroom",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "Doctor Room",
+    "source_file": "GF_Z2B_DoctorRoom_1.jpg",
+    "photo": "photos/Z2B__doctorroom.jpg",
+    "photo_count_in_room": 2
+  },
+  {
+    "room_id": "Z2B__firsthallway",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "First Hallway",
+    "source_file": "GF_Z2B_FirstHallway_1.jpg",
+    "photo": "photos/Z2B__firsthallway.jpg",
+    "photo_count_in_room": 1
+  },
+  {
+    "room_id": "Z2B__hrbusinesscoordinator",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "HR Business Coordinator",
+    "source_file": "GF_Z2B_HRBusinessCoordinator_2.jpg",
+    "photo": "photos/Z2B__hrbusinesscoordinator.jpg",
+    "photo_count_in_room": 2
+  },
+  {
+    "room_id": "Z2B__isolationroom",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "Isolation Room",
+    "source_file": "GF_Z2B_IsolationRoom_2.jpg",
+    "photo": "photos/Z2B__isolationroom.jpg",
+    "photo_count_in_room": 2
+  },
+  {
+    "room_id": "Z2B__multipurposehall",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "Multipurpose Hall",
+    "source_file": "GF_Z2B_MultipurposeHall_2.jpg",
+    "photo": "photos/Z2B__multipurposehall.jpg",
+    "photo_count_in_room": 2
+  },
+  {
+    "room_id": "Z2B__nurseoffice",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "Nurse Office",
+    "source_file": "GF_Z2B_NurseOffice_2.jpg",
+    "photo": "photos/Z2B__nurseoffice.jpg",
+    "photo_count_in_room": 2
+  },
+  {
+    "room_id": "Z2B__reception",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "Reception",
+    "source_file": "GF_Z2B_Reception_2.jpg",
+    "photo": "photos/Z2B__reception.jpg",
+    "photo_count_in_room": 2
+  },
+  {
+    "room_id": "Z2B__receptionstore",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "Reception Store",
+    "source_file": "GF_Z2B_ReceptionStore_2.jpg",
+    "photo": "photos/Z2B__receptionstore.jpg",
+    "photo_count_in_room": 2
+  },
+  {
+    "room_id": "Z2B__teacherworkshop",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "Teacher Workshop",
+    "source_file": "GF_Z2B_TeacherWorkshop_2.jpg",
+    "photo": "photos/Z2B__teacherworkshop.jpg",
+    "photo_count_in_room": 3
+  },
+  {
+    "room_id": "Z2B__teacherworkshop2",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "Teacher Workshop 2",
+    "source_file": "GF_Z2B_TeacherWorkshop2_1.jpg",
+    "photo": "photos/Z2B__teacherworkshop2.jpg",
+    "photo_count_in_room": 2
+  },
+  {
+    "room_id": "Z2B__teacherworkshop2_abolution",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "Teacher Workshop 2 Ablution",
+    "source_file": "GF_Z2B_TeacherWorkshop2_Abolution.jpg",
+    "photo": "photos/Z2B__teacherworkshop2_abolution.jpg",
+    "photo_count_in_room": 1
+  },
+  {
+    "room_id": "Z2B__teacherworkshop_abolution",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "Teacher Workshop Ablution",
+    "source_file": "GF_Z2B_TeacherWorkshop_Abolution.jpg",
+    "photo": "photos/Z2B__teacherworkshop_abolution.jpg",
+    "photo_count_in_room": 1
+  },
+  {
+    "room_id": "Z2B__vpoffice",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "VP Office",
+    "source_file": "GF_Z2B_VPOffice_2.jpg",
+    "photo": "photos/Z2B__vpoffice.jpg",
+    "photo_count_in_room": 2
+  },
+  {
+    "room_id": "Z2B__vpoffice2",
+    "zone": "Z2B",
+    "zone_label": "Zone 2B",
+    "room_label": "VP Office 2",
+    "source_file": "GF_Z2B_VPOffice2_1.jpg",
+    "photo": "photos/Z2B__vpoffice2.jpg",
+    "photo_count_in_room": 2
+  }
+]

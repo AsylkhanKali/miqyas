@@ -23,6 +23,7 @@ import {
   Loader2,
   Plug,
   Crosshair,
+  Camera,
 } from "lucide-react";
 import clsx from "clsx";
 import { format } from "date-fns";
@@ -123,6 +124,13 @@ export default function ProjectDetailPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              to={`/projects/${projectId}/site-diary`}
+              className="btn-ghost text-xs"
+            >
+              <Camera size={13} />
+              Site Diary
+            </Link>
             <Link
               to={`/projects/${projectId}/integrations`}
               className="btn-ghost text-xs"

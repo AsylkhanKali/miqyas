@@ -50,6 +50,7 @@ const CaptureDetailPage    = lazy(() => import("@/pages/CaptureDetailPage"));
 const DelayForecastPage    = lazy(() => import("@/pages/DelayForecastPage"));
 const IntegrationsPage     = lazy(() => import("@/pages/IntegrationsPage"));
 const AlFalahDiaryPage     = lazy(() => import("@/pages/AlFalahDiaryPage"));
+const SiteDiaryPage        = lazy(() => import("@/pages/SiteDiaryPage"));
 
 // Heavy 3D pages — Three.js only loads when these routes are visited
 const BIMViewerPage        = lazy(() => import("@/pages/BIMViewerPage"));
@@ -73,6 +74,8 @@ export const router = createBrowserRouter([
       { path: "/projects/:projectId/captures/:captureId",        element: <Lazy page={CaptureDetailPage} /> },
       { path: "/projects/:projectId/forecast",                   element: <Lazy page={DelayForecastPage} /> },
       { path: "/projects/:projectId/integrations",               element: <Lazy page={IntegrationsPage} /> },
+      { path: "/projects/:projectId/site-diary",                 element: <Lazy page={SiteDiaryPage} /> },
+      { path: "/site-diary/welcome-center",                      element: <Lazy page={SiteDiaryPage} /> },
       { path: "/site-diary/al-falah",                            element: <Lazy page={AlFalahDiaryPage} /> },
       { path: "/settings",                                       element: <Lazy page={SettingsPage} /> },
       { path: "/reports",                                        element: <Lazy page={ReportsPage} /> },

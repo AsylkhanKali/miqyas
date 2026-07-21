@@ -49,7 +49,8 @@ const ProgressOverviewPage = lazy(() => import("@/pages/ProgressOverviewPage"));
 const CaptureDetailPage    = lazy(() => import("@/pages/CaptureDetailPage"));
 const DelayForecastPage    = lazy(() => import("@/pages/DelayForecastPage"));
 const IntegrationsPage     = lazy(() => import("@/pages/IntegrationsPage"));
-const AlFalahDiaryPage     = lazy(() => import("@/pages/AlFalahDiaryPage"));
+const AlFalahDashboardPage = lazy(() => import("@/pages/AlFalahDashboardPage"));
+const AlFalahZonePage      = lazy(() => import("@/pages/AlFalahZonePage"));
 const SiteDiaryPage        = lazy(() => import("@/pages/SiteDiaryPage"));
 
 // Heavy 3D pages — Three.js only loads when these routes are visited
@@ -76,7 +77,8 @@ export const router = createBrowserRouter([
       { path: "/projects/:projectId/integrations",               element: <Lazy page={IntegrationsPage} /> },
       { path: "/projects/:projectId/site-diary",                 element: <Lazy page={SiteDiaryPage} /> },
       { path: "/site-diary/welcome-center",                      element: <Lazy page={SiteDiaryPage} /> },
-      { path: "/site-diary/al-falah",                            element: <Lazy page={AlFalahDiaryPage} /> },
+      { path: "/site-diary/al-falah",                            element: <Lazy page={AlFalahDashboardPage} /> },
+      { path: "/site-diary/al-falah/:zone",                      element: <Lazy page={AlFalahZonePage} /> },
       { path: "/settings",                                       element: <Lazy page={SettingsPage} /> },
       { path: "/reports",                                        element: <Lazy page={ReportsPage} /> },
       { path: "/schedule",                                       element: <Lazy page={ProjectsPage} /> },

@@ -66,7 +66,7 @@ const TOP_NAV: NavItem[] = [
     badge: "projects",
   },
   {
-    label: "Al Falah Z2 Walk",
+    label: "Al Falah Zone 2",
     icon: Footprints,
     path: () => "/site-diary/al-falah",
   },

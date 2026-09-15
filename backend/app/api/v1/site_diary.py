@@ -52,7 +52,7 @@ async def get_welcome_center_photo(filename: str):
     safe_name = Path(filename).name
     photo_path = _ASSETS_DIR / safe_name
 
-    if not photo_path.exists() or not photo_path.suffix.lower() in {".jpg", ".jpeg"}:
+    if not photo_path.exists() or photo_path.suffix.lower() not in {".jpg", ".jpeg"}:
         raise HTTPException(status_code=404, detail=f"Photo not found: {safe_name}")
 
     return FileResponse(

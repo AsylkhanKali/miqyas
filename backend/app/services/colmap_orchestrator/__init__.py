@@ -119,6 +119,7 @@ class COLMAPOrchestrator:
             await self._run_feature_extractor(workspace, images_dir, database_path, config)
             await self._run_feature_matcher(workspace, database_path, config)
             await self._run_mapper(workspace, database_path, images_dir, sparse_dir, config)
+            await self._convert_models_to_text(sparse_dir)
 
             # Parse results
             model_dir = self._find_best_model(sparse_dir)
@@ -337,6 +338,21 @@ class COLMAPOrchestrator:
             "--Mapper.ba_global_max_refinements", "3",
         ]
         await self._run_colmap_cmd(cmd, "mapper")
+
+    async def _convert_models_to_text(self, sparse_dir: Path) -> None:
+        """Export mapper output to the text format consumed by this service."""
+        model_dirs = sorted(path for path in sparse_dir.iterdir() if path.is_dir())
+        for model_dir in model_dirs:
+            if (model_dir / "images.txt").exists():
+                continue
+
+            cmd = [
+                "colmap", "model_converter",
+                "--input_path", str(model_dir),
+                "--output_path", str(model_dir),
+                "--output_type", "TXT",
+            ]
+            await self._run_colmap_cmd(cmd, f"model_converter ({model_dir.name})")
 
     def _find_best_model(self, sparse_dir: Path) -> Path | None:
         """Find the COLMAP model with most registered images."""

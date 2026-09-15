@@ -1,131 +1,169 @@
-# MIQYAS — AI-Powered Construction Progress Tracking
+# MIQYAS
 
-Платформа для автоматического мониторинга строительного прогресса: загружаешь видео с объекта, BIM-модель и расписание — система сравнивает реальное состояние с запланированным и выдаёт отчёты по отклонениям.
+**Research prototype for construction-progress monitoring from 360° video, BIM, and Primavera P6 schedules.**
 
-# Dashboard
-<img width="1496" height="850" alt="Screenshot 2026-04-26 at 13 34 52" src="https://github.com/user-attachments/assets/66c47324-588e-48d1-bb78-bcaf5f7e0efe" />
+MIQYAS connects a computer-vision pipeline to a full web application: it extracts video frames, estimates camera poses, segments construction scenes, renders the expected BIM state, and compares observed and expected masks. The application then links those observations to schedule activities and exposes progress and deviation information through an IFC-aware viewer.
 
-# Executive overview
-<img width="1496" height="848" alt="Screenshot 2026-04-26 at 13 35 37" src="https://github.com/user-attachments/assets/89a02bb2-56c6-4f28-9ea9-0545eb28823d" />
+> **Research status:** the repository contains an explicit deterministic demo mode and an implemented real CV path. A reproducible real-world benchmark is not yet published. Screenshots and product flows may use simulated data unless stated otherwise; no production-accuracy claim is made in this README.
 
-# BIM Viewer
-<img width="1496" height="851" alt="Screenshot 2026-04-17 at 19 38 35" src="https://github.com/user-attachments/assets/b93fcce5-c64b-4d86-99b0-a66c010a4c1e" />
+## Demo
 
+| Dashboard | Executive overview | BIM viewer |
+|---|---|---|
+| <img alt="MIQYAS dashboard" src="https://github.com/user-attachments/assets/66c47324-588e-48d1-bb78-bcaf5f7e0efe" /> | <img alt="MIQYAS executive overview" src="https://github.com/user-attachments/assets/89a02bb2-56c6-4f28-9ea9-0545eb28823d" /> | <img alt="MIQYAS BIM viewer" src="https://github.com/user-attachments/assets/b93fcce5-c64b-4d86-99b0-a66e-b447e1b9ed9a" /> |
 
-## Архитектура
+## System overview
 
+```mermaid
+flowchart LR
+    Video[360° site video] --> Frames[FFmpeg frame extraction]
+    Frames --> Poses[COLMAP camera poses]
+    Frames --> Seg[Mask2Former segmentation]
+    IFC[IFC / BIM model] --> Render[BIM expectation renderer]
+    Poses --> Render
+    Seg --> Compare[Per-element IoU comparison]
+    Render --> Compare
+    P6[Primavera P6 schedule] --> Progress[Progress and deviation engine]
+    Compare --> Progress
+    Progress --> API[FastAPI + Celery + PostgreSQL]
+    API --> UI[React + Three.js viewer]
 ```
+
+The pipeline is modular so that reconstruction, segmentation, rendering, and comparison failures can be inspected independently instead of being hidden behind a single aggregate score.
+
+## Implementation status
+
+| Component | Status | Notes |
+|---|---|---|
+| IFC ingestion and element extraction | Implemented | Uses IfcOpenShell; stores element geometry and metadata |
+| P6 XER/XML ingestion | Implemented | Parses activities, hierarchy, relationships, and schedule fields |
+| Video frame extraction | Implemented | FFmpeg-based frame and keyframe processing |
+| Camera reconstruction | Implemented integration | Runs COLMAP and exports mapper output to the text format consumed by the service; still requires site-specific BIM registration and validation |
+| Semantic segmentation | Implemented integration | Mask2Former through Hugging Face; requires the ML dependencies and suitable compute |
+| BIM expectation rendering | Implemented integration | Mesh rasterization with a bounding-box projection fallback |
+| Per-element comparison | Implemented | Binary-mask IoU, confidence aggregation, and schedule-linked progress items |
+| Demo mode | Implemented | Explicit `use_mock=true`; deterministic simulated masks/progress for UI and development |
+| Public real-world benchmark | Not yet published | Dataset protocol, held-out split, baselines, and failure analysis are planned |
+
+## Real and demo modes
+
+MIQYAS does not silently replace a failed real pipeline with simulated results.
+
+- **Real mode** is the default. It requires FFmpeg, the ML dependencies, and either COLMAP reconstruction or a validated manual alignment. A comparison that produces no progress items fails with a diagnostic error.
+- **Demo mode** must be enabled explicitly with `use_mock=true`. Simulated progress items are deterministic and labelled `[SIMULATED]` in generated narratives and relevant UI surfaces.
+- `GET /api/v1/system/capabilities` reports whether the current environment can run the real pipeline.
+
+## Repository structure
+
+```text
 miqyas/
-├── backend/          # FastAPI + Celery + PostgreSQL
+├── backend/
 │   ├── app/
-│   │   ├── api/v1/   # REST endpoints
-│   │   ├── core/     # Config, security, database, logging
-│   │   ├── models/   # SQLAlchemy ORM models
-│   │   ├── schemas/  # Pydantic request/response schemas
-│   │   ├── services/ # Business logic (IFC parser, P6 parser, storage, auto-linker)
-│   │   ├── tasks/    # Celery async tasks (video, pipeline, procore)
-│   │   └── utils/    # Shared helpers
-│   ├── migrations/   # Alembic migrations
-│   └── tests/        # Unit + integration tests
-├── frontend/         # React + TypeScript + Vite
-│   └── src/
-│       ├── pages/    # DashboardPage, ProjectDetailPage, etc.
-│       ├── components/
-│       └── services/ # API client (axios)
-├── docker/           # Docker Compose (dev + prod), Caddyfile, Prometheus
-├── scripts/          # Dev utilities, Procore validation
-└── docs/
+│   │   ├── api/v1/       # REST endpoints
+│   │   ├── core/         # configuration, database, security, logging
+│   │   ├── models/       # SQLAlchemy models
+│   │   ├── services/     # IFC, P6, CV, storage, reports, integrations
+│   │   └── tasks/        # Celery workflows
+│   ├── migrations/
+│   └── tests/
+├── frontend/             # React, TypeScript, Vite, Three.js
+├── docker/               # local and production containers
+├── docs/
+└── scripts/
 ```
 
-## Быстрый старт
+## Quick start
+
+### Prerequisites
+
+- Python 3.11+
+- Node.js 20+
+- PostgreSQL 15 and Redis 7
+- FFmpeg
+- COLMAP for automatic camera reconstruction
+- A CUDA-capable GPU is recommended for real segmentation
+
+### Start the application
 
 ```bash
-# 1. Скопировать окружение
 cp .env.example .env
 
-# 2. Поднять инфраструктуру (postgres + redis)
 docker compose -f docker/docker-compose.yml up -d postgres redis
 
-# 3. Бэкенд
 cd backend
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 alembic upgrade head
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
 
-# 4. Celery worker (отдельный терминал)
-celery -A app.tasks.worker worker -Q default,parsing,video --loglevel=info
+In a second terminal:
 
-# 5. Фронтенд (отдельный терминал)
+```bash
+cd backend
+source .venv/bin/activate
+celery -A app.tasks.worker worker -Q default,parsing,video,gpu --loglevel=info
+```
+
+In a third terminal:
+
+```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
-Открыть: http://localhost:5173
+Open `http://localhost:5173`.
 
-## Стек технологий
-
-| Слой | Технологии |
-|------|-----------|
-| **Backend API** | FastAPI, SQLAlchemy 2.0 async, Alembic |
-| **Task Queue** | Celery + Redis (queues: gpu, default, parsing, video) |
-| **Database** | PostgreSQL 15 |
-| **IFC Parsing** | IfcOpenShell |
-| **Schedule Parsing** | Custom P6 XER/XML parser |
-| **CV Pipeline** | FFmpeg + COLMAP + Mask2Former (HuggingFace) |
-| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, Three.js, recharts |
-| **Storage** | Local FS (dev) / S3 (prod) |
-| **Observability** | structlog, Prometheus + Grafana |
-| **Reverse Proxy** | Caddy (SSL auto) |
-| **Procore** | OAuth2 integration, bulk RFI/Issue push |
-
-## Основные возможности
-
-- 📁 **Загрузка IFC** — парсинг BIM-модели, извлечение элементов по категориям и уровням
-- 📅 **Расписание P6** — парсинг XER/XML, критический путь, плановые сроки
-- 🎥 **Видеозахват** — извлечение кадров через FFmpeg, COLMAP для 3D-реконструкции
-- 🤖 **CV Pipeline** — сегментация Mask2Former, IoU-сравнение с BIM, расчёт отклонений
-- 📊 **Investor Dashboard** — KPI-карты, donut chart отклонений, health score проектов
-- 📄 **Отчёты** — PDF с executive summary, deviation breakdown
-- 🔗 **Procore** — OAuth2, bulk push RFI/Issue с маппингом полей
-
-## CV Pipeline
-
-**Режим "real"** требует: PyTorch + HuggingFace transformers + FFmpeg.  
-COLMAP опционален (без него — только ручное выравнивание).
-
-Проверить состояние: `GET /api/v1/system/capabilities`
-
-**Режим "mock"** — детерминированные заглушки для dev/demo без GPU.
-
-## Production
+## Testing
 
 ```bash
-# Запуск полного стека (Caddy, Prometheus, Grafana, backup)
-make prod-up
+cd backend
+pytest tests/unit/ -v
+ruff check app/ tests/
 
-# Логи
-make logs-prod
-
-# Метрики Prometheus
-make metrics        # http://localhost:9090
-
-# Grafana
-make grafana        # http://localhost:3000
+cd ../frontend
+npm run build
 ```
 
-Переменные окружения: см. `.env.example`
+The GitHub Actions workflow runs backend linting/tests, the frontend build, and Docker builds on pull requests to `main`.
 
-## Тестирование
+## Evaluation contract
 
-```bash
-# Unit тесты
-cd backend && pytest tests/unit/ -v
+Any future performance result should report:
 
-# Проверка Procore конфига
-python scripts/check_procore.py
+1. the dataset, sites, cameras, and collection protocol;
+2. train/validation/test separation;
+3. whether each pipeline stage used real or simulated inputs;
+4. the exact metric—such as per-class IoU, element-presence precision/recall, or deviation-class macro F1;
+5. baselines and uncertainty across runs or sites; and
+6. failure cases caused by segmentation, camera/BIM alignment, occlusion, or schedule linkage.
 
-# API health
-curl http://localhost:8000/api/v1/health
-```
+This is intentionally stricter than reporting a single “accuracy” number: a progress-monitoring system can appear correct while one upstream stage is failing systematically.
+
+## Technology
+
+| Layer | Main tools |
+|---|---|
+| Computer vision | PyTorch, Mask2Former, OpenCV/Pillow, COLMAP, NumPy |
+| BIM and scheduling | IfcOpenShell, pyrender, trimesh, custom P6 XER/XML parser |
+| Backend | FastAPI, SQLAlchemy, Celery, Redis, PostgreSQL |
+| Frontend | React, TypeScript, Vite, Tailwind CSS, Three.js, Recharts |
+| Infrastructure | Docker, Caddy, Prometheus, Grafana, S3-compatible storage |
+
+## Security
+
+Never commit a local `.env` file. Copy `.env.example`, keep credentials outside Git, and use deployment-platform or repository secrets for production and CI. If a credential ever enters Git history, rotate it first and then purge the history. See [SECURITY.md](SECURITY.md).
+
+## Current research priorities
+
+- Validate the real pipeline on a documented multi-site split.
+- Add synthetic end-to-end fixtures for reconstruction, rendering, and IoU checks.
+- Calibrate confidence across segmentation and camera/BIM alignment failures.
+- Compare automatic COLMAP alignment with validated manual registration.
+- Report per-stage failure attribution rather than only final progress labels.
+
+## Author
+
+Built by [Asylkhan Kali](https://github.com/AsylkhanKali), a Computer Engineering student and AI & Computer Vision researcher at NYU Abu Dhabi.

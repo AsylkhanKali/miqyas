@@ -20,6 +20,9 @@ frontend/.env.local
 frontend/.env.production
 
 # ── General ───────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
 .DS_Store
 Thumbs.db
 *.log

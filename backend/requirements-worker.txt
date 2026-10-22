@@ -29,7 +29,7 @@ shapely==2.1.2
 
 # Report generation
 reportlab==4.2.5
-Pillow==11.1.0
+Pillow==13.0.0
 trimesh==4.11.5
 
 # Cloud Storage
